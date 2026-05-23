@@ -1,0 +1,1798 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pokémon Math Quest — Mrs. Rogers</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Fredoka+One&family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════
+   RESET & VARS
+═══════════════════════════════════════════ */
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --poke-yellow:#FFCB05;--poke-blue:#3B4CCA;--poke-red:#CC0000;
+  --poke-dark:#1a1a2e;--poke-darker:#0d0d1a;
+  --green:#2ed573;--red:#ff4757;--orange:#ffa502;
+  --sky:#74b9ff;--purple:#a29bfe;--pink:#fd79a8;--teal:#2dd4bf;
+  --white:#f8f8f8;--gold:#FFD700;
+  --body-font:'Nunito',sans-serif;
+  --pixel-font:'Press Start 2P',monospace;
+  --title-font:'Fredoka One',cursive;
+}
+body{font-family:var(--body-font);background:var(--poke-darker);color:var(--white);min-height:100vh;overflow-x:hidden}
+.screen{display:none;min-height:100vh;flex-direction:column;align-items:center}
+.screen.active{display:flex}
+button{cursor:pointer;font-family:var(--body-font)}
+.hidden{display:none!important}
+
+/* ═══════════════════════════════════════════
+   ANIMATIONS
+═══════════════════════════════════════════ */
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-16px)}}
+@keyframes popIn{0%{transform:scale(0) rotate(-10deg);opacity:0}70%{transform:scale(1.15)}100%{transform:scale(1);opacity:1}}
+@keyframes evolveFlash{0%,100%{opacity:0}10%,90%{opacity:1}50%{opacity:.7;filter:brightness(3)}}
+@keyframes hpDrain{from{width:var(--hp-from)}to{width:var(--hp-to)}}
+@keyframes slideUp{0%{transform:translateY(30px);opacity:0}100%{transform:translateY(0);opacity:1}}
+@keyframes twinkle{0%,100%{opacity:.3;transform:scale(1)}50%{opacity:1;transform:scale(1.4)}}
+@keyframes spin360{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+@keyframes heartbeat{0%,100%{transform:scale(1)}50%{transform:scale(1.2)}}
+@keyframes redFlash{0%{background:rgba(255,0,0,.5)}100%{background:transparent}}
+@keyframes zap{0%{opacity:0;transform:scale(.5)}30%{opacity:1;transform:scale(1.3)}60%{transform:scale(.9)}100%{opacity:1;transform:scale(1)}}
+@keyframes glow{0%,100%{box-shadow:0 0 8px var(--poke-yellow)}50%{box-shadow:0 0 25px var(--poke-yellow),0 0 50px rgba(255,203,5,.3)}}
+@keyframes numberPop{0%{transform:scale(.5);color:var(--green)}50%{transform:scale(1.3)}100%{transform:scale(1);color:var(--white)}}
+@keyframes wrongWiggle{0%,100%{transform:rotate(0)}25%{transform:rotate(-5deg)}75%{transform:rotate(5deg)}}
+@keyframes starSpin{0%{transform:rotate(0) scale(0);opacity:0}50%{transform:rotate(180deg) scale(1.3);opacity:1}100%{transform:rotate(360deg) scale(1);opacity:1}}
+
+/* ═══════════════════════════════════════════
+   PIXEL BUTTONS & BOXES
+═══════════════════════════════════════════ */
+.pxbtn{
+  font-family:var(--pixel-font);font-size:clamp(.55rem,1.4vw,.7rem);
+  padding:12px 22px;border:4px solid #000;
+  box-shadow:4px 4px 0 #000;letter-spacing:1px;
+  transition:transform .08s,box-shadow .08s;line-height:1.8;
+}
+.pxbtn:hover{transform:translate(-2px,-2px);box-shadow:6px 6px 0 #000}
+.pxbtn:active{transform:translate(2px,2px);box-shadow:1px 1px 0 #000}
+.pxbtn:disabled{opacity:.5;cursor:not-allowed;transform:none!important;box-shadow:4px 4px 0 #000!important}
+
+.battle-btn{
+  font-family:var(--body-font);font-size:clamp(1rem,2.5vw,1.3rem);font-weight:900;
+  padding:14px 18px;background:#fff;color:var(--poke-dark);
+  border:4px solid #000;box-shadow:4px 4px 0 #000;
+  transition:all .1s;text-align:center;line-height:1.4;
+}
+.battle-btn:hover{background:var(--poke-yellow);transform:translate(-2px,-2px);box-shadow:6px 6px 0 #000}
+.battle-btn:active{transform:translate(2px,2px);box-shadow:1px 1px 0 #000}
+.battle-btn.correct{background:#c8f5d0!important;border-color:var(--green)!important;color:#155724!important;animation:numberPop .4s ease}
+.battle-btn.wrong{background:#ffd6d6!important;border-color:var(--red)!important;color:#7a0000!important;animation:wrongWiggle .3s ease}
+.battle-btn:disabled{cursor:default}
+
+.pixel-box{border:4px solid #fff;box-shadow:4px 4px 0 #000}
+.pixel-box-gold{border:4px solid var(--gold);box-shadow:4px 4px 0 #000,0 0 20px rgba(255,215,0,.3)}
+
+/* ═══════════════════════════════════════════
+   TITLE SCREEN
+═══════════════════════════════════════════ */
+#title{
+  background:linear-gradient(180deg,#0d0d2e 0%,#1a1a5e 40%,#2d2d8e 100%);
+  justify-content:center;align-items:center;text-align:center;
+  gap:1.4rem;padding:2rem 1rem;position:relative;overflow:hidden;
+}
+#title::before{
+  content:'⭐';position:absolute;font-size:1.2rem;
+  top:10%;left:8%;animation:twinkle 2.1s ease-in-out infinite;
+}
+#title::after{
+  content:'✨';position:absolute;font-size:1rem;
+  top:15%;right:10%;animation:twinkle 1.7s ease-in-out infinite .5s;
+}
+.title-logo{
+  font-family:var(--pixel-font);font-size:clamp(1.2rem,4vw,2rem);
+  color:var(--poke-yellow);letter-spacing:3px;line-height:1.5;
+  text-shadow:4px 4px 0 #8b6914,0 0 40px rgba(255,203,5,.4);
+}
+.title-sub{
+  font-family:var(--title-font);font-size:clamp(1.2rem,3vw,1.8rem);
+  color:var(--purple);letter-spacing:2px;
+}
+.title-hero{font-size:6rem;animation:float 3s ease-in-out infinite;filter:drop-shadow(0 6px 12px rgba(255,203,5,.4))}
+.title-desc{
+  font-size:clamp(1rem,2.5vw,1.2rem);font-weight:700;
+  color:rgba(255,255,255,.7);max-width:420px;line-height:1.8;
+  font-family:var(--body-font);
+}
+.title-start{
+  background:var(--poke-yellow);color:var(--poke-dark);font-size:clamp(1rem,2.5vw,1.3rem);
+  font-family:var(--title-font);padding:14px 32px;border:4px solid #000;
+  box-shadow:5px 5px 0 #000;letter-spacing:2px;transition:all .1s;
+}
+.title-start:hover{transform:translate(-2px,-2px);box-shadow:7px 7px 0 #000}
+.blink{animation:blink 1.2s step-end infinite;font-family:var(--pixel-font);font-size:clamp(.5rem,1.2vw,.65rem);letter-spacing:2px}
+
+/* ═══════════════════════════════════════════
+   POKÉDEX / TEAM SCREEN
+═══════════════════════════════════════════ */
+#pokedex{
+  background:linear-gradient(135deg,#1a0a00,#3d1a00,#5a2800);
+  padding:1.5rem 1rem 3rem;gap:1.2rem;overflow-y:auto;
+}
+.pdx-title{
+  font-family:var(--pixel-font);font-size:clamp(.7rem,2vw,1rem);
+  color:var(--poke-yellow);text-shadow:3px 3px 0 #000;letter-spacing:3px;text-align:center;
+  padding-top:.5rem;
+}
+.pdx-sub{font-size:1rem;color:rgba(255,255,255,.5);text-align:center;letter-spacing:1px}
+.pdx-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;max-width:700px;width:100%}
+@media(max-width:560px){.pdx-grid{grid-template-columns:repeat(2,1fr)}}
+.pdx-card{
+  background:#1a1a4e;border:4px solid #333;border-radius:0;
+  padding:12px 8px;text-align:center;
+  display:flex;flex-direction:column;align-items:center;gap:5px;
+  box-shadow:4px 4px 0 #000;min-height:100px;justify-content:center;
+  position:relative;transition:transform .1s,box-shadow .1s;
+}
+.pdx-card.unlocked{border-color:var(--poke-yellow);cursor:pointer;animation:glow 2.5s ease-in-out infinite}
+.pdx-card.unlocked:hover{transform:translate(-2px,-2px);box-shadow:6px 6px 0 #000}
+.pdx-card.locked{opacity:.4;filter:grayscale(.9)}
+.pdx-emo{font-size:2.4rem}
+.pdx-name{font-family:var(--pixel-font);font-size:clamp(.38rem,.9vw,.52rem);color:var(--white);letter-spacing:.5px;line-height:1.5}
+.pdx-star{font-size:.95rem;min-height:1.1rem}
+.pdx-zone{position:absolute;top:4px;left:6px;font-family:var(--pixel-font);font-size:.35rem;color:rgba(255,255,255,.4)}
+.pdx-stars-total{font-family:var(--pixel-font);font-size:clamp(.48rem,1.2vw,.62rem);color:var(--poke-yellow);text-align:center;letter-spacing:1px}
+
+/* ═══════════════════════════════════════════
+   BATTLE HUD
+═══════════════════════════════════════════ */
+#game{min-height:100vh;overflow-y:auto;overflow-x:hidden}
+.battle-hud{
+  background:rgba(0,0,0,.7);border-bottom:4px solid rgba(255,255,255,.12);
+  padding:8px 14px;display:flex;align-items:center;
+  gap:10px;flex-wrap:wrap;position:sticky;top:0;z-index:100;
+}
+.hud-poke{font-size:1.8rem;flex-shrink:0}
+.hud-info{display:flex;flex-direction:column;gap:3px;flex:1;min-width:0}
+.hud-name{font-family:var(--pixel-font);font-size:clamp(.38rem,1vw,.52rem);color:var(--poke-yellow);letter-spacing:1px;white-space:nowrap}
+.hud-hp-row{display:flex;align-items:center;gap:6px}
+.hp-label{font-family:var(--pixel-font);font-size:.4rem;color:rgba(255,255,255,.6);letter-spacing:1px;white-space:nowrap}
+.hp-bar-bg{flex:1;height:10px;background:rgba(255,255,255,.15);border:2px solid rgba(255,255,255,.2);max-width:140px}
+.hp-bar-fill{height:100%;background:var(--green);transition:width .5s ease}
+.hp-bar-fill.warning{background:var(--orange)}
+.hp-bar-fill.danger{background:var(--red);animation:heartbeat .5s ease-in-out infinite}
+.hud-zone-name{font-family:var(--pixel-font);font-size:clamp(.35rem,.9vw,.48rem);color:var(--sky);letter-spacing:1px;text-align:right}
+.hud-q{font-family:var(--pixel-font);font-size:clamp(.35rem,.9vw,.48rem);color:rgba(255,255,255,.5);letter-spacing:1px;text-align:right}
+
+/* ═══════════════════════════════════════════
+   GAME AREA
+═══════════════════════════════════════════ */
+.gbg{flex:1;display:flex;flex-direction:column;align-items:center;padding:16px;gap:14px;width:100%;padding-bottom:80px}
+.prog-wrap{width:100%;max-width:680px;background:rgba(255,255,255,.1);border:3px solid rgba(255,255,255,.2);height:14px}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--green),var(--poke-yellow));transition:width .4s}
+
+/* Question box - Pokémon battle dialog style */
+.battle-dialog{
+  width:100%;max-width:680px;
+  background:#f8f4e8;color:var(--poke-dark);
+  border:6px solid #2a2a2a;box-shadow:6px 6px 0 #000;
+  padding:20px 24px;
+  position:relative;
+}
+.battle-dialog::before{
+  content:'';position:absolute;top:4px;left:4px;right:4px;bottom:4px;
+  border:2px solid rgba(0,0,0,.15);pointer-events:none;
+}
+.battle-question{
+  font-size:clamp(1.1rem,2.8vw,1.5rem);font-weight:900;
+  color:#1a1a2e;line-height:1.6;text-align:center;
+  font-family:var(--body-font);
+}
+.battle-label{
+  font-family:var(--pixel-font);font-size:clamp(.42rem,1.1vw,.58rem);
+  color:var(--poke-blue);letter-spacing:2px;margin-bottom:8px;text-align:center;display:block;
+}
+
+/* Answer grid - styled like Pokémon battle menu */
+.ans-grid-4{display:grid;grid-template-columns:1fr 1fr;gap:8px;max-width:680px;width:100%}
+.ans-grid-2{display:grid;grid-template-columns:1fr;gap:8px;max-width:680px;width:100%}
+.ans-grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;max-width:680px;width:100%}
+@media(max-width:420px){.ans-grid-3{grid-template-columns:1fr 1fr}}
+
+/* Number pad */
+.numpad{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;max-width:480px;width:100%}
+.numpad-btn{
+  font-family:var(--body-font);font-size:clamp(1.1rem,3vw,1.5rem);font-weight:900;
+  padding:14px 8px;background:#1a1a4e;border:4px solid #4a4a8a;color:var(--white);
+  box-shadow:3px 3px 0 #000;transition:all .1s;text-align:center;
+}
+.numpad-btn:hover{background:#2a2a7e;border-color:var(--sky);transform:translate(-1px,-1px);box-shadow:4px 4px 0 #000}
+.numpad-btn:active{transform:translate(1px,1px);box-shadow:1px 1px 0 #000}
+.numpad-btn.backspace{background:#3d1a1a;border-color:var(--red);color:var(--red)}
+.numpad-btn.enter{background:#0d3d1a;border-color:var(--green);color:var(--green);grid-column:span 2}
+.answer-display{
+  font-family:var(--body-font);font-size:clamp(2rem,6vw,3.5rem);font-weight:900;
+  min-width:140px;text-align:center;
+  background:#fff;color:#1a1a2e;
+  border:4px solid #000;box-shadow:4px 4px 0 #000;padding:10px 20px;
+  min-height:70px;display:flex;align-items:center;justify-content:center;
+  letter-spacing:4px;
+}
+.answer-display.correct-ans{background:#c8f5d0;border-color:var(--green);animation:popIn .4s}
+.answer-display.wrong-ans{background:#ffd6d6;border-color:var(--red);animation:shake .35s}
+
+/* Feedback */
+.fb-text{font-size:clamp(1rem,2.5vw,1.3rem);font-weight:900;text-align:center;letter-spacing:1px;min-height:1.6rem;font-family:var(--body-font)}
+.fb-text.good{color:var(--green)}.fb-text.bad{color:var(--red)}
+
+/* ═══════════════════════════════════════════
+   SHAPE GAME
+═══════════════════════════════════════════ */
+.shape-display{
+  width:160px;height:160px;display:flex;align-items:center;justify-content:center;
+  background:rgba(255,255,255,.08);border:4px solid rgba(255,255,255,.2);
+  box-shadow:4px 4px 0 #000;
+}
+.shape-svg{width:130px;height:130px}
+
+/* ═══════════════════════════════════════════
+   VERTICAL MATH (regrouping/borrowing)
+═══════════════════════════════════════════ */
+.vertical-math{
+  background:#f8f4e8;color:#1a1a2e;
+  border:6px solid #2a2a2a;box-shadow:6px 6px 0 #000;
+  padding:20px 28px;font-family:var(--body-font);
+  font-size:clamp(1.8rem,5vw,3rem);font-weight:900;
+  text-align:right;min-width:200px;
+  display:flex;flex-direction:column;align-items:flex-end;gap:4px;
+}
+.vert-top{color:#1a1a2e}
+.vert-op{color:var(--poke-blue);padding-right:4px;font-size:clamp(1.4rem,4vw,2.2rem)}
+.vert-bottom{color:#1a1a2e;padding-top:4px;border-top:4px solid #1a1a2e}
+.vert-answer-row{display:flex;gap:4px;align-items:center;padding-top:6px}
+.vert-blank{
+  font-size:clamp(1.8rem,5vw,3rem);font-weight:900;
+  min-width:60px;border-bottom:4px solid var(--poke-blue);
+  text-align:center;color:var(--poke-blue);background:rgba(59,76,202,.1);
+  padding:2px 8px;
+}
+.carry-box{
+  font-size:clamp(.8rem,2vw,1rem);color:var(--poke-red);
+  font-weight:900;align-self:flex-start;
+  background:rgba(204,0,0,.1);border:2px solid rgba(204,0,0,.3);
+  padding:2px 6px;margin-bottom:-4px;
+}
+
+/* ═══════════════════════════════════════════
+   SEQUENCE FILL
+═══════════════════════════════════════════ */
+.sequence-row{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;align-items:center;max-width:680px}
+.seq-box{
+  font-family:var(--body-font);font-size:clamp(1.1rem,3vw,1.5rem);font-weight:900;
+  min-width:56px;padding:10px 8px;text-align:center;
+  background:#1a1a4e;border:4px solid #4a4a8a;color:var(--white);
+  box-shadow:3px 3px 0 #000;
+}
+.seq-box.blank{background:rgba(255,203,5,.1);border:4px dashed var(--poke-yellow);color:var(--poke-yellow)}
+.seq-box.correct{background:#0d3d1a;border-color:var(--green);color:var(--green);animation:popIn .3s}
+.seq-box.wrong{background:#3d0d0d;border-color:var(--red);animation:shake .3s}
+
+/* ═══════════════════════════════════════════
+   PLACE VALUE
+═══════════════════════════════════════════ */
+.place-val-box{
+  display:flex;gap:10px;flex-wrap:wrap;justify-content:center;align-items:flex-end;max-width:680px;
+}
+.pv-column{display:flex;flex-direction:column;align-items:center;gap:4px}
+.pv-label{font-family:var(--pixel-font);font-size:clamp(.38rem,.9vw,.52rem);color:var(--sky);letter-spacing:1px}
+.pv-value{
+  font-family:var(--body-font);font-size:clamp(2rem,5vw,3rem);font-weight:900;
+  background:#f8f4e8;color:#1a1a2e;
+  border:4px solid #000;box-shadow:3px 3px 0 #000;
+  padding:8px 16px;min-width:70px;text-align:center;
+}
+.pv-value.h{background:#ffd6e8;border-color:var(--pink)}
+.pv-value.t{background:#d6e8ff;border-color:var(--sky)}
+.pv-value.o{background:#d6ffe8;border-color:var(--green)}
+.pv-separator{font-family:var(--body-font);font-size:2rem;font-weight:900;color:rgba(255,255,255,.3);padding-bottom:12px}
+
+/* ═══════════════════════════════════════════
+   EVOLUTION / GAME OVER / ZONE COMPLETE
+═══════════════════════════════════════════ */
+.overlay{position:fixed;inset:0;z-index:800;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.5rem;text-align:center;padding:2rem}
+#evolveScreen{background:radial-gradient(ellipse at center,#1a1a6e,#000 80%)}
+#zoneOver{background:radial-gradient(ellipse at center,#0d2d0d,#000 80%)}
+#gameOver{background:radial-gradient(ellipse at center,#2d0000,#000 80%)}
+
+.evo-poke-before{font-size:5rem;animation:bounce 1s ease-in-out 3}
+.evo-poke-after{font-size:7rem;opacity:0;transition:opacity .5s;filter:drop-shadow(0 0 30px var(--poke-yellow))}
+.evo-poke-after.show{opacity:1;animation:popIn .7s cubic-bezier(.34,1.56,.64,1)}
+.evo-flash{
+  position:absolute;inset:0;background:white;
+  animation:evolveFlash 1s ease-in-out forwards;pointer-events:none;
+}
+.evo-title{
+  font-family:var(--pixel-font);font-size:clamp(.8rem,2.5vw,1.3rem);
+  color:var(--poke-yellow);text-shadow:4px 4px 0 #8b6914;letter-spacing:3px;
+}
+.evo-name{
+  font-family:var(--title-font);font-size:clamp(2rem,5vw,3rem);
+  color:var(--white);text-shadow:3px 3px 0 #000;letter-spacing:2px;
+}
+.evo-type{font-size:clamp(.9rem,2.2vw,1.2rem);font-weight:800;color:var(--sky);letter-spacing:2px}
+.evo-stats{
+  background:rgba(255,255,255,.08);border:3px solid rgba(255,255,255,.2);
+  padding:14px 24px;font-size:clamp(.9rem,2.2vw,1.1rem);font-weight:800;line-height:2.2;color:var(--white);
+}
+.zo-star{font-size:5rem;animation:starSpin .8s cubic-bezier(.34,1.56,.64,1) forwards}
+.zo-title{font-family:var(--pixel-font);font-size:clamp(.8rem,2.5vw,1.3rem);color:var(--poke-yellow);text-shadow:3px 3px 0 #8b6914;letter-spacing:2px}
+.zo-score{font-size:clamp(1rem,2.5vw,1.3rem);font-weight:800;color:var(--white)}
+.go-skull{font-size:5rem;animation:shake .5s ease-in-out 3;filter:drop-shadow(0 0 20px rgba(255,50,50,.6))}
+.go-title{font-family:var(--pixel-font);font-size:clamp(.8rem,2.5vw,1.2rem);color:var(--red);text-shadow:4px 4px 0 #8b0000;letter-spacing:2px}
+.go-sub{font-size:clamp(.9rem,2.2vw,1.1rem);font-weight:800;color:rgba(255,255,255,.7);line-height:1.8}
+
+/* ═══════════════════════════════════════════
+   BG THEMES
+═══════════════════════════════════════════ */
+.bg-grass{background:linear-gradient(180deg,#0a2e0a,#1a5c1a 30%,#2d8a2d 65%,#1a4a1a)}
+.bg-fire{background:linear-gradient(180deg,#1a0000,#3d0a00 30%,#8b1a00 60%,#cc3300 85%)}
+.bg-water{background:linear-gradient(180deg,#001833,#003366 30%,#0055aa 60%,#0077cc)}
+.bg-electric{background:linear-gradient(180deg,#1a1a00,#3d3d00 30%,#6e6e00 60%,#aaaa00)}
+.bg-psychic{background:linear-gradient(180deg,#1a0030,#2d0050 30%,#4a0080 60%,#6a00b0)}
+.bg-ice{background:linear-gradient(180deg,#001833,#003355 30%,#005577 60%,#008899)}
+.bg-fighting{background:linear-gradient(180deg,#2d0a00,#5a1500 30%,#8b2200 60%,#aa3300)}
+.bg-ground{background:linear-gradient(180deg,#2d1b00,#5a3a00 30%,#8b6914 60%,#b8860b)}
+.bg-normal{background:linear-gradient(180deg,#1a1a2e,#2d2d4e 30%,#1a3d3d 60%,#0d2d2d)}
+
+/* game over flash */
+.red-flash{position:fixed;inset:0;pointer-events:none;z-index:900;background:rgba(255,0,0,.5);animation:redFlash .4s ease-out forwards}
+
+/* FINAL SCREEN */
+#finalScreen{background:radial-gradient(ellipse at center,#1a1a6e 0%,#000 80%);overflow-y:auto}
+.final-title{font-family:var(--pixel-font);font-size:clamp(.9rem,2.5vw,1.4rem);color:var(--poke-yellow);text-shadow:4px 4px 0 #8b6914;letter-spacing:3px;text-align:center}
+.final-team{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;max-width:600px}
+.final-poke{font-size:3rem;background:rgba(255,255,255,.08);border:3px solid var(--poke-yellow);padding:12px;box-shadow:3px 3px 0 #000;animation:bounce 2s ease-in-out infinite}
+.final-poke:nth-child(2){animation-delay:.2s}.final-poke:nth-child(3){animation-delay:.4s}
+.final-poke:nth-child(4){animation-delay:.6s}.final-poke:nth-child(5){animation-delay:.8s}
+.final-poke:nth-child(6){animation-delay:1s}.final-poke:nth-child(7){animation-delay:1.2s}
+.final-poke:nth-child(8){animation-delay:1.4s}.final-poke:nth-child(9){animation-delay:1.6s}
+
+/* ─── STREAK MOVE BADGE ─────────────────────────────────────── */
+.move-badge {
+  display:inline-flex;align-items:center;gap:5px;
+  background:rgba(255,203,5,.15);border:2px solid var(--poke-yellow);
+  padding:3px 9px;font-family:var(--pixel-font);
+  font-size:clamp(.32rem,.75vw,.42rem);color:var(--poke-yellow);
+  letter-spacing:1px;animation:movePop .4s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes movePop{0%{transform:scale(0);opacity:0}70%{transform:scale(1.2)}100%{transform:scale(1);opacity:1}}
+.move-badge.hyper{background:rgba(255,71,87,.2);border-color:var(--red);color:var(--red);animation:movePop .4s cubic-bezier(.34,1.56,.64,1),glow 1s ease-in-out infinite}
+.streak-flash{
+  position:fixed;top:60px;left:50%;transform:translateX(-50%);
+  background:var(--poke-yellow);color:#1a1a2e;
+  font-family:var(--pixel-font);font-size:clamp(.55rem,1.4vw,.72rem);
+  padding:10px 22px;border:4px solid #000;box-shadow:4px 4px 0 #000;
+  z-index:500;letter-spacing:2px;white-space:nowrap;
+  animation:streakAnim .6s cubic-bezier(.34,1.56,.64,1) forwards;
+}
+@keyframes streakAnim{0%{transform:translateX(-50%) translateY(-30px) scale(.7);opacity:0}50%{transform:translateX(-50%) translateY(0) scale(1.1);opacity:1}80%{transform:translateX(-50%) translateY(0) scale(1);opacity:1}100%{transform:translateX(-50%) translateY(-10px) scale(.9);opacity:0}}
+.hud-move{font-family:var(--pixel-font);font-size:clamp(.3rem,.7vw,.4rem);letter-spacing:1px;color:var(--poke-yellow);margin-top:2px}
+
+/* ─── WILD ENCOUNTER SCREEN ─────────────────────────────────── */
+#wildScreen{
+  position:fixed;inset:0;z-index:850;
+  background:radial-gradient(ellipse at center,#0a2e0a 0%,#000 80%);
+  display:flex;flex-direction:column;align-items:center;justify-content:flex-start;
+  padding:0 1rem 2rem;overflow-y:auto;
+}
+.wild-header{
+  width:100%;background:rgba(0,0,0,.5);
+  border-bottom:4px solid rgba(255,255,255,.1);
+  padding:10px 16px;display:flex;align-items:center;gap:12px;
+  position:sticky;top:0;z-index:10;
+}
+.wild-enemy-area{
+  display:flex;flex-direction:column;align-items:center;gap:8px;
+  padding:20px 0 10px;width:100%;
+}
+.wild-poke-sprite{font-size:6rem;animation:wildBob 1.5s ease-in-out infinite}
+@keyframes wildBob{0%,100%{transform:translateY(0) scaleX(1)}50%{transform:translateY(-8px) scaleX(-1)}}
+.wild-name{font-family:var(--pixel-font);font-size:clamp(.6rem,1.6vw,.8rem);color:var(--white);letter-spacing:2px}
+.enemy-hp-wrap{width:100%;max-width:340px}
+.enemy-hp-label{font-family:var(--pixel-font);font-size:.42rem;color:rgba(255,255,255,.6);letter-spacing:1px;margin-bottom:4px}
+.enemy-hp-bg{height:14px;background:rgba(255,255,255,.15);border:3px solid rgba(255,255,255,.3)}
+.enemy-hp-fill{height:100%;background:var(--green);transition:width .6s ease}
+.enemy-hp-fill.warn{background:var(--orange)}
+.enemy-hp-fill.crit{background:var(--red)}
+.wild-battle-dialog{
+  width:100%;max-width:620px;
+  background:#f8f4e8;color:#1a1a2e;
+  border:6px solid #2a2a2a;box-shadow:6px 6px 0 #000;
+  padding:18px 22px;margin-top:8px;
+}
+.wild-q{font-size:clamp(1.1rem,2.8vw,1.4rem);font-weight:900;color:#1a1a2e;line-height:1.6;text-align:center;font-family:var(--body-font)}
+.wild-timer-bar{width:100%;max-width:620px;height:10px;background:rgba(255,255,255,.1);border:2px solid rgba(255,255,255,.2)}
+.wild-timer-fill{height:100%;background:var(--sky);transition:width .1s linear}
+.wild-timer-fill.hurry{background:var(--orange)}
+.wild-timer-fill.urgent{background:var(--red);animation:heartbeat .3s ease-in-out infinite}
+.damage-flash{position:absolute;inset:0;background:rgba(255,255,255,.7);pointer-events:none;animation:dmgFlash .25s ease-out forwards}
+@keyframes dmgFlash{0%{opacity:.7}100%{opacity:0}}
+.wild-result{
+  text-align:center;display:flex;flex-direction:column;align-items:center;gap:1rem;
+  padding:1.5rem 0;
+}
+.catch-shake{animation:catchShake 0.4s ease-in-out 3}
+@keyframes catchShake{0%,100%{transform:rotate(0)}25%{transform:rotate(-8deg)}75%{transform:rotate(8deg)}}
+.pokeball-anim{font-size:4rem;animation:pokeballSpin 1.5s ease-in-out}
+@keyframes pokeballSpin{0%{transform:rotate(0) scale(1)}30%{transform:rotate(360deg) scale(1.3)}60%{transform:rotate(360deg) scale(.9)}100%{transform:rotate(360deg) scale(1)}}
+
+/* ─── PC BOX SCREEN ─────────────────────────────────────────── */
+#pcBox{
+  background:linear-gradient(180deg,#0a0a2e 0%,#1a1a4e 50%,#0a0a2e 100%);
+  padding:1rem 1rem 3rem;overflow-y:auto;align-items:center;gap:1rem;
+}
+.pcbox-title{font-family:var(--pixel-font);font-size:clamp(.7rem,2vw,.95rem);color:var(--poke-yellow);text-shadow:3px 3px 0 #000;letter-spacing:3px;text-align:center;padding-top:.5rem}
+.pc-tabs{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
+.pc-tab{
+  font-family:var(--pixel-font);font-size:clamp(.38rem,.9vw,.5rem);
+  padding:8px 14px;background:#1a1a4e;border:3px solid #333;
+  color:rgba(255,255,255,.5);letter-spacing:1px;transition:all .1s;
+}
+.pc-tab.active{background:var(--poke-blue);border-color:var(--poke-yellow);color:var(--white)}
+.pc-tab:hover:not(.active){background:#2a2a6e;border-color:#555}
+.pc-cards-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;max-width:780px;width:100%}
+@media(max-width:580px){.pc-cards-grid{grid-template-columns:repeat(2,1fr)}}
+.pc-card{
+  background:#0d0d2e;border:3px solid #333;
+  padding:12px 10px;display:flex;flex-direction:column;align-items:center;gap:6px;
+  box-shadow:4px 4px 0 #000;transition:transform .1s,box-shadow .1s;cursor:pointer;
+}
+.pc-card:hover{transform:translate(-2px,-2px);box-shadow:6px 6px 0 #000;border-color:var(--poke-yellow)}
+.pc-card.main-poke{border-color:var(--poke-yellow);background:#1a1a3e}
+.pc-card.wild-poke{border-color:var(--green)}
+.pc-card-emo{font-size:2.5rem}
+.pc-card-name{font-family:var(--pixel-font);font-size:clamp(.35rem,.85vw,.48rem);color:var(--white);letter-spacing:.5px;text-align:center;line-height:1.5}
+.pc-card-type{font-size:.9rem;font-weight:800;color:var(--sky);font-family:var(--body-font)}
+.pc-stat-bars{width:100%;display:flex;flex-direction:column;gap:3px;margin-top:4px}
+.pc-stat-row{display:flex;align-items:center;gap:5px}
+.pc-stat-lbl{font-family:var(--body-font);font-size:.75rem;font-weight:900;color:rgba(255,255,255,.6);letter-spacing:.5px;min-width:28px}
+.pc-stat-bg{flex:1;height:10px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15)}
+.pc-stat-fill{height:100%;transition:width .5s;border-radius:0}
+.pc-stat-val{font-family:var(--body-font);font-size:.75rem;font-weight:900;color:rgba(255,255,255,.5);min-width:22px;text-align:right}
+.pc-power{font-family:var(--body-font);font-size:.85rem;font-weight:900;color:var(--poke-yellow);margin-top:4px}
+.pc-wild-tag{font-family:var(--body-font);font-size:.75rem;font-weight:800;color:var(--green)}
+.pc-total-power{
+  background:#0d0d2e;border:4px solid var(--poke-yellow);
+  padding:14px 24px;text-align:center;box-shadow:4px 4px 0 #000;max-width:400px;width:100%;
+}
+.pc-total-num{font-family:var(--pixel-font);font-size:clamp(.8rem,2.5vw,1.2rem);color:var(--poke-yellow);letter-spacing:2px}
+.pc-total-lbl{font-size:.9rem;font-weight:800;color:rgba(255,255,255,.5);margin-top:4px;font-family:var(--body-font)}
+
+/* ─── MAP BUTTONS ────────────────────────────────────────────── */
+.map-nav{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin:.3rem 0}
+.map-nav-btn{
+  font-family:var(--pixel-font);font-size:clamp(.38rem,.9vw,.5rem);
+  padding:8px 14px;background:#1a1a4e;border:3px solid #4a4a8a;
+  color:var(--white);box-shadow:3px 3px 0 #000;letter-spacing:1px;transition:all .1s;
+}
+.map-nav-btn:hover{transform:translate(-1px,-1px);box-shadow:4px 4px 0 #000;border-color:var(--poke-yellow)}
+
+</style>
+</head>
+<body>
+
+<!-- TITLE -->
+<div id="title" class="screen active">
+  <div class="title-logo">POKÉMON<br>MATH QUEST</div>
+  <div class="title-sub">⚡ Grade 2 Adventure ⚡</div>
+  <div class="title-hero">🥚</div>
+  <div class="title-desc">Start with an egg — answer math questions — EVOLVE your Pokémon team!</div>
+  <button class="title-start" onclick="startGame()">▶ START ADVENTURE!</button>
+  <div class="blink" style="color:var(--white);margin-top:.5rem">PRESS START!</div>
+</div>
+
+<!-- POKÉDEX / ZONE SELECT -->
+<div id="pokedex" class="screen">
+  <div class="pdx-title">🗺️ POKÉMON MATH QUEST</div>
+  <div class="pdx-stars-total" id="pdxTotal">BADGES: 0 / 9</div>
+  <div class="map-nav">
+    <button class="map-nav-btn" onclick="showScreen('pcBox');buildPCBox()">💾 PC BOX</button>
+    <button class="map-nav-btn" style="border-color:var(--red);color:var(--red)" onclick="confirmReset()">↺ RESET</button>
+  </div>
+  <div class="pdx-sub" id="pdxSub">Choose a zone to battle!</div>
+  <div class="pdx-grid" id="pdxGrid"></div>
+</div>
+
+<!-- GAME -->
+<div id="game" class="screen">
+  <div class="battle-hud">
+    <div class="hud-poke" id="hudPoke">🥚</div>
+    <div class="hud-info">
+      <div class="hud-name" id="hudName">EGG</div>
+      <div class="hud-hp-row">
+        <span class="hp-label">HP</span>
+        <div class="hp-bar-bg"><div class="hp-bar-fill" id="hpFill" style="width:100%"></div></div>
+        <span class="hp-label" id="hpText">3/3</span>
+      </div>
+      <div class="hud-move" id="hudMoveEl"></div>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:3px">
+      <div class="hud-zone-name" id="hudZone">ZONE 1</div>
+      <div class="hud-q" id="hudQ">Q: 1/8</div>
+    </div>
+  </div>
+  <div class="gbg" id="gbg">
+    <div class="prog-wrap"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
+    <div id="gameArea" style="width:100%;max-width:680px;display:flex;flex-direction:column;align-items:center;gap:12px"></div>
+  </div>
+</div>
+
+<!-- EVOLUTION SCREEN -->
+<div id="evolveScreen" class="overlay hidden">
+  <div class="evo-flash" id="evoFlash" style="display:none"></div>
+  <div class="evo-poke-before" id="evoBefore">🥚</div>
+  <div class="evo-title">✨ LEVEL UP! EVOLVING! ✨</div>
+  <div class="evo-poke-after" id="evoAfter">⚡</div>
+  <div class="evo-name" id="evoName">PIKACHU</div>
+  <div class="evo-type" id="evoType">TYPE: ELECTRIC</div>
+  <div class="evo-stats" id="evoStats">ATK +15 ⬆  DEF +10 ⬆  SPD +20 ⬆</div>
+  <button class="pxbtn" style="background:var(--poke-yellow);color:#000;font-size:clamp(.6rem,1.5vw,.75rem)" id="evoContinueBtn" onclick="afterEvolve()">CONTINUE ▶</button>
+</div>
+
+<!-- ZONE COMPLETE (no evolution) -->
+<div id="zoneOver" class="overlay hidden">
+  <div class="zo-star">⭐</div>
+  <div class="zo-title" id="zoTitle">ZONE CLEAR!</div>
+  <div class="zo-score" id="zoScore">YOU GOT 8/8!</div>
+  <div style="font-size:1rem;font-weight:800;color:rgba(255,255,255,.5)" id="zoSub">A BADGE HAS BEEN EARNED!</div>
+  <button class="pxbtn" style="background:var(--poke-yellow);color:#000;font-size:clamp(.55rem,1.4vw,.7rem)" onclick="afterZone()">BACK TO MAP ▶</button>
+  <button class="pxbtn" style="background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.3);color:#fff;font-size:clamp(.5rem,1.2vw,.62rem)" onclick="retryZone()">↺ TRY AGAIN</button>
+</div>
+
+<!-- GAME OVER -->
+<div id="gameOver" class="overlay hidden">
+  <div class="go-skull">💀</div>
+  <div class="go-title">YOUR POKÉMON FAINTED!</div>
+  <div class="go-sub" id="goSub">You ran out of HP!<br>Try again with new questions!</div>
+  <button class="pxbtn" style="background:var(--red);color:#fff;font-size:clamp(.55rem,1.4vw,.7rem)" onclick="retryZone()">▶ TRY AGAIN!</button>
+  <button class="pxbtn" style="background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.3);color:#fff;font-size:clamp(.5rem,1.2vw,.62rem)" onclick="goToMap()">MAP ▶</button>
+</div>
+
+<!-- FINAL SCREEN -->
+<div id="finalScreen" class="screen">
+  <div style="display:flex;flex-direction:column;align-items:center;gap:1.5rem;padding:2rem 1rem;width:100%">
+    <div class="final-title">🏆 YOU COMPLETED POKÉMON MATH QUEST! 🏆</div>
+    <div style="font-size:5rem;animation:spin360 2s ease-in-out 1">🏆</div>
+    <div style="font-family:var(--title-font);font-size:clamp(1.5rem,4vw,2.5rem);color:var(--gold)">YOUR FULL TEAM:</div>
+    <div class="final-team" id="finalTeam"></div>
+    <div style="font-size:1.1rem;font-weight:800;color:rgba(255,255,255,.7);text-align:center;max-width:480px;line-height:1.8">You mastered all 9 Math Zones!<br>You are a TRUE Pokémon Math Champion!</div>
+    <button class="pxbtn" style="background:var(--poke-yellow);color:#000;font-size:clamp(.6rem,1.5vw,.75rem)" onclick="resetGame()">▶ PLAY AGAIN</button>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// POKÉMON DATA
+// ═══════════════════════════════════════════════════════════════
+const POKEMON_CHAIN = [
+  {before:'🥚', after:'🌱', name:'BULBASAUR',  type:'GRASS',    atk:'+12', def:'+8',  spd:'+10'},
+  {before:'🌱', after:'🌿', name:'IVYSAUR',    type:'GRASS',    atk:'+15', def:'+12', spd:'+8'},
+  {before:'🌿', after:'🌲', name:'VENUSAUR',   type:'GRASS',    atk:'+20', def:'+18', spd:'+10'},
+  {before:'🔥', after:'🦎', name:'CHARMELEON', type:'FIRE',     atk:'+18', def:'+10', spd:'+15'},
+  {before:'🦎', after:'🐉', name:'CHARIZARD',  type:'FIRE/FLY', atk:'+25', def:'+15', spd:'+22'},
+  {before:'💧', after:'🐢', name:'WARTORTLE',  type:'WATER',    atk:'+14', def:'+20', spd:'+12'},
+  {before:'🐢', after:'🛡️', name:'BLASTOISE',  type:'WATER',    atk:'+18', def:'+28', spd:'+10'},
+  {before:'🦊', after:'💧', name:'VAPOREON',   type:'WATER',    atk:'+16', def:'+16', spd:'+18'},
+  {before:'💧', after:'⚡', name:'JOLTEON',    type:'ELECTRIC', atk:'+22', def:'+12', spd:'+30'},
+];
+
+const ZONE_DATA = [
+  {id:1, name:'ADDITION FACTS\nTO 12',      emoji:'➕', bg:'bg-grass',     poke:'🌱', type:'mc',       unlocked:true},
+  {id:2, name:'SUBTRACTION\nFACTS TO 12',   emoji:'➖', bg:'bg-fire',      poke:'🦎', type:'mc',       unlocked:false},
+  {id:3, name:'ADD & SUBTRACT\nTENS',        emoji:'🔟', bg:'bg-water',     poke:'🐢', type:'mc',       unlocked:false},
+  {id:4, name:'ADD & SUBTRACT\nHUNDREDS',    emoji:'💯', bg:'bg-electric',  poke:'⚡', type:'mc',       unlocked:false},
+  {id:5, name:'PLACE VALUE\nTO 999',         emoji:'🏛️', bg:'bg-psychic',   poke:'🔮', type:'placeVal', unlocked:false},
+  {id:6, name:'SKIP COUNTING\n2s, 5s, 10s', emoji:'🔢', bg:'bg-ice',       poke:'❄️', type:'sequence', unlocked:false},
+  {id:7, name:'ADDITION WITH\nREGROUPING',   emoji:'🔼', bg:'bg-fighting',  poke:'💪', type:'vertical', unlocked:false},
+  {id:8, name:'SUBTRACTION\nWITH BORROWING', emoji:'🔽', bg:'bg-ground',    poke:'⛏️', type:'vertical', unlocked:false},
+  {id:9, name:'2D SHAPES',                   emoji:'🔷', bg:'bg-normal',    poke:'🔷', type:'shapes',   unlocked:false},
+];
+
+// ═══════════════════════════════════════════════════════════════
+// QUESTION POOLS — 24+ per zone
+// ═══════════════════════════════════════════════════════════════
+
+// ZONE 1: Addition facts to 12
+const Z1_POOL = [
+  {q:'What is 6 + 6?',  choices:['10','11','12','13'], ans:2},
+  {q:'What is 7 + 5?',  choices:['10','11','12','13'], ans:2},
+  {q:'What is 8 + 4?',  choices:['10','11','12','13'], ans:2},
+  {q:'What is 9 + 3?',  choices:['10','11','12','13'], ans:2},
+  {q:'What is 5 + 7?',  choices:['10','11','12','13'], ans:2},
+  {q:'What is 4 + 8?',  choices:['11','12','13','14'], ans:1},
+  {q:'What is 6 + 5?',  choices:['9','10','11','12'],  ans:2},
+  {q:'What is 9 + 2?',  choices:['9','10','11','12'],  ans:2},
+  {q:'What is 8 + 3?',  choices:['9','10','11','12'],  ans:2},
+  {q:'What is 7 + 4?',  choices:['9','10','11','12'],  ans:2},
+  {q:'What is 6 + 4?',  choices:['8','9','10','11'],   ans:2},
+  {q:'What is 5 + 5?',  choices:['8','9','10','11'],   ans:2},
+  {q:'What is 9 + 1?',  choices:['8','9','10','11'],   ans:2},
+  {q:'What is 8 + 2?',  choices:['8','9','10','11'],   ans:2},
+  {q:'What is 7 + 3?',  choices:['8','9','10','11'],   ans:2},
+  {q:'What is 3 + 9?',  choices:['10','11','12','13'], ans:2},
+  {q:'What is 4 + 7?',  choices:['9','10','11','12'],  ans:2},
+  {q:'What is 2 + 8?',  choices:['8','9','10','11'],   ans:2},
+  {q:'What is 1 + 9?',  choices:['8','9','10','11'],   ans:2},
+  {q:'What is 6 + 6?',  choices:['10','11','12','13'], ans:2},
+  {q:'5 + ___ = 11',    choices:['5','6','7','8'],     ans:1},
+  {q:'___ + 4 = 12',    choices:['6','7','8','9'],     ans:2},
+  {q:'7 + ___ = 12',    choices:['3','4','5','6'],     ans:2},
+  {q:'9 + ___ = 12',    choices:['1','2','3','4'],     ans:2},
+  {q:'What is 6 + 3?',  choices:['7','8','9','10'],    ans:2},
+  {q:'What is 4 + 5?',  choices:['7','8','9','10'],    ans:2},
+  {q:'What is 7 + 6?',  choices:['11','12','13','14'], ans:2},
+  {q:'What is 8 + 5?',  choices:['11','12','13','14'], ans:2},
+];
+
+// ZONE 2: Subtraction facts to 12
+const Z2_POOL = [
+  {q:'What is 12 − 6?', choices:['4','5','6','7'],    ans:2},
+  {q:'What is 12 − 4?', choices:['6','7','8','9'],    ans:2},
+  {q:'What is 11 − 5?', choices:['4','5','6','7'],    ans:2},
+  {q:'What is 10 − 7?', choices:['1','2','3','4'],    ans:2},
+  {q:'What is 12 − 9?', choices:['1','2','3','4'],    ans:2},
+  {q:'What is 11 − 8?', choices:['1','2','3','4'],    ans:2},
+  {q:'What is 10 − 4?', choices:['4','5','6','7'],    ans:2},
+  {q:'What is 12 − 7?', choices:['3','4','5','6'],    ans:2},
+  {q:'What is 9 − 5?',  choices:['2','3','4','5'],    ans:2},
+  {q:'What is 11 − 4?', choices:['5','6','7','8'],    ans:2},
+  {q:'What is 12 − 3?', choices:['7','8','9','10'],   ans:2},
+  {q:'What is 10 − 6?', choices:['2','3','4','5'],    ans:2},
+  {q:'What is 8 − 5?',  choices:['1','2','3','4'],    ans:2},
+  {q:'What is 9 − 4?',  choices:['3','4','5','6'],    ans:2},
+  {q:'12 − ___ = 5',    choices:['5','6','7','8'],    ans:2},
+  {q:'11 − ___ = 4',    choices:['5','6','7','8'],    ans:2},
+  {q:'10 − ___ = 3',    choices:['5','6','7','8'],    ans:2},
+  {q:'___ − 6 = 6',     choices:['10','11','12','13'],ans:2},
+  {q:'What is 7 − 3?',  choices:['2','3','4','5'],    ans:2},
+  {q:'What is 8 − 4?',  choices:['2','3','4','5'],    ans:2},
+  {q:'What is 6 − 2?',  choices:['2','3','4','5'],    ans:2},
+  {q:'What is 11 − 6?', choices:['3','4','5','6'],    ans:2},
+  {q:'What is 10 − 5?', choices:['3','4','5','6'],    ans:2},
+  {q:'What is 12 − 5?', choices:['5','6','7','8'],    ans:2},
+  {q:'What is 9 − 3?',  choices:['4','5','6','7'],    ans:2},
+  {q:'What is 11 − 7?', choices:['2','3','4','5'],    ans:2},
+  {q:'What is 12 − 8?', choices:['2','3','4','5'],    ans:2},
+  {q:'What is 10 − 9?', choices:['0','1','2','3'],    ans:1},
+];
+
+// ZONE 3: Add & Subtract Tens
+const Z3_POOL = [
+  {q:'What is 30 + 10?', choices:['30','40','50','60'],  ans:1},
+  {q:'What is 50 − 10?', choices:['30','40','50','60'],  ans:1},
+  {q:'What is 45 + 10?', choices:['45','54','55','56'],  ans:2},
+  {q:'What is 72 − 10?', choices:['62','70','71','73'],  ans:0},
+  {q:'What is 63 + 10?', choices:['64','70','73','74'],  ans:2},
+  {q:'What is 88 − 10?', choices:['78','79','80','87'],  ans:0},
+  {q:'What is 27 + 10?', choices:['28','36','37','38'],  ans:2},
+  {q:'What is 54 − 10?', choices:['44','45','46','53'],  ans:0},
+  {q:'What is 16 + 10?', choices:['17','25','26','27'],  ans:2},
+  {q:'What is 91 − 10?', choices:['80','81','82','90'],  ans:1},
+  {q:'What is 48 + 10?', choices:['49','57','58','59'],  ans:2},
+  {q:'What is 34 − 10?', choices:['23','24','25','33'],  ans:1},
+  {q:'30 + 10 + 10 = ?', choices:['40','50','60','70'], ans:1},
+  {q:'70 − 10 − 10 = ?', choices:['40','50','60','80'], ans:1},
+  {q:'What is 19 + 10?', choices:['20','28','29','30'],  ans:2},
+  {q:'What is 80 − 10?', choices:['70','71','79','90'],  ans:0},
+  {q:'What is 55 + 10?', choices:['56','60','65','66'],  ans:2},
+  {q:'What is 43 − 10?', choices:['33','34','42','44'],  ans:0},
+  {q:'What is 77 + 10?', choices:['78','86','87','88'],  ans:2},
+  {q:'What is 62 − 10?', choices:['51','52','53','61'],  ans:1},
+  {q:'___ + 10 = 60',    choices:['40','50','60','70'],  ans:1},
+  {q:'___ − 10 = 35',    choices:['25','30','45','55'],  ans:2},
+  {q:'25 + 10 = ___',    choices:['15','30','35','36'],  ans:2},
+  {q:'What is 39 + 10?', choices:['40','48','49','50'],  ans:2},
+  {q:'What is 51 − 10?', choices:['40','41','42','50'],  ans:1},
+  {q:'What is 68 + 10?', choices:['69','77','78','79'],  ans:2},
+];
+
+// ZONE 4: Add & Subtract Hundreds
+const Z4_POOL = [
+  {q:'What is 300 + 100?', choices:['300','400','500','600'], ans:1},
+  {q:'What is 700 − 100?', choices:['500','600','700','800'], ans:1},
+  {q:'What is 245 + 100?', choices:['245','345','355','445'], ans:1},
+  {q:'What is 862 − 100?', choices:['762','772','861','863'], ans:0},
+  {q:'What is 530 + 100?', choices:['540','620','630','640'], ans:2},
+  {q:'What is 419 − 100?', choices:['309','319','320','418'], ans:1},
+  {q:'What is 174 + 100?', choices:['175','264','274','284'], ans:2},
+  {q:'What is 956 − 100?', choices:['846','850','856','955'], ans:2},
+  {q:'What is 683 + 100?', choices:['693','773','783','793'], ans:2},
+  {q:'What is 327 − 100?', choices:['217','226','227','328'], ans:2},
+  {q:'___ + 100 = 600',    choices:['400','500','600','700'], ans:1},
+  {q:'___ − 100 = 250',    choices:['150','250','350','450'], ans:2},
+  {q:'400 + 100 + 100 = ?',choices:['400','500','600','700'], ans:2},
+  {q:'800 − 100 − 100 = ?',choices:['500','600','700','800'], ans:1},
+  {q:'What is 100 + 100?', choices:['100','150','200','300'], ans:2},
+  {q:'What is 500 − 100?', choices:['300','400','500','600'], ans:1},
+  {q:'What is 712 + 100?', choices:['722','802','812','813'], ans:2},
+  {q:'What is 468 − 100?', choices:['358','360','368','467'], ans:2},
+  {q:'What is 291 + 100?', choices:['292','381','391','392'], ans:2},
+  {q:'What is 835 − 100?', choices:['725','734','735','836'], ans:2},
+  {q:'What is 100 + 600?', choices:['500','600','700','800'], ans:2},
+  {q:'What is 900 − 100?', choices:['700','800','900','1000'],ans:1},
+  {q:'547 + 100 = ___',    choices:['547','607','647','648'], ans:2},
+  {q:'763 − 100 = ___',    choices:['663','673','762','764'], ans:0},
+  {q:'What is 120 + 100?', choices:['121','200','220','221'], ans:2},
+  {q:'What is 380 − 100?', choices:['270','280','290','381'], ans:1},
+];
+
+// ZONE 5: Place Value to 999
+const Z5_POOL = [
+  {q:'In 456, how many HUNDREDS?', choices:['4','5','6','45'],  ans:0, type:'hundreds', num:456},
+  {q:'In 382, how many TENS?',     choices:['3','8','2','38'],  ans:1, type:'tens',     num:382},
+  {q:'In 719, how many ONES?',     choices:['7','1','9','71'],  ans:2, type:'ones',     num:719},
+  {q:'In 265, how many HUNDREDS?', choices:['2','6','5','26'],  ans:0, type:'hundreds', num:265},
+  {q:'In 843, how many TENS?',     choices:['8','4','3','84'],  ans:1, type:'tens',     num:843},
+  {q:'In 507, how many ONES?',     choices:['5','0','7','50'],  ans:2, type:'ones',     num:507},
+  {q:'What number is 3 hundreds, 4 tens, 7 ones?', choices:['374','347','437','473'], ans:1, num:347},
+  {q:'What number is 6 hundreds, 0 tens, 8 ones?', choices:['608','680','806','860'], ans:0, num:608},
+  {q:'What number is 1 hundred, 5 tens, 2 ones?',  choices:['125','152','215','251'], ans:1, num:152},
+  {q:'What number is 9 hundreds, 9 tens, 9 ones?', choices:['909','990','999','969'], ans:2, num:999},
+  {q:'In 500, how many HUNDREDS?', choices:['0','5','50','500'], ans:1, type:'hundreds', num:500},
+  {q:'In 830, how many TENS?',     choices:['0','3','8','83'],   ans:1, type:'tens',     num:830},
+  {q:'What is the value of the 4 in 462?', choices:['4','40','400','4000'], ans:2, num:462},
+  {q:'What is the value of the 7 in 375?', choices:['7','70','700','7000'], ans:1, num:375},
+  {q:'What is the value of the 9 in 198?', choices:['9','90','900','9000'], ans:0, num:198},
+  {q:'Which number has 5 hundreds?', choices:['500','50','540','605'],  ans:0},
+  {q:'Which number has 7 in the tens place?', choices:['107','170','701','710'], ans:1},
+  {q:'In 204, the 0 is in which place?', choices:['Ones','Tens','Hundreds','Thousands'], ans:1},
+  {q:'In 920, how many ONES?',     choices:['0','2','9','92'],  ans:0, type:'ones', num:920},
+  {q:'What number is 5 hundreds, 3 tens, 0 ones?', choices:['503','530','350','305'], ans:1, num:530},
+  {q:'What number is 8 hundreds, 2 tens, 1 one?',  choices:['128','182','821','812'], ans:2, num:821},
+  {q:'In 645, what is the tens digit?',  choices:['6','4','5','64'],  ans:1},
+  {q:'In 378, what is the hundreds digit?', choices:['3','7','8','37'], ans:0},
+  {q:'What number is 2 hundreds, 8 tens, 6 ones?', choices:['286','268','628','682'], ans:0, num:286},
+  {q:'In 951, how many TENS?', choices:['9','5','1','95'], ans:1, type:'tens', num:951},
+  {q:'Which has a 3 in the hundreds place?', choices:['33','133','300','330'], ans:2},
+];
+
+// ZONE 6: Skip Counting
+const Z6_POOL = [
+  {q:'Count by 2s: 2, 4, 6, ___', choices:['7','8','9','10'],    ans:1, rule:2, seq:[2,4,6,null]},
+  {q:'Count by 2s: 8, 10, 12, ___',choices:['13','14','15','16'],ans:1, rule:2, seq:[8,10,12,null]},
+  {q:'Count by 5s: 5, 10, 15, ___',choices:['18','19','20','25'],ans:2, rule:5, seq:[5,10,15,null]},
+  {q:'Count by 5s: 20, 25, 30, ___',choices:['33','35','40','45'],ans:1, rule:5, seq:[20,25,30,null]},
+  {q:'Count by 10s: 10, 20, 30, ___',choices:['35','38','40','50'],ans:2, rule:10,seq:[10,20,30,null]},
+  {q:'Count by 10s: 40, 50, 60, ___',choices:['65','70','75','80'],ans:1, rule:10,seq:[40,50,60,null]},
+  {q:'Count by 2s: 14, 16, 18, ___', choices:['19','20','21','22'],ans:1, rule:2, seq:[14,16,18,null]},
+  {q:'Count by 5s: 35, 40, 45, ___', choices:['46','48','50','55'],ans:2, rule:5, seq:[35,40,45,null]},
+  {q:'Count by 10s: 60, 70, 80, ___',choices:['85','88','90','100'],ans:2,rule:10,seq:[60,70,80,null]},
+  {q:'Count by 2s: 20, 22, 24, ___', choices:['25','26','27','28'],ans:1, rule:2, seq:[20,22,24,null]},
+  {q:'Count by 5s: 50, 55, 60, ___', choices:['61','63','65','70'],ans:2, rule:5, seq:[50,55,60,null]},
+  {q:'Count by 10s: 70, 80, 90, ___',choices:['91','95','100','110'],ans:2,rule:10,seq:[70,80,90,null]},
+  {q:'Count by 2s: ___, 4, 6, 8',    choices:['1','2','3','4'],    ans:1, rule:2, seq:[null,4,6,8]},
+  {q:'Count by 5s: ___, 10, 15, 20', choices:['3','4','5','6'],    ans:2, rule:5, seq:[null,10,15,20]},
+  {q:'Count by 10s: ___, 20, 30, 40',choices:['5','8','10','15'],  ans:2, rule:10,seq:[null,20,30,40]},
+  {q:'Count by 2s: 6, ___, 10, 12',  choices:['7','8','9','10'],   ans:1, rule:2, seq:[6,null,10,12]},
+  {q:'Count by 5s: 15, ___, 25, 30', choices:['16','18','20','22'],ans:2, rule:5, seq:[15,null,25,30]},
+  {q:'Count by 10s: 30, ___, 50, 60',choices:['35','38','40','45'],ans:2, rule:10,seq:[30,null,50,60]},
+  {q:'Count by 2s: 24, 26, 28, ___', choices:['29','30','31','32'],ans:1, rule:2, seq:[24,26,28,null]},
+  {q:'Count by 5s: 55, 60, 65, ___', choices:['66','68','70','75'],ans:2, rule:5, seq:[55,60,65,null]},
+  {q:'Count by 10s: 10, ___, 30, 40',choices:['15','18','20','25'],ans:2, rule:10,seq:[10,null,30,40]},
+  {q:'Count by 2s: ___, 12, 14, 16', choices:['8','9','10','11'],  ans:2, rule:2, seq:[null,12,14,16]},
+  {q:'Count by 5s: 65, 70, 75, ___', choices:['76','78','80','85'],ans:2, rule:5, seq:[65,70,75,null]},
+  {q:'Count by 10s: 80, 90, ___, 110',choices:['95','98','100','105'],ans:2,rule:10,seq:[80,90,null,110]},
+  {q:'Count by 2s: 30, 32, 34, ___', choices:['35','36','37','38'],ans:1, rule:2, seq:[30,32,34,null]},
+  {q:'Count by 5s: 75, 80, 85, ___', choices:['86','88','90','95'],ans:2, rule:5, seq:[75,80,85,null]},
+];
+
+// ZONE 7: Addition with Regrouping
+const Z7_POOL = [
+  {top:47, bot:35, op:'+', ans:82},
+  {top:58, bot:26, op:'+', ans:84},
+  {top:69, bot:14, op:'+', ans:83},
+  {top:75, bot:18, op:'+', ans:93},
+  {top:48, bot:43, op:'+', ans:91},
+  {top:56, bot:37, op:'+', ans:93},
+  {top:39, bot:43, op:'+', ans:82},
+  {top:67, bot:25, op:'+', ans:92},
+  {top:78, bot:14, op:'+', ans:92},
+  {top:45, bot:47, op:'+', ans:92},
+  {top:234, bot:158, op:'+', ans:392},
+  {top:347, bot:265, op:'+', ans:612},
+  {top:456, bot:178, op:'+', ans:634},
+  {top:538, bot:294, op:'+', ans:832},
+  {top:163, bot:258, op:'+', ans:421},
+  {top:274, bot:368, op:'+', ans:642},
+  {top:485, bot:237, op:'+', ans:722},
+  {top:196, bot:475, op:'+', ans:671},
+  {top:327, bot:485, op:'+', ans:812},
+  {top:648, bot:275, op:'+', ans:923},
+  {top:55, bot:45, op:'+', ans:100},
+  {top:36, bot:54, op:'+', ans:90},
+  {top:88, bot:12, op:'+', ans:100},
+  {top:77, bot:14, op:'+', ans:91},
+  {top:63, bot:28, op:'+', ans:91},
+  {top:149, bot:382, op:'+', ans:531},
+  {top:265, bot:447, op:'+', ans:712},
+  {top:378, bot:143, op:'+', ans:521},
+];
+
+// ZONE 8: Subtraction with Borrowing
+const Z8_POOL = [
+  {top:43, bot:17, op:'−', ans:26},
+  {top:52, bot:28, op:'−', ans:24},
+  {top:61, bot:34, op:'−', ans:27},
+  {top:75, bot:48, op:'−', ans:27},
+  {top:84, bot:56, op:'−', ans:28},
+  {top:93, bot:47, op:'−', ans:46},
+  {top:60, bot:23, op:'−', ans:37},
+  {top:72, bot:35, op:'−', ans:37},
+  {top:80, bot:44, op:'−', ans:36},
+  {top:91, bot:63, op:'−', ans:28},
+  {top:342, bot:168, op:'−', ans:174},
+  {top:451, bot:283, op:'−', ans:168},
+  {top:563, bot:275, op:'−', ans:288},
+  {top:674, bot:387, op:'−', ans:287},
+  {top:785, bot:496, op:'−', ans:289},
+  {top:500, bot:243, op:'−', ans:257},
+  {top:600, bot:358, op:'−', ans:242},
+  {top:700, bot:462, op:'−', ans:238},
+  {top:800, bot:547, op:'−', ans:253},
+  {top:432, bot:154, op:'−', ans:278},
+  {top:521, bot:263, op:'−', ans:258},
+  {top:643, bot:375, op:'−', ans:268},
+  {top:754, bot:486, op:'−', ans:268},
+  {top:865, bot:597, op:'−', ans:268},
+  {top:300, bot:156, op:'−', ans:144},
+  {top:400, bot:278, op:'−', ans:122},
+  {top:900, bot:364, op:'−', ans:536},
+  {top:750, bot:483, op:'−', ans:267},
+];
+
+// ZONE 9: 2D Shapes
+const Z9_POOL = [
+  {q:'How many sides does a TRIANGLE have?',   choices:['2','3','4','5'], ans:1, shape:'triangle'},
+  {q:'How many sides does a SQUARE have?',     choices:['3','4','5','6'], ans:1, shape:'square'},
+  {q:'How many sides does a RECTANGLE have?',  choices:['2','3','4','5'], ans:2, shape:'rectangle'},
+  {q:'How many sides does a PENTAGON have?',   choices:['4','5','6','7'], ans:1, shape:'pentagon'},
+  {q:'How many sides does a HEXAGON have?',    choices:['4','5','6','7'], ans:2, shape:'hexagon'},
+  {q:'How many sides does a CIRCLE have?',     choices:['0','1','2','3'], ans:0, shape:'circle'},
+  {q:'How many CORNERS does a square have?',   choices:['2','3','4','5'], ans:2, shape:'square'},
+  {q:'How many corners does a triangle have?', choices:['2','3','4','5'], ans:1, shape:'triangle'},
+  {q:'How many corners does a pentagon have?', choices:['3','4','5','6'], ans:2, shape:'pentagon'},
+  {q:'A shape with 4 equal sides is a ___?',   choices:['Rectangle','Square','Triangle','Pentagon'], ans:1, shape:'square'},
+  {q:'A shape with 6 sides is a ___?',         choices:['Pentagon','Hexagon','Octagon','Rectangle'], ans:1, shape:'hexagon'},
+  {q:'A shape with 8 sides is an ___?',        choices:['Hexagon','Octagon','Pentagon','Heptagon'],  ans:1, shape:'octagon'},
+  {q:'Which shape has NO corners?',            choices:['Square','Triangle','Circle','Hexagon'],     ans:2, shape:'circle'},
+  {q:'How many sides does an OCTAGON have?',   choices:['6','7','8','9'], ans:2, shape:'octagon'},
+  {q:'A shape with 4 sides but NOT all equal is a ___?', choices:['Square','Triangle','Rectangle','Pentagon'], ans:2, shape:'rectangle'},
+  {q:'How many corners does a hexagon have?',  choices:['4','5','6','7'], ans:2, shape:'hexagon'},
+  {q:'A pizza slice looks like a ___?',        choices:['Rectangle','Circle','Triangle','Square'], ans:2, shape:'triangle'},
+  {q:'A stop sign has how many sides?',        choices:['6','7','8','9'], ans:2, shape:'octagon'},
+  {q:'How many sides does a RHOMBUS have?',    choices:['2','3','4','5'], ans:2, shape:'rhombus'},
+  {q:'Which shape has only 3 corners?',        choices:['Square','Triangle','Rectangle','Pentagon'], ans:1, shape:'triangle'},
+  {q:'A door shape is most like a ___?',       choices:['Circle','Triangle','Square','Rectangle'], ans:3, shape:'rectangle'},
+  {q:'How many sides does a HEPTAGON have?',   choices:['5','6','7','8'], ans:2, shape:'heptagon'},
+  {q:'How many corners does an octagon have?', choices:['6','7','8','9'], ans:2, shape:'octagon'},
+  {q:'Which has MORE sides — hexagon or pentagon?', choices:['Pentagon','Same','Hexagon','Neither'], ans:2},
+  {q:'A quarter coin is shaped like a ___?',   choices:['Square','Triangle','Circle','Rectangle'], ans:2, shape:'circle'},
+  {q:'How many corners does a rectangle have?',choices:['2','3','4','5'], ans:2, shape:'rectangle'},
+];
+
+// Shape SVG renderer
+function drawShape(name){
+  const svgs = {
+    triangle: '<polygon points="65,10 10,120 120,120" fill="none" stroke="#FFD700" stroke-width="6" stroke-linejoin="round"/>',
+    square: '<rect x="15" y="15" width="100" height="100" fill="none" stroke="#4CC9F0" stroke-width="6"/>',
+    rectangle: '<rect x="5" y="30" width="120" height="70" fill="none" stroke="#2dd4bf" stroke-width="6"/>',
+    circle: '<circle cx="65" cy="65" r="55" fill="none" stroke="#fd79a8" stroke-width="6"/>',
+    pentagon: (()=>{const pts=Array.from({length:5},(_,i)=>{const a=(i*72-90)*Math.PI/180;return`${65+56*Math.cos(a)},${65+56*Math.sin(a)}`}).join(' ');return`<polygon points="${pts}" fill="none" stroke="#a29bfe" stroke-width="6" stroke-linejoin="round"/>`;})(),
+    hexagon: (()=>{const pts=Array.from({length:6},(_,i)=>{const a=(i*60)*Math.PI/180;return`${65+56*Math.cos(a)},${65+56*Math.sin(a)}`}).join(' ');return`<polygon points="${pts}" fill="none" stroke="#ffd700" stroke-width="6" stroke-linejoin="round"/>`;})(),
+    octagon: (()=>{const pts=Array.from({length:8},(_,i)=>{const a=(i*45-22.5)*Math.PI/180;return`${65+56*Math.cos(a)},${65+56*Math.sin(a)}`}).join(' ');return`<polygon points="${pts}" fill="none" stroke="#fd9644" stroke-width="6" stroke-linejoin="round"/>`;})(),
+    rhombus: '<polygon points="65,5 120,65 65,125 10,65" fill="none" stroke="#2dd4bf" stroke-width="6" stroke-linejoin="round"/>',
+    heptagon: (()=>{const pts=Array.from({length:7},(_,i)=>{const a=(i*51.43-90)*Math.PI/180;return`${65+56*Math.cos(a)},${65+56*Math.sin(a)}`}).join(' ');return`<polygon points="${pts}" fill="none" stroke="#2ed573" stroke-width="6" stroke-linejoin="round"/>`;})(),
+  };
+  return svgs[name] || svgs.circle;
+}
+
+
+// ═══════════════════════════════════════════════════════════════
+// WILD POKÉMON DATA
+// ═══════════════════════════════════════════════════════════════
+const WILD_POKEMON = [
+  {emoji:'🐭',name:'RATTATA',  type:'NORMAL',  rarity:'common'},
+  {emoji:'🐦',name:'PIDGEY',   type:'FLYING',  rarity:'common'},
+  {emoji:'🐛',name:'CATERPIE', type:'BUG',     rarity:'common'},
+  {emoji:'🦋',name:'BUTTERFREE',type:'BUG',    rarity:'uncommon'},
+  {emoji:'🐝',name:'BEEDRILL', type:'BUG',     rarity:'uncommon'},
+  {emoji:'🐸',name:'POLIWAG',  type:'WATER',   rarity:'uncommon'},
+  {emoji:'⭐',name:'STARYU',   type:'WATER',   rarity:'uncommon'},
+  {emoji:'🦆',name:'PSYDUCK',  type:'WATER',   rarity:'uncommon'},
+  {emoji:'🦊',name:'VULPIX',   type:'FIRE',    rarity:'uncommon'},
+  {emoji:'🌙',name:'CLEFAIRY', type:'FAIRY',   rarity:'rare'},
+  {emoji:'🎤',name:'JIGGLYPUFF',type:'FAIRY',  rarity:'rare'},
+  {emoji:'💤',name:'SNORLAX',  type:'NORMAL',  rarity:'rare'},
+  {emoji:'🔮',name:'ABRA',     type:'PSYCHIC', rarity:'rare'},
+  {emoji:'🥊',name:'MACHOP',   type:'FIGHTING',rarity:'uncommon'},
+  {emoji:'🌸',name:'ODDISH',   type:'GRASS',   rarity:'common'},
+  {emoji:'🌻',name:'BELLSPROUT',type:'GRASS',  rarity:'common'},
+  {emoji:'🪨',name:'GEODUDE',  type:'ROCK',    rarity:'common'},
+  {emoji:'👻',name:'GASTLY',   type:'GHOST',   rarity:'rare'},
+  {emoji:'🧊',name:'LAPRAS',   type:'ICE',     rarity:'rare'},
+  {emoji:'⚡',name:'ELECTABUZZ',type:'ELECTRIC',rarity:'rare'},
+  {emoji:'🔥',name:'MAGMAR',   type:'FIRE',    rarity:'rare'},
+  {emoji:'🦎',name:'DRATINI',  type:'DRAGON',  rarity:'legendary'},
+  {emoji:'🐲',name:'DRAGONAIR',type:'DRAGON',  rarity:'legendary'},
+];
+
+const RARITY_COLORS = {common:'rgba(255,255,255,.5)',uncommon:'#4ade80',rare:'#74b9ff',legendary:'#ffd700'};
+
+// ── STREAK & WILD STATE ───────────────────────────────────────
+let streak = 0;
+let currentMove = '';
+let zoneScoreForStats = 0;  // tracks 0-8 for PC box stats
+let wildActive = false;
+let wildPoke = null;
+let wildQs = [];
+let wildQIdx = 0;
+let wildHits = 0;
+let wildMaxHp = 5;
+let wildCurrentHp = 5;
+let wildTimer = null;
+let wildTimeLeft = 45;
+let wildAnswered = false;
+let pcCurrentTab = 'all';
+
+// PC box data: {zoneId: {score, poke}, wildCatches:[{poke,zone,score}]}
+let pcData = {zonePokes:{}, wildCatches:[]};
+
+// ═══════════════════════════════════════════════════════════════
+// ENGINE
+// ═══════════════════════════════════════════════════════════════
+const SAVE = 'pokemathquest_v3';
+let badges = {};
+let currentZone = 0;
+let currentQ = 0;
+let lives = 3;
+let totalCorrect = 0;
+let questionAnswered = false;
+let shuffledQs = [];
+let evolvedPokes = {};
+
+function sh(arr){const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+
+function loadSave(){
+  try{
+    const d=JSON.parse(localStorage.getItem(SAVE));
+    if(d){
+      badges=d.badges||{};
+      evolvedPokes=d.pokes||{};
+      pcData=d.pcData||{zonePokes:{},wildCatches:[]};
+    }
+  }catch(e){}
+}
+function saveSave(){
+  try{localStorage.setItem(SAVE,JSON.stringify({badges,pokes:evolvedPokes,pcData}));}catch(e){}
+}
+
+function isUnlocked(id){return id===1||badges[id-1]===true;}
+
+// ── SCREENS ───────────────────────────────────────────────────
+function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');window.scrollTo(0,0);}
+function hideOverlays(){['evolveScreen','zoneOver','gameOver'].forEach(id=>document.getElementById(id).classList.add('hidden'));}
+
+// ── TITLE ─────────────────────────────────────────────────────
+function startGame(){loadSave();buildMap();showScreen('pokedex');}
+
+// ── MAP ───────────────────────────────────────────────────────
+function buildMap(){
+  const total=Object.values(badges).filter(Boolean).length;
+  document.getElementById('pdxTotal').textContent=`BADGES: ${total} / 9`;
+  document.getElementById('pdxSub').textContent=total===9?'ALL BADGES EARNED! YOU\'RE A CHAMPION!':'Choose a zone to battle!';
+  const grid=document.getElementById('pdxGrid');grid.innerHTML='';
+  ZONE_DATA.forEach(z=>{
+    const unlocked=isUnlocked(z.id);
+    const done=badges[z.id]===true;
+    const tile=document.createElement('div');
+    tile.className='pdx-card'+(unlocked?' unlocked':'locked');
+    tile.innerHTML=`<div class="pdx-zone">${z.id}</div><div class="pdx-emo">${done?(POKEMON_CHAIN[z.id-1].after):z.emoji}</div><div class="pdx-name">${z.name}</div><div class="pdx-star">${done?'⭐':'○'}</div>`;
+    if(unlocked) tile.onclick=()=>launchZone(z.id);
+    grid.appendChild(tile);
+  });
+}
+function goToMap(){hideOverlays();buildMap();showScreen('pokedex');}
+
+// ── LAUNCH ZONE ───────────────────────────────────────────────
+const ZONE_POOLS=[Z1_POOL,Z2_POOL,Z3_POOL,Z4_POOL,Z5_POOL,Z6_POOL,Z7_POOL,Z8_POOL,Z9_POOL];
+function launchZone(id){
+  currentZone=id;currentQ=0;lives=3;totalCorrect=0;questionAnswered=false;
+  streak=0;currentMove='';zoneScoreForStats=0;
+  shuffledQs=sh(ZONE_POOLS[id-1]).slice(0,8);
+  const z=ZONE_DATA[id-1];
+  document.getElementById('gbg').className='gbg '+z.bg;
+  const pc=POKEMON_CHAIN[id-1];
+  document.getElementById('hudPoke').textContent=pc.before;
+  document.getElementById('hudName').textContent=pc.before+' LVL'+(id);
+  document.getElementById('hudZone').textContent=z.name.replace('\n',' ');
+  hideOverlays();
+  showScreen('game');
+  updateHUD();
+  renderQ();
+}
+
+// ── HUD ───────────────────────────────────────────────────────
+function updateHUD(){
+  const pct=lives/3*100;
+  const fill=document.getElementById('hpFill');
+  fill.style.width=pct+'%';
+  fill.className='hp-bar-fill'+(lives===1?' danger':lives===2?' warning':'');
+  document.getElementById('hpText').textContent=lives+'/3';
+  document.getElementById('hudQ').textContent=`Q: ${currentQ+1}/${shuffledQs.length}`;
+  document.getElementById('progFill').style.width=(currentQ/shuffledQs.length*100)+'%';
+}
+
+// ── WRONG ANSWER ──────────────────────────────────────────────
+function wrongAnswer(){
+  streak=0;currentMove='';updateMoveHUD();
+  lives=Math.max(0,lives-1);
+  updateHUD();
+  const fl=document.createElement('div');fl.className='red-flash';document.body.appendChild(fl);setTimeout(()=>fl.remove(),450);
+  if(lives===0){setTimeout(showGameOver,900);}
+}
+
+function showGameOver(){
+  const z=ZONE_DATA[currentZone-1];
+  document.getElementById('goSub').textContent=`You ran out of HP in\n${z.emoji} ${z.name.replace('\n',' ')}!\nTry again with new questions!`;
+  document.getElementById('gameOver').classList.remove('hidden');
+}
+
+// ── NEXT QUESTION ─────────────────────────────────────────────
+function nextQ(){
+  questionAnswered=false;
+  currentQ++;
+  if(currentQ>=shuffledQs.length){endZone();}
+  else{renderQ();}
+}
+
+// ── END ZONE ─────────────────────────────────────────────────
+function endZone(){
+  document.getElementById('progFill').style.width='100%';
+  zoneScoreForStats=totalCorrect;
+  const won=totalCorrect>=5;
+  if(won){
+    badges[currentZone]=true;
+    evolvedPokes[currentZone]=true;
+    // Save zone stats for PC box
+    pcData.zonePokes[currentZone]={score:totalCorrect,maxScore:shuffledQs.length};
+    saveSave();
+    if(Object.values(badges).filter(Boolean).length===9){setTimeout(showFinalScreen,400);return;}
+    // Show evolve THEN trigger wild after continue
+    showEvolve();
+  } else {
+    pcData.zonePokes[currentZone]=pcData.zonePokes[currentZone]||{score:0,maxScore:8};
+    saveSave();
+    const zo=document.getElementById('zoneOver');
+    document.getElementById('zoTitle').textContent=totalCorrect>=4?'SO CLOSE! 💪':'KEEP TRAINING!';
+    document.getElementById('zoScore').textContent=`YOU GOT ${totalCorrect} OUT OF ${shuffledQs.length}!`;
+    document.getElementById('zoSub').textContent=totalCorrect>=4?'Almost! Need 5/8 to earn the badge.':'Need 5/8 to earn the badge. You can do it!';
+    zo.classList.remove('hidden');
+  }
+}
+
+// ── EVOLVE ────────────────────────────────────────────────────
+function showEvolve(){
+  const pc=POKEMON_CHAIN[currentZone-1];
+  document.getElementById('evoBefore').textContent=pc.before;
+  document.getElementById('evoAfter').textContent=pc.after;
+  document.getElementById('evoAfter').classList.remove('show');
+  document.getElementById('evoName').textContent='✨ '+pc.name+' ✨';
+  document.getElementById('evoType').textContent='TYPE: '+pc.type;
+  document.getElementById('evoStats').innerHTML=`ATK ${pc.atk} ⬆️  &nbsp;  DEF ${pc.def} ⬆️  &nbsp;  SPD ${pc.spd} ⬆️`;
+  document.getElementById('evoContinueBtn').disabled=true;
+  const flashEl=document.getElementById('evoFlash');
+  flashEl.style.display='block';
+  document.getElementById('evolveScreen').classList.remove('hidden');
+  setTimeout(()=>{flashEl.style.display='none';document.getElementById('evoAfter').classList.add('show');document.getElementById('evoContinueBtn').disabled=false;},1200);
+}
+function afterEvolve(){
+  hideOverlays();
+  // After earning badge, trigger wild encounter!
+  setTimeout(()=>startWild(), 300);
+}
+
+// ── AFTER ZONE (passed, no evolve shown / retry) ──────────────
+function afterZone(){hideOverlays();buildMap();showScreen('pokedex');}
+function retryZone(){hideOverlays();launchZone(currentZone);}
+
+// ── FINAL ─────────────────────────────────────────────────────
+function showFinalScreen(){
+  const team=document.getElementById('finalTeam');team.innerHTML='';
+  POKEMON_CHAIN.forEach(pc=>{const d=document.createElement('div');d.className='final-poke';d.textContent=pc.after;team.appendChild(d);});
+  showScreen('finalScreen');
+}
+function resetGame(){badges={};evolvedPokes={};pcData={zonePokes:{},wildCatches:[]};saveSave();buildMap();showScreen('pokedex');}
+function confirmReset(){if(confirm('Reset ALL progress? Your Pokémon will be released!'))resetGame();}
+
+// ── NEXT BUTTON ───────────────────────────────────────────────
+function addNextBtn(area){
+  const w=document.createElement('div');w.style.marginTop='6px';
+  const b=document.createElement('button');
+  b.className='pxbtn';b.style.cssText='background:var(--poke-yellow);color:#1a1a2e;font-size:clamp(.52rem,1.3vw,.68rem)';
+  b.textContent=currentQ<shuffledQs.length-1?'NEXT QUESTION ▶':'FINISH ZONE ✓';
+  b.onclick=nextQ;w.appendChild(b);area.appendChild(w);
+}
+
+function addFeedback(area){const f=document.createElement('div');f.className='fb-text';f.id='fbText';area.appendChild(f);return f;}
+function setFeedback(good, msg){const f=document.getElementById('fbText');if(!f)return;f.textContent=msg;f.className='fb-text '+(good?'good':'bad');}
+
+// ── CORRECT ANSWER (handles streak + move unlock) ─────────────
+function correctAnswer(){
+  totalCorrect++;streak++;
+  updateStreak();
+}
+
+// ── STREAK & MOVE SYSTEM ──────────────────────────────────────
+const MOVES=[
+  {streak:3, name:'TACKLE!',    emoji:'💥', cls:''},
+  {streak:5, name:'QUICK ATTACK!', emoji:'⚡', cls:''},
+  {streak:8, name:'HYPER BEAM!', emoji:'🌟', cls:'hyper'},
+];
+function updateStreak(){
+  const prev=currentMove;
+  let newMove='';
+  MOVES.forEach(m=>{if(streak>=m.streak)newMove=m.name;});
+  if(newMove!==prev){
+    currentMove=newMove;
+    updateMoveHUD();
+    showStreakFlash(newMove, MOVES.find(m=>m.name===newMove));
+  }
+}
+function updateMoveHUD(){
+  const el=document.getElementById('hudMoveEl');
+  if(!el)return;
+  if(!currentMove){el.textContent='';return;}
+  const m=MOVES.find(mv=>mv.name===currentMove);
+  el.innerHTML=`<span class="move-badge ${m?.cls||''}">${m?.emoji||''} ${currentMove}</span>`;
+}
+function showStreakFlash(moveName, moveData){
+  if(!moveName)return;
+  const old=document.getElementById('streakFlashEl');if(old)old.remove();
+  const f=document.createElement('div');f.id='streakFlashEl';f.className='streak-flash';
+  f.textContent=(moveData?.emoji||'⚡')+' '+streak+'x STREAK! '+moveName;
+  document.body.appendChild(f);
+  setTimeout(()=>{if(f.parentNode)f.remove();},1800);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// RENDER DISPATCHER
+// ═══════════════════════════════════════════════════════════════
+function renderQ(){
+  questionAnswered=false;updateHUD();
+  const area=document.getElementById('gameArea');area.innerHTML='';
+  const q=shuffledQs[currentQ];
+  const ztype=ZONE_DATA[currentZone-1].type;
+
+  if(ztype==='mc')          renderMC(q,area);
+  else if(ztype==='placeVal') renderPlaceVal(q,area);
+  else if(ztype==='sequence') renderSequence(q,area);
+  else if(ztype==='vertical') renderVertical(q,area);
+  else if(ztype==='shapes')   renderShapes(q,area);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// MC RENDER (zones 1-4)
+// ═══════════════════════════════════════════════════════════════
+function renderMC(q, area){
+  const z=ZONE_DATA[currentZone-1];
+  const banner=document.createElement('div');
+  banner.style.cssText='font-family:var(--pixel-font);font-size:clamp(.38rem,.9vw,.5rem);color:rgba(255,255,255,.4);letter-spacing:2px;text-align:center';
+  banner.textContent=z.name.replace('\n',' ');
+  area.appendChild(banner);
+
+  const dialog=document.createElement('div');
+  dialog.className='battle-dialog';
+  dialog.innerHTML=`<span class="battle-label">Q${currentQ+1} OF ${shuffledQs.length} — ${z.emoji} ${z.name.replace('\n',' ')}</span><div class="battle-question">${q.q}</div>`;
+  area.appendChild(dialog);
+
+  const grid=document.createElement('div');
+  grid.className='ans-grid-4';
+  const fb=addFeedback(area);
+
+  q.choices.forEach((c,i)=>{
+    const btn=document.createElement('button');
+    btn.className='battle-btn';
+    btn.textContent=c;
+    btn.onclick=()=>{
+      if(questionAnswered)return;
+      questionAnswered=true;
+      const ok=i===q.ans;
+      grid.querySelectorAll('.battle-btn').forEach((b,j)=>{b.disabled=true;if(j===q.ans)b.classList.add('correct');else if(j===i&&!ok)b.classList.add('wrong');});
+      if(ok){correctAnswer();setFeedback(true,'✓ CORRECT! Great job!');}
+      else{wrongAnswer();setFeedback(false,`✗ The answer was: ${q.choices[q.ans]}`);}
+      if(lives>0) addNextBtn(area);
+    };
+    grid.appendChild(btn);
+  });
+  area.appendChild(grid);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// PLACE VALUE RENDER
+// ═══════════════════════════════════════════════════════════════
+function renderPlaceVal(q, area){
+  const z=ZONE_DATA[currentZone-1];
+  const banner=document.createElement('div');
+  banner.style.cssText='font-family:var(--pixel-font);font-size:clamp(.38rem,.9vw,.5rem);color:rgba(255,255,255,.4);letter-spacing:2px;text-align:center';
+  banner.textContent='🏛️ PLACE VALUE TO 999';
+  area.appendChild(banner);
+
+  const dialog=document.createElement('div');
+  dialog.className='battle-dialog';
+  if(q.num!==undefined){
+    const h=Math.floor(q.num/100),t=Math.floor((q.num%100)/10),o=q.num%10;
+    dialog.innerHTML=`<span class="battle-label">Q${currentQ+1} OF ${shuffledQs.length} — PLACE VALUE</span>
+    <div class="battle-question">${q.q}</div>
+    <div class="place-val-box" style="margin-top:14px;justify-content:center">
+      <div class="pv-column"><div class="pv-label">HUNDREDS</div><div class="pv-value h">${h}</div></div>
+      <div class="pv-separator">—</div>
+      <div class="pv-column"><div class="pv-label">TENS</div><div class="pv-value t">${t}</div></div>
+      <div class="pv-separator">—</div>
+      <div class="pv-column"><div class="pv-label">ONES</div><div class="pv-value o">${o}</div></div>
+    </div>`;
+  } else {
+    dialog.innerHTML=`<span class="battle-label">Q${currentQ+1} OF ${shuffledQs.length} — PLACE VALUE</span><div class="battle-question">${q.q}</div>`;
+  }
+  area.appendChild(dialog);
+
+  const grid=document.createElement('div');grid.className='ans-grid-4';
+  const fb=addFeedback(area);
+  q.choices.forEach((c,i)=>{
+    const btn=document.createElement('button');btn.className='battle-btn';btn.textContent=c;
+    btn.onclick=()=>{
+      if(questionAnswered)return;questionAnswered=true;
+      const ok=i===q.ans;
+      grid.querySelectorAll('.battle-btn').forEach((b,j)=>{b.disabled=true;if(j===q.ans)b.classList.add('correct');else if(j===i&&!ok)b.classList.add('wrong');});
+      if(ok){correctAnswer();setFeedback(true,'✓ CORRECT!');}
+      else{wrongAnswer();setFeedback(false,`✗ Answer: ${q.choices[q.ans]}`);}
+      if(lives>0)addNextBtn(area);
+    };
+    grid.appendChild(btn);
+  });
+  area.appendChild(grid);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// SEQUENCE RENDER
+// ═══════════════════════════════════════════════════════════════
+function renderSequence(q, area){
+  const banner=document.createElement('div');
+  banner.style.cssText='font-family:var(--pixel-font);font-size:clamp(.38rem,.9vw,.5rem);color:rgba(255,255,255,.4);letter-spacing:2px;text-align:center';
+  banner.textContent='🔢 SKIP COUNTING';
+  area.appendChild(banner);
+
+  const dialog=document.createElement('div');
+  dialog.className='battle-dialog';
+  dialog.innerHTML=`<span class="battle-label">Q${currentQ+1} OF ${shuffledQs.length} — SKIP COUNTING BY ${q.rule}s</span><div class="battle-question">${q.q}</div>`;
+
+  // Show sequence visually
+  const seqRow=document.createElement('div');seqRow.className='sequence-row';seqRow.style.marginTop='12px';
+  if(q.seq){
+    q.seq.forEach((n,i)=>{
+      const box=document.createElement('div');
+      box.className='seq-box'+(n===null?' blank':'');
+      box.textContent=n===null?'?':n;
+      seqRow.appendChild(box);
+      if(i<q.seq.length-1){const arr=document.createElement('span');arr.textContent='→';arr.style.cssText='color:rgba(255,255,255,.4);font-size:1.2rem;font-weight:900';seqRow.appendChild(arr);}
+    });
+  }
+  dialog.appendChild(seqRow);
+  area.appendChild(dialog);
+
+  const grid=document.createElement('div');grid.className='ans-grid-4';
+  const fb=addFeedback(area);
+  q.choices.forEach((c,i)=>{
+    const btn=document.createElement('button');btn.className='battle-btn';btn.textContent=c;
+    btn.onclick=()=>{
+      if(questionAnswered)return;questionAnswered=true;
+      const ok=i===q.ans;
+      // Fill in the blank visually
+      const blanks=seqRow.querySelectorAll('.blank');
+      if(blanks.length>0) blanks[0].textContent=q.choices[q.ans];
+      if(ok){blanks[0]&&blanks[0].classList.add('correct');}
+      else{blanks[0]&&blanks[0].classList.add('wrong');}
+      grid.querySelectorAll('.battle-btn').forEach((b,j)=>{b.disabled=true;if(j===q.ans)b.classList.add('correct');else if(j===i&&!ok)b.classList.add('wrong');});
+      if(ok){correctAnswer();setFeedback(true,'✓ CORRECT! You got the pattern!');}
+      else{wrongAnswer();setFeedback(false,`✗ Answer: ${q.choices[q.ans]}`);}
+      if(lives>0)addNextBtn(area);
+    };
+    grid.appendChild(btn);
+  });
+  area.appendChild(grid);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// VERTICAL MATH RENDER (regrouping + borrowing)
+// ═══════════════════════════════════════════════════════════════
+function renderVertical(q, area){
+  const z=ZONE_DATA[currentZone-1];
+  const banner=document.createElement('div');
+  banner.style.cssText='font-family:var(--pixel-font);font-size:clamp(.38rem,.9vw,.5rem);color:rgba(255,255,255,.4);letter-spacing:2px;text-align:center';
+  banner.textContent=z.name.replace('\n',' ');
+  area.appendChild(banner);
+
+  // Build vertical problem display
+  const vbox=document.createElement('div');
+  vbox.className='vertical-math';
+  // No carry hint upfront — shown only after a wrong answer
+  vbox.innerHTML+=`<div class="vert-top">${q.top}</div><div style="display:flex;align-items:center;justify-content:flex-end;gap:6px"><span class="vert-op">${q.op}</span><span class="vert-bottom">${q.bot}</span></div><hr style="border:3px solid #1a1a2e;width:100%;margin:4px 0"><div class="vert-answer-row"><span style="font-size:clamp(1.1rem,3vw,1.8rem);color:rgba(0,0,0,.4);font-weight:900">= </span><span class="vert-blank">?</span></div>`;
+  area.appendChild(vbox);
+
+  // Generate 4 choices around the answer
+  const correct=q.ans;
+  const wrongs=new Set();
+  while(wrongs.size<3){
+    const off=Math.floor(Math.random()*20)-10;
+    const w=correct+off;
+    if(w!==correct&&w>0&&!wrongs.has(w)) wrongs.add(w);
+  }
+  const choices=sh([correct,...wrongs]);
+  const correctIdx=choices.indexOf(correct);
+
+  const grid=document.createElement('div');grid.className='ans-grid-4';
+  const fb=addFeedback(area);
+  choices.forEach((c,i)=>{
+    const btn=document.createElement('button');btn.className='battle-btn';btn.textContent=c;
+    btn.onclick=()=>{
+      if(questionAnswered)return;questionAnswered=true;
+      const ok=i===correctIdx;
+      const blankEl=vbox.querySelector('.vert-blank');
+      if(blankEl){blankEl.textContent=choices[correctIdx];blankEl.style.color=ok?'#155724':'#7a0000';blankEl.style.borderColor=ok?'var(--green)':'var(--red)';}
+      grid.querySelectorAll('.battle-btn').forEach((b,j)=>{b.disabled=true;if(j===correctIdx)b.classList.add('correct');else if(j===i&&!ok)b.classList.add('wrong');});
+      if(ok){correctAnswer();setFeedback(true,'✓ CORRECT! Amazing math!');}
+      else{
+        wrongAnswer();
+        setFeedback(false,`✗ The answer was: ${correct}`);
+        // Show carry/borrow hint after wrong answer
+        if(q.op==='+'){
+          const hint=getCarries(q.top,q.bot);
+          if(hint&&!vbox.querySelector('.carry-box')){
+            const hintEl=document.createElement('div');hintEl.className='carry-box';
+            hintEl.textContent='Hint: '+hint;vbox.insertBefore(hintEl,vbox.firstChild);
+          }
+        } else if(q.op==='−'){
+          if(!vbox.querySelector('.carry-box')){
+            const hintEl=document.createElement('div');hintEl.className='carry-box';
+            hintEl.style.borderColor='rgba(59,76,202,.4)';hintEl.style.background='rgba(59,76,202,.08)';
+            hintEl.textContent='Hint: you may need to borrow from the tens place';
+            vbox.insertBefore(hintEl,vbox.firstChild);
+          }
+        }
+      }
+      if(lives>0)addNextBtn(area);
+    };
+    grid.appendChild(btn);
+  });
+  area.appendChild(grid);
+}
+
+function getCarries(a,b){
+  // Show where regrouping happens (ones digit)
+  const onesSum=(a%10)+(b%10);
+  if(onesSum>=10) return '1 (from ones to tens)';
+  return '';
+}
+
+// ═══════════════════════════════════════════════════════════════
+// SHAPES RENDER
+// ═══════════════════════════════════════════════════════════════
+function renderShapes(q, area){
+  const banner=document.createElement('div');
+  banner.style.cssText='font-family:var(--pixel-font);font-size:clamp(.38rem,.9vw,.5rem);color:rgba(255,255,255,.4);letter-spacing:2px;text-align:center';
+  banner.textContent='🔷 2D SHAPES';
+  area.appendChild(banner);
+
+  const dialog=document.createElement('div');
+  dialog.className='battle-dialog';
+
+  let shapeHTML='';
+  if(q.shape){
+    shapeHTML=`<div style="display:flex;justify-content:center;margin:12px 0"><div class="shape-display"><svg class="shape-svg" viewBox="0 0 130 130">${drawShape(q.shape)}</svg></div></div>`;
+  }
+  dialog.innerHTML=`<span class="battle-label">Q${currentQ+1} OF ${shuffledQs.length} — 2D SHAPES</span><div class="battle-question">${q.q}</div>${shapeHTML}`;
+  area.appendChild(dialog);
+
+  const grid=document.createElement('div');
+  grid.className=q.choices.length<=2?'ans-grid-2':'ans-grid-4';
+  const fb=addFeedback(area);
+  q.choices.forEach((c,i)=>{
+    const btn=document.createElement('button');btn.className='battle-btn';btn.textContent=c;
+    btn.onclick=()=>{
+      if(questionAnswered)return;questionAnswered=true;
+      const ok=i===q.ans;
+      grid.querySelectorAll('.battle-btn').forEach((b,j)=>{b.disabled=true;if(j===q.ans)b.classList.add('correct');else if(j===i&&!ok)b.classList.add('wrong');});
+      if(ok){correctAnswer();setFeedback(true,'✓ CORRECT! Great shape knowledge!');}
+      else{wrongAnswer();setFeedback(false,`✗ Answer: ${q.choices[q.ans]}`);}
+      if(lives>0)addNextBtn(area);
+    };
+    grid.appendChild(btn);
+  });
+  area.appendChild(grid);
+}
+
+
+// ═══════════════════════════════════════════════════════════════
+// WILD ENCOUNTER SYSTEM
+// ═══════════════════════════════════════════════════════════════
+function getWildQPool(){
+  // Pull from all cleared zones for genuine cumulative review
+  const clearedZones=Object.keys(badges).filter(k=>badges[k]).map(Number);
+  if(clearedZones.length===0) return ZONE_POOLS[0];
+  const pool=[];
+  clearedZones.forEach(zid=>{
+    const zpool=ZONE_POOLS[zid-1];
+    // Take up to 8 random from each cleared zone
+    sh(zpool).slice(0,8).forEach(q=>pool.push({...q,_zoneId:zid}));
+  });
+  return pool.length>0?pool:ZONE_POOLS[0];
+}
+
+function startWild(){
+  // Pick a random wild Pokémon (rarity weighted)
+  const roll=Math.random();
+  let pool;
+  if(roll<0.05) pool=WILD_POKEMON.filter(p=>p.rarity==='legendary');
+  else if(roll<0.2) pool=WILD_POKEMON.filter(p=>p.rarity==='rare');
+  else if(roll<0.55) pool=WILD_POKEMON.filter(p=>p.rarity==='uncommon');
+  else pool=WILD_POKEMON.filter(p=>p.rarity==='common');
+  if(pool.length===0) pool=WILD_POKEMON;
+  wildPoke=pool[Math.floor(Math.random()*pool.length)];
+
+  // Check if already caught (can still battle, just won't add again)
+  const alreadyCaught=pcData.wildCatches.some(w=>w.name===wildPoke.name);
+
+  wildQs=sh(getWildQPool()).slice(0,5);
+  wildQIdx=0;wildHits=0;wildAnswered=false;
+  wildMaxHp=5;wildCurrentHp=5;
+  wildActive=true;
+
+  // Set up UI
+  document.getElementById('wildSprite').textContent=wildPoke.emoji;
+  document.getElementById('wildName').textContent='WILD '+wildPoke.name+'!';
+  const rarityClr=RARITY_COLORS[wildPoke.rarity];
+  document.getElementById('wildType').textContent=wildPoke.type+(alreadyCaught?' (ALREADY CAUGHT)':'');
+  document.getElementById('wildType').style.color=rarityClr;
+  document.getElementById('wildName').style.color=rarityClr;
+  updateWildHp();
+  document.getElementById('wildResult').classList.add('hidden');
+  document.getElementById('wildAnsGrid').style.display='grid';
+  document.getElementById('wildScreen').classList.remove('hidden');
+
+  renderWildQ();
+}
+
+function updateWildHp(){
+  const pct=wildCurrentHp/wildMaxHp*100;
+  const fill=document.getElementById('wildHpFill');
+  fill.style.width=pct+'%';
+  fill.className='enemy-hp-fill'+(pct<=40?' warn':'')+(pct<=20?' crit':'');
+}
+
+function renderWildQ(){
+  if(wildQIdx>=wildQs.length){endWild();return;}
+  wildAnswered=false;
+  const q=wildQs[wildQIdx];
+  document.getElementById('wildQNum').textContent=`Q: ${wildQIdx+1}/5`;
+  document.getElementById('progFill'); // unused here
+
+  // Question label
+  const zname=q._zoneId?ZONE_DATA[q._zoneId-1].name.replace('\n',' '):'';
+  document.getElementById('wildDialog').innerHTML=
+    `<div style="font-family:var(--pixel-font);font-size:clamp(.32rem,.75vw,.42rem);color:rgba(0,0,0,.4);letter-spacing:1px;margin-bottom:6px">${zname}</div>`+
+    `<div class="wild-q">${q.q||buildVertQ(q)}</div>`;
+
+  // Choices
+  const grid=document.getElementById('wildAnsGrid');grid.innerHTML='';
+  let choices, correctIdx;
+
+  if(q.top!==undefined){
+    // Vertical math question
+    const correct=q.ans;
+    const wrongs=new Set();
+    while(wrongs.size<3){const w=correct+Math.floor(Math.random()*20)-10;if(w!==correct&&w>0)wrongs.add(w);}
+    const ch=sh([correct,...wrongs]);
+    correctIdx=ch.indexOf(correct);
+    choices=ch.map(String);
+  } else {
+    choices=q.choices;
+    correctIdx=q.ans;
+  }
+
+  choices.forEach((ch,i)=>{
+    const btn=document.createElement('button');
+    btn.className='battle-btn';btn.textContent=ch;
+    btn.onclick=()=>wildAnswer(i,correctIdx,btn,grid);
+    grid.appendChild(btn);
+  });
+
+  // Start 30-second timer
+  startWildTimer();
+}
+
+function buildVertQ(q){
+  return `${q.top} ${q.op} ${q.bot} = ?`;
+}
+
+let wildTimerInterval=null;
+function startWildTimer(){
+  clearInterval(wildTimerInterval);
+  wildTimeLeft=45;
+  updateWildTimer();
+  wildTimerInterval=setInterval(()=>{
+    wildTimeLeft--;
+    updateWildTimer();
+    if(wildTimeLeft<=0){
+      clearInterval(wildTimerInterval);
+      if(!wildAnswered) wildTimedOut();
+    }
+  },1000);
+}
+function updateWildTimer(){
+  const pct=wildTimeLeft/45*100;
+  const fill=document.getElementById('wildTimerFill');
+  if(!fill)return;
+  fill.style.width=pct+'%';
+  fill.className='wild-timer-fill'+(wildTimeLeft<=10?' hurry':'')+(wildTimeLeft<=5?' urgent':'');
+}
+function wildTimedOut(){
+  if(wildAnswered)return;
+  wildAnswered=true;
+  clearInterval(wildTimerInterval);
+  const grid=document.getElementById('wildAnsGrid');
+  grid.querySelectorAll('.battle-btn').forEach(b=>b.disabled=true);
+  const fb=document.getElementById('wildFb');
+  fb.textContent="⏱ TIME'S UP! The wild Pokémon dodged!";fb.className="fb-text bad";
+  // Wild recovers a bit of HP
+  wildCurrentHp=Math.min(wildMaxHp,wildCurrentHp+1);
+  updateWildHp();
+  setTimeout(()=>{
+    wildQIdx++;fb.textContent='';
+    if(wildQIdx<wildQs.length)renderWildQ();else endWild();
+  },1200);
+}
+
+function wildAnswer(i, correctIdx, btn, grid){
+  if(wildAnswered)return;
+  wildAnswered=true;
+  clearInterval(wildTimerInterval);
+  const ok=i===correctIdx;
+  grid.querySelectorAll('.battle-btn').forEach((b,j)=>{
+    b.disabled=true;
+    if(j===correctIdx)b.classList.add('correct');
+    else if(j===i&&!ok)b.classList.add('wrong');
+  });
+  const fb=document.getElementById('wildFb');
+  if(ok){
+    wildHits++;
+    wildCurrentHp=Math.max(0,wildCurrentHp-1);
+    updateWildHp();
+    // Damage flash on sprite
+    const sprite=document.getElementById('wildSprite');
+    const dmg=document.createElement('div');dmg.className='damage-flash';dmg.style.position='absolute';dmg.style.inset='0';
+    sprite.parentElement.style.position='relative';sprite.parentElement.appendChild(dmg);
+    setTimeout(()=>dmg.remove(),300);
+    fb.textContent=`✓ HIT! ${wildPoke.name} took damage! (HP: ${wildCurrentHp}/${wildMaxHp})`;
+    fb.className='fb-text good';
+  } else {
+    fb.textContent=`✗ MISSED! ${wildPoke.name} dodged!`;
+    fb.className='fb-text bad';
+  }
+  setTimeout(()=>{
+    wildQIdx++;fb.textContent='';
+    if(wildCurrentHp<=0){endWild();return;}
+    if(wildQIdx<wildQs.length)renderWildQ();else endWild();
+  },1300);
+}
+
+function endWild(){
+  clearInterval(wildTimerInterval);
+  wildActive=false;
+  const caught=wildHits>=3;
+  const alreadyCaught=pcData.wildCatches.some(w=>w.name===wildPoke.name);
+  document.getElementById('wildAnsGrid').style.display='none';
+  document.getElementById('wildTimerFill').style.width='0%';
+  const result=document.getElementById('wildResult');
+  const ball=document.getElementById('wildResultBall');
+  const title=document.getElementById('wildResultTitle');
+  const sub=document.getElementById('wildResultSub');
+
+  if(caught){
+    ball.textContent='🔴';title.textContent=alreadyCaught?'GOTCHA! (ALREADY IN BOX)':'⭐ GOTCHA! POKÉMON CAUGHT! ⭐';
+    title.style.color=alreadyCaught?'var(--poke-yellow)':'var(--green)';
+    sub.textContent=wildPoke.emoji+' '+wildPoke.name+' was added to your PC Box!';
+    if(!alreadyCaught){
+      pcData.wildCatches.push({
+        name:wildPoke.name,emoji:wildPoke.emoji,type:wildPoke.type,
+        rarity:wildPoke.rarity,hits:wildHits,zoneId:currentZone
+      });
+      saveSave();
+    }
+  } else {
+    ball.textContent='⚪';title.textContent='IT GOT AWAY...';
+    title.style.color='rgba(255,255,255,.6)';
+    sub.textContent=`You hit ${wildHits}/5! Need 3+ to catch. Try again after the next zone!`;
+  }
+  result.classList.remove('hidden');
+}
+
+function afterWild(){
+  document.getElementById('wildScreen').classList.add('hidden');
+  buildMap();showScreen('pokedex');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// PC BOX SYSTEM
+// ═══════════════════════════════════════════════════════════════
+function buildPCBox(){
+  pcCurrentTab='all';
+  document.querySelectorAll('.pc-tab').forEach((t,i)=>{t.classList.toggle('active',i===0);});
+  renderPCCards('all');
+}
+
+function pcShowTab(tab){
+  pcCurrentTab=tab;
+  document.querySelectorAll('.pc-tab').forEach(t=>{
+    t.classList.toggle('active',t.getAttribute('onclick').includes("'"+tab+"'"));
+  });
+  renderPCCards(tab);
+}
+
+function renderPCCards(tab){
+  const grid=document.getElementById('pcCardsGrid');
+  grid.innerHTML='';
+  let totalPower=0;
+  let cards=[];
+
+  // Main team (earned through zones)
+  if(tab==='all'||tab==='main'){
+    ZONE_DATA.forEach(z=>{
+      if(badges[z.id]){
+        const pc=POKEMON_CHAIN[z.id-1];
+        const stats=pcData.zonePokes[z.id]||{score:5,maxScore:8};
+        const power=calcPower(stats.score,stats.maxScore);
+        totalPower+=power;
+        cards.push({
+          emoji:pc.after,name:pc.name,type:pc.type,
+          score:stats.score,maxScore:stats.maxScore,
+          power,cardClass:'main-poke',
+          label:'ZONE '+z.id+' TEAM',
+          tag:z.emoji+' '+z.name.replace('\n',' '),
+        });
+      }
+    });
+  }
+
+  // Wild catches
+  if(tab==='all'||tab==='wild'){
+    pcData.wildCatches.forEach(w=>{
+      const power=calcPower(w.hits,5)*0.8|0;
+      totalPower+=power;
+      cards.push({
+        emoji:w.emoji,name:w.name,type:w.type,
+        score:w.hits,maxScore:5,
+        power,cardClass:'wild-poke',
+        label:'WILD CATCH',
+        tag:'Caught in Zone '+w.zoneId,
+        rarity:w.rarity,
+      });
+    });
+  }
+
+  // Total power
+  document.getElementById('pcTotalNum').textContent='POWER: '+totalPower;
+
+  if(cards.length===0){
+    grid.innerHTML='<div style="grid-column:1/-1;text-align:center;font-size:1rem;font-weight:800;color:rgba(255,255,255,.4);padding:2rem">No Pokémon here yet!<br>Win zones to build your team!</div>';
+    return;
+  }
+
+  cards.forEach(card=>{
+    const el=document.createElement('div');
+    el.className='pc-card '+card.cardClass;
+    const atkPct=Math.round(card.score/card.maxScore*100);
+    const defPct=Math.max(40,atkPct-10);
+    const spdPct=Math.min(100,atkPct+5);
+    const atkColor=atkPct>=80?'#2ed573':atkPct>=60?'#ffa502':'#ff4757';
+    const rarityBadge=card.rarity?`<div class="pc-wild-tag" style="color:${RARITY_COLORS[card.rarity]||'#fff'}">${card.rarity.toUpperCase()}</div>`:'';
+    el.innerHTML=`
+      <div class="pc-card-emo">${card.emoji}</div>
+      <div class="pc-card-name">${card.name}</div>
+      <div class="pc-card-type">${card.type}</div>
+      ${rarityBadge}
+      <div class="pc-stat-bars">
+        <div class="pc-stat-row">
+          <div class="pc-stat-lbl">ATK</div>
+          <div class="pc-stat-bg"><div class="pc-stat-fill" style="width:${atkPct}%;background:${atkColor}"></div></div>
+          <div class="pc-stat-val">${atkPct}</div>
+        </div>
+        <div class="pc-stat-row">
+          <div class="pc-stat-lbl">DEF</div>
+          <div class="pc-stat-bg"><div class="pc-stat-fill" style="width:${defPct}%;background:${atkColor}"></div></div>
+          <div class="pc-stat-val">${defPct}</div>
+        </div>
+        <div class="pc-stat-row">
+          <div class="pc-stat-lbl">SPD</div>
+          <div class="pc-stat-bg"><div class="pc-stat-fill" style="width:${spdPct}%;background:${atkColor}"></div></div>
+          <div class="pc-stat-val">${spdPct}</div>
+        </div>
+      </div>
+      <div class="pc-power">PWR: ${card.power}</div>
+      <div class="pc-wild-tag">${card.tag}</div>
+      <div style="font-size:.7rem;font-weight:800;color:rgba(255,255,255,.3);margin-top:2px">${card.score}/${card.maxScore} correct</div>
+    `;
+    grid.appendChild(el);
+  });
+}
+
+function calcPower(score,maxScore){
+  const pct=score/maxScore;
+  return Math.round(pct*100);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// BOOT
+// ═══════════════════════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded',()=>{loadSave();});
+</script>
+
+<!-- WILD ENCOUNTER -->
+<div id="wildScreen" class="hidden">
+  <div class="wild-header">
+    <div style="font-family:var(--pixel-font);font-size:clamp(.38rem,.9vw,.52rem);color:var(--green);letter-spacing:2px;flex:1">⚡ WILD POKÉMON APPEARED!</div>
+    <div style="font-family:var(--pixel-font);font-size:clamp(.35rem,.8vw,.45rem);color:rgba(255,255,255,.4)" id="wildQNum">Q: 1/5</div>
+  </div>
+  <div class="wild-enemy-area">
+    <div style="position:relative">
+      <div class="wild-poke-sprite" id="wildSprite">❓</div>
+    </div>
+    <div class="wild-name" id="wildName">WILD POKÉMON</div>
+    <div style="font-size:.85rem;font-weight:800;color:rgba(255,255,255,.5)" id="wildType"></div>
+    <div class="enemy-hp-wrap">
+      <div class="enemy-hp-label">WILD HP</div>
+      <div class="enemy-hp-bg"><div class="enemy-hp-fill" id="wildHpFill" style="width:100%"></div></div>
+    </div>
+  </div>
+  <div class="wild-timer-bar" style="max-width:620px;width:100%"><div class="wild-timer-fill" id="wildTimerFill" style="width:100%"></div></div>
+  <div class="wild-battle-dialog" id="wildDialog">
+    <div class="wild-q" id="wildQ">Loading question...</div>
+  </div>
+  <div id="wildAnsGrid" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;max-width:620px;width:100%;margin-top:8px"></div>
+  <div class="fb-text" id="wildFb" style="min-height:1.4rem"></div>
+  <div id="wildResult" class="wild-result hidden">
+    <div class="pokeball-anim" id="wildResultBall">⚪</div>
+    <div style="font-family:var(--pixel-font);font-size:clamp(.7rem,2vw,.9rem)" id="wildResultTitle">YOU CAUGHT IT!</div>
+    <div style="font-size:1rem;font-weight:800;color:rgba(255,255,255,.7)" id="wildResultSub"></div>
+    <button class="pxbtn" style="background:var(--poke-yellow);color:#000;font-size:clamp(.52rem,1.3vw,.68rem)" onclick="afterWild()">CONTINUE ▶</button>
+  </div>
+</div>
+
+<!-- PC BOX -->
+<div id="pcBox" class="screen">
+  <div class="pcbox-title">💾 PC BOX — YOUR POKÉMON</div>
+  <div class="pc-tabs" id="pcTabs">
+    <button class="pc-tab active" onclick="pcShowTab('all')">ALL POKÉMON</button>
+    <button class="pc-tab" onclick="pcShowTab('main')">ZONE TEAM</button>
+    <button class="pc-tab" onclick="pcShowTab('wild')">WILD CATCHES</button>
+  </div>
+  <div class="pc-total-power" id="pcTotalPower">
+    <div class="pc-total-num" id="pcTotalNum">POWER: 0</div>
+    <div class="pc-total-lbl">Total Team Power</div>
+  </div>
+  <div class="pc-cards-grid" id="pcCardsGrid"></div>
+  <button class="pxbtn" style="background:var(--poke-yellow);color:#000;font-size:clamp(.52rem,1.3vw,.68rem);margin-top:1rem" onclick="buildMap();showScreen('pokedex')">◀ BACK TO MAP</button>
+</div>
+
+</body>
+</html>
