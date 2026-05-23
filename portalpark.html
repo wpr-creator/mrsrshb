@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Portal Park</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ink:#1f2937;--muted:#526174;--paper:#fffaf0;--line:#1f2937;
+  --blue:#3b82f6;--cyan:#38bdf8;--mint:#6ee7b7;--green:#22c55e;
+  --gold:#fbbf24;--orange:#fb923c;--pink:#f472b6;--purple:#a78bfa;--red:#ef4444;
+  --shadow:rgba(31,41,55,.18);
+  --display:'Baloo 2',system-ui,sans-serif;
+  --body:'Nunito',system-ui,sans-serif;
+}
+html{font-size:22px}
+body{font-family:var(--body);color:var(--ink);min-height:100vh;overflow-x:hidden;background:#f5efe2;font-size:22px;line-height:1.4}
+button{font-family:var(--display);font-weight:800;color:var(--ink);cursor:pointer}
+.screen{display:none;min-height:100vh;flex-direction:column;align-items:center}
+.screen.active{display:flex}
+.hidden{display:none!important}
+.card{background:rgba(255,255,255,.96);border:4px solid var(--line);border-radius:30px;box-shadow:0 8px 0 var(--line),0 18px 30px var(--shadow)}
+.btn{
+  font-size:clamp(1.2rem,3vw,1.75rem);line-height:1.05;
+  padding:16px 28px;border:4px solid var(--line);border-radius:22px;
+  background:var(--gold);box-shadow:0 7px 0 var(--line);transition:.08s
+}
+.btn:hover{transform:translateY(-2px);box-shadow:0 9px 0 var(--line)}
+.btn:active{transform:translateY(4px);box-shadow:0 3px 0 var(--line)}
+.btn.secondary{background:#fff}
+.btn.small{font-size:clamp(1rem,2.5vw,1.2rem);padding:10px 18px;border-radius:18px;box-shadow:0 5px 0 var(--line)}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+@keyframes pop{0%{transform:scale(.72);opacity:0}80%{transform:scale(1.08)}100%{transform:scale(1);opacity:1}}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+@keyframes pulse{0%,100%{filter:brightness(1)}50%{filter:brightness(1.13)}}
+@keyframes drift{0%{transform:translateX(-10px)}50%{transform:translateX(10px)}100%{transform:translateX(-10px)}}
+
+/* ── TITLE ── */
+#title{
+  justify-content:center;text-align:center;gap:22px;padding:28px 16px;
+  background:
+    radial-gradient(circle at 24% 22%,rgba(59,130,246,.3),transparent 26%),
+    radial-gradient(circle at 78% 30%,rgba(251,191,36,.26),transparent 25%),
+    linear-gradient(180deg,#e9f5ff,#fff2d2);
+}
+.logo-card{padding:28px;max-width:860px;width:100%;position:relative;overflow:hidden}
+.logo-card::before{content:"";position:absolute;inset:-20%;background:radial-gradient(circle,rgba(59,130,246,.12),transparent 40%);animation:drift 7s ease-in-out infinite}
+.logo-card>*{position:relative}
+.logo-mark{font-size:clamp(4rem,12vw,7.5rem);animation:bob 2.4s ease-in-out infinite}
+.game-title{font-family:var(--display);font-size:clamp(3.2rem,9.5vw,6rem);line-height:.88;color:#215fa8;text-shadow:4px 5px 0 rgba(255,255,255,.95)}
+.tagline{font-size:clamp(1.2rem,3vw,1.6rem);font-weight:900;line-height:1.35;max-width:720px;margin:12px auto 0;color:#34465d}
+
+/* ── HUB ── */
+#hub{padding:16px;gap:14px;background:linear-gradient(180deg,#e7f4ff,#fff3d6)}
+.topbar{
+  width:100%;position:sticky;top:0;z-index:20;
+  display:flex;gap:10px;align-items:center;justify-content:center;flex-wrap:wrap;
+  padding:12px;background:rgba(255,255,255,.94);border-bottom:4px solid var(--line)
+}
+.stat{font-family:var(--display);font-size:clamp(1rem,2.5vw,1.35rem);background:#fff;border:3px solid var(--line);border-radius:16px;padding:8px 14px}
+.hub-title{font-family:var(--display);font-size:clamp(2.2rem,6.5vw,3.8rem);color:#215fa8;line-height:1;text-align:center}
+.hub-sub{font-size:clamp(1.1rem,2.5vw,1.4rem);font-weight:900;text-align:center;max-width:880px;line-height:1.35;color:#415166}
+.portal-grid{width:100%;max-width:1160px;display:grid;grid-template-columns:repeat(3,1fr);gap:20px;padding:10px 0 42px}
+@media(max-width:900px){.portal-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:600px){.portal-grid{grid-template-columns:1fr}}
+.portal{
+  min-height:230px;padding:20px;text-align:center;
+  display:flex;flex-direction:column;gap:10px;align-items:center;justify-content:center;
+  overflow:hidden;position:relative;border-radius:32px;cursor:pointer;
+  transition:transform .12s,box-shadow .12s;
+}
+.portal::before{content:"";position:absolute;inset:-45%;background:radial-gradient(circle,rgba(255,255,255,.5),transparent 48%);opacity:.7;animation:pulse 3.2s ease-in-out infinite}
+.portal::after{content:"ENTER";position:absolute;top:12px;right:12px;font-family:var(--display);font-size:clamp(.8rem,1.8vw,.95rem);background:rgba(255,255,255,.8);border:2px solid var(--line);border-radius:999px;padding:4px 10px}
+.portal>*{position:relative}
+.portal:hover{transform:translateY(-4px);box-shadow:0 12px 0 var(--line),0 22px 32px var(--shadow)}
+.portal-emoji{font-size:clamp(3.5rem,9vw,5.5rem);animation:bob 2.7s ease-in-out infinite}
+.portal-name{font-family:var(--display);font-size:clamp(1.7rem,4.2vw,2.4rem);line-height:.96;color:#153e75}
+.portal-story{font-size:clamp(1rem,2.3vw,1.22rem);font-weight:900;line-height:1.25;color:#34465d}
+.portal-status{font-size:clamp(.88rem,2vw,1.05rem);color:#526174;font-weight:900}
+.candy{background:linear-gradient(160deg,#fff,#ffe1ee 45%,#dffdea)}
+.space{background:linear-gradient(160deg,#f4fbff,#e3e8ff 45%,#dff7ff)}
+.zoo{background:linear-gradient(160deg,#fff,#e0f5ed 45%,#fff0cd)}
+.island{background:linear-gradient(160deg,#e1fbff,#fff1d7 45%,#d8f7e7)}
+.block{background:linear-gradient(160deg,#eef6ff,#e8ffe6 45%,#fff3c4)}
+.pop{background:linear-gradient(160deg,#fff1fb,#eee9ff 45%,#ffe6ba)}
+
+/* ── GAME ── */
+#game{background:linear-gradient(180deg,#e4f4ff,#fff6df)}
+.hud{
+  width:100%;position:sticky;top:0;z-index:30;
+  display:flex;align-items:center;justify-content:space-between;
+  gap:12px;flex-wrap:wrap;padding:14px 16px;
+  background:rgba(255,255,255,.95);border-bottom:4px solid var(--line)
+}
+.hud-left{display:flex;align-items:center;gap:12px}
+.hud-emoji{font-size:clamp(2rem,5vw,2.8rem)}
+.hud-title{font-family:var(--display);font-size:clamp(1.2rem,3vw,1.75rem);color:#215fa8;line-height:1}
+.hud-sub{font-size:clamp(.95rem,2.2vw,1.18rem);font-weight:900;color:var(--muted)}
+.hearts{font-size:clamp(1.2rem,3vw,1.45rem);letter-spacing:2px}
+.progress{width:100%;height:18px;background:#fff;border:3px solid var(--line);border-radius:999px;overflow:hidden;max-width:700px}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--green),var(--gold));width:0%;transition:.28s}
+.game-wrap{width:100%;max-width:920px;padding:20px 16px 80px;display:flex;flex-direction:column;gap:16px;align-items:center}
+.event{width:100%;font-size:clamp(1.1rem,2.8vw,1.42rem);font-weight:900;text-align:center;padding:12px 16px;border-radius:22px;background:#fff;border:3px solid var(--line)}
+.question{width:100%;padding:22px}
+.q-text{font-size:clamp(1.5rem,4.5vw,2.4rem);line-height:1.25;font-weight:900;text-align:center}
+.visual{font-size:clamp(1.8rem,5vw,3rem);line-height:1.4;margin-top:10px;word-break:break-word;text-align:center}
+.answers{width:100%;display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+@media(max-width:600px){.answers{grid-template-columns:1fr}}
+.answer{
+  font-size:clamp(1.3rem,3.8vw,1.9rem);line-height:1.1;
+  min-height:84px;padding:18px 14px;
+  border:4px solid var(--line);border-radius:24px;
+  background:#fff;box-shadow:0 7px 0 var(--line);
+  font-family:var(--body);font-weight:900;
+}
+.answer:hover:not(:disabled){background:#fff0bd;transform:translateY(-2px)}
+.answer.correct{background:#c9f7dc;border-color:#157a48;color:#105b36;animation:pop .25s}
+.answer.wrong{background:#ffd3d3;border-color:#c82333;color:#8d1520;animation:shake .25s}
+.answer:disabled{cursor:default}
+.feedback{min-height:40px;font-family:var(--display);font-size:clamp(1.2rem,3vw,1.75rem);font-weight:800;text-align:center}
+.good{color:#157a48}.bad{color:#c82333}
+
+/* ── MODALS ── */
+.modal{position:fixed;inset:0;z-index:90;display:flex;align-items:center;justify-content:center;background:rgba(255,250,240,.9);padding:20px}
+.modal-card{max-width:660px;width:100%;padding:28px;text-align:center;display:flex;flex-direction:column;gap:14px;align-items:center}
+.modal-emoji{font-size:clamp(3.5rem,10vw,5rem)}
+.modal-title{font-family:var(--display);font-size:clamp(2.2rem,6.5vw,3.8rem);color:#215fa8;line-height:1}
+.modal-text{font-size:clamp(1.15rem,2.8vw,1.5rem);font-weight:900;line-height:1.4}
+.theme-candy{background:linear-gradient(180deg,#fff3f8,#e4fff1)}
+.theme-space{background:linear-gradient(180deg,#eef8ff,#e6eaff)}
+.theme-zoo{background:linear-gradient(180deg,#fff8e9,#e3f8ee)}
+.theme-island{background:linear-gradient(180deg,#e6fbff,#fff1d8)}
+.theme-block{background:linear-gradient(180deg,#eef6ff,#e9ffe9)}
+.theme-pop{background:linear-gradient(180deg,#fff0fa,#f0edff)}
+</style>
+</head>
+<body>
+
+<!-- TITLE -->
+<section id="title" class="screen active">
+  <div class="logo-card card">
+    <div class="logo-mark">🚪</div>
+    <h1 class="game-title">Portal Park</h1>
+    <p class="tagline">Six doors. Six worlds. Each run is different — coins, hearts, and a badge waiting inside.</p>
+  </div>
+  <button class="btn" onclick="startGame()">Open the Gates ▶</button>
+</section>
+
+<!-- HUB -->
+<section id="hub" class="screen">
+  <div class="topbar">
+    <div class="stat" id="rankStat">🌟 Rank 1</div>
+    <div class="stat" id="coinStat">🪙 0</div>
+    <div class="stat" id="badgeStat">🏅 0 / 6</div>
+    <button class="btn small secondary" onclick="resetAll()">Reset</button>
+  </div>
+  <h2 class="hub-title">Pick Your Portal</h2>
+  <p class="hub-sub">Each world has its own challenge mix. Find the badge to unlock it for good.</p>
+  <div class="portal-grid" id="portalGrid"></div>
+</section>
+
+<!-- GAME -->
+<section id="game" class="screen">
+  <div class="hud">
+    <div class="hud-left">
+      <div class="hud-emoji" id="hudEmoji">🍭</div>
+      <div>
+        <div class="hud-title" id="hudTitle">Candy Animals</div>
+        <div class="hud-sub" id="hudSub">Challenge 1 of 8</div>
+      </div>
+    </div>
+    <div class="hearts" id="hearts">❤️❤️❤️</div>
+    <div class="stat" id="hudCoins">🪙 0</div>
+    <div class="progress"><div class="progress-fill" id="progress"></div></div>
+  </div>
+  <main class="game-wrap">
+    <div class="event" id="eventText">A portal opens...</div>
+    <div id="gameArea" style="width:100%;display:flex;flex-direction:column;gap:16px;align-items:center"></div>
+  </main>
+</section>
+
+<!-- TREASURE -->
+<div id="treasure" class="modal hidden">
+  <div class="modal-card card">
+    <div class="modal-emoji" id="treasureEmoji">🎁</div>
+    <div class="modal-title">Portal Prize!</div>
+    <div class="modal-text" id="treasureText">You found coins!</div>
+    <button class="btn" onclick="closeTreasure()">Keep Going ▶</button>
+  </div>
+</div>
+
+<!-- COMPLETE -->
+<div id="complete" class="modal hidden">
+  <div class="modal-card card">
+    <div class="modal-emoji" id="completeEmoji">🏅</div>
+    <div class="modal-title" id="completeTitle">Badge Found!</div>
+    <div class="modal-text" id="completeText">Great work!</div>
+    <button class="btn" onclick="finishRun()">Back to Portal Park ▶</button>
+    <button class="btn secondary" onclick="restartRun()">Play This World Again ↺</button>
+  </div>
+</div>
+
+<!-- GAME OVER -->
+<div id="gameover" class="modal hidden">
+  <div class="modal-card card">
+    <div class="modal-emoji">💤</div>
+    <div class="modal-title">Portal Closed!</div>
+    <div class="modal-text">You ran out of hearts. New challenges are waiting — try again!</div>
+    <button class="btn" onclick="restartRun()">Try Again ▶</button>
+    <button class="btn secondary" onclick="gameOverHub()">Back to Park</button>
+  </div>
+</div>
+
+<script>
+const SAVE_KEY="portal_park_v3";
+let state={coins:0,badges:{},rank:1};
+let current=null,deck=[],index=0,hearts=3,correct=0,locked=false;
+
+const PORTALS=[
+  {id:"candy",name:"Candy Animals",emoji:"🍭",css:"candy",theme:"theme-candy",
+   story:"Gummy creatures guard the sweetest door in the park.",
+   types:["money","fractions","skip","graphs"]},
+  {id:"space",name:"Space Station",emoji:"🚀",css:"space",theme:"theme-space",
+   story:"A glowing elevator launches you into orbit.",
+   types:["time","skip","place","measurement"]},
+  {id:"zoo",name:"Metro Zoo City",emoji:"🐾",css:"zoo",theme:"theme-zoo",
+   story:"Animal citizens need help all across the city.",
+   types:["graphs","ela","sentences","map"]},
+  {id:"island",name:"Stitch Island",emoji:"🛸",css:"island",theme:"theme-island",
+   story:"A wild island portal hums with alien energy.",
+   types:["measurement","time","map","fractions"]},
+  {id:"block",name:"Block World",emoji:"🎮",css:"block",theme:"theme-block",
+   story:"Build, buy, and unlock your way through blocky worlds.",
+   types:["place","money","measurement","skip"]},
+  {id:"pop",name:"Pop Star City",emoji:"🎤",css:"pop",theme:"theme-pop",
+   story:"The stage portal flashes like a concert countdown.",
+   types:["time","graphs","sentences","ela"]}
+];
+
+const EVENTS={
+  candy:["A gummy fox opens a secret stand! 🦊","A sprinkle chest sparkles nearby! ✨","A chocolate bridge needs brain power! 🍫","The gummy bears have a quiz! 🐻"],
+  space:["An alien clock is blinking! 👽","Rocket fuel numbers are scrambled! 🚀","A moon chest lands softly! 🌙","Mission control needs answers! 📡"],
+  zoo:["A bunny officer waves you over! 🐰","The city graph board lights up! 📊","A train schedule changes! 🚆","The zookeeper has a question! 🦁"],
+  island:["A blue alien finds a treasure coconut! 🥥","A surfboard needs measuring! 🏄","The beach map blows across the sand! 🗺️","A crab holds a mystery clue! 🦀"],
+  block:["A builder needs the perfect block! 🧱","The item shop opens! 🛒","A mystery block glows! ❓","A crafting recipe appears! ⚒️"],
+  pop:["The stage lights turn on! 🎤","Fans vote for the next song! ⭐","The concert clock starts! ⏰","The crowd holds up score cards! 🃏"]
+};
+
+function rand(a){return a[Math.floor(Math.random()*a.length)]}
+function shuffle(a){let b=[...a];for(let i=b.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]]}return b}
+function save(){localStorage.setItem(SAVE_KEY,JSON.stringify(state))}
+function load(){try{state=JSON.parse(localStorage.getItem(SAVE_KEY))||state}catch(e){}}
+function show(id){document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));document.getElementById(id).classList.add("active");scrollTo(0,0)}
+function startGame(){load();buildHub();show("hub")}
+function resetAll(){if(confirm("Reset Portal Park progress?")){state={coins:0,badges:{},rank:1};save();buildHub()}}
+
+function buildHub(){
+  state.rank=1+Math.floor(Object.keys(state.badges).length/2);
+  document.getElementById("rankStat").textContent="🌟 Rank "+state.rank;
+  document.getElementById("coinStat").textContent="🪙 "+state.coins;
+  document.getElementById("badgeStat").textContent="🏅 "+Object.keys(state.badges).length+" / "+PORTALS.length;
+  const grid=document.getElementById("portalGrid");grid.innerHTML="";
+  PORTALS.forEach(p=>{
+    const b=document.createElement("button");
+    b.className=`portal card ${p.css}`;
+    b.innerHTML=`<div class="portal-emoji">${p.emoji}</div><div class="portal-name">${p.name}</div><div class="portal-story">${p.story}</div><div class="portal-status">${state.badges[p.id]?"🏅 Badge found — portal reopens":"Tap to jump through"}</div>`;
+    b.onclick=()=>launch(p.id);
+    grid.appendChild(b);
+  });
+}
+
+function launch(id){
+  current=PORTALS.find(p=>p.id===id);
+  hearts=3;correct=0;index=0;locked=false;
+  deck=shuffle(current.types.flatMap(t=>makeBank(t))).slice(0,8);
+  const game=document.getElementById("game");
+  game.className="screen active "+current.theme;
+  show("game");render();
+}
+
+function updateHud(){
+  document.getElementById("hudEmoji").textContent=current.emoji;
+  document.getElementById("hudTitle").textContent=current.name;
+  document.getElementById("hudSub").textContent=`Challenge ${index+1} of ${deck.length}`;
+  document.getElementById("hearts").textContent="❤️".repeat(hearts)+"🤍".repeat(3-hearts);
+  document.getElementById("hudCoins").textContent="🪙 "+state.coins;
+  document.getElementById("progress").style.width=(index/deck.length*100)+"%";
+  document.getElementById("eventText").textContent=rand(EVENTS[current.id]);
+}
+
+function render(){
+  locked=false;updateHud();
+  const q=deck[index],area=document.getElementById("gameArea");
+  area.innerHTML=`
+    <section class="question card">
+      <div class="q-text">${q.q}</div>
+      ${q.visual?`<div class="visual">${q.visual}</div>`:""}
+    </section>
+    <section class="answers">
+      ${q.choices.map((c,i)=>`<button class="answer" onclick="answer(${i})">${c}</button>`).join("")}
+    </section>
+    <div id="feedback" class="feedback"></div>`;
+}
+
+function answer(i){
+  if(locked)return;locked=true;
+  const q=deck[index],btns=[...document.querySelectorAll(".answer")],fb=document.getElementById("feedback");
+  btns.forEach(b=>b.disabled=true);
+  if(i===q.ans){
+    btns[i].classList.add("correct");correct++;
+    let gain=5+Math.floor(Math.random()*7);state.coins+=gain;save();
+    fb.textContent=rand(["Correct!","Great thinking!","Nice move!","You got it!"]);
+    fb.className="feedback good";updateHud();
+    if(Math.random()<.3)setTimeout(()=>showTreasure(gain),550);else setTimeout(next,950);
+  }else{
+    btns[i].classList.add("wrong");btns[q.ans].classList.add("correct");hearts--;updateHud();
+    fb.textContent="Good try! The answer was: "+q.choices[q.ans]+".";fb.className="feedback bad";
+    if(hearts<=0)setTimeout(()=>document.getElementById("gameover").classList.remove("hidden"),1000);
+    else setTimeout(next,1500);
+  }
+}
+
+function next(){index++;if(index>=deck.length)endRun();else render()}
+function showTreasure(gain){
+  document.getElementById("treasureEmoji").textContent=rand(["🎁","💎","🧢","🪄","⭐","🍀","🛸","🧱","🎟️","🐾"]);
+  document.getElementById("treasureText").textContent=`You found ${gain} coins inside ${current.name}!`;
+  document.getElementById("treasure").classList.remove("hidden");
+}
+function closeTreasure(){document.getElementById("treasure").classList.add("hidden");next()}
+
+function endRun(){
+  document.getElementById("progress").style.width="100%";
+  const won=correct>=6;
+  if(won){state.badges[current.id]=true;state.coins+=20;save()}
+  document.getElementById("completeEmoji").textContent=won?"🏅":"⭐";
+  document.getElementById("completeTitle").textContent=won?"Portal Badge Found!":"Run Complete!";
+  document.getElementById("completeText").textContent=won
+    ?`You solved ${correct}/8 and found the ${current.name} badge — plus 20 bonus coins!`
+    :`You solved ${correct}/8. Hit 6 or more to find the badge.`;
+  document.getElementById("complete").classList.remove("hidden");
+}
+function finishRun(){document.getElementById("complete").classList.add("hidden");buildHub();show("hub")}
+function restartRun(){document.getElementById("complete").classList.add("hidden");document.getElementById("gameover").classList.add("hidden");launch(current.id)}
+function gameOverHub(){document.getElementById("gameover").classList.add("hidden");buildHub();show("hub")}
+
+// ── QUESTION BUILDER ──────────────────────────────────────────
+function q(text,choices,ans,visual=""){
+  const correct=choices[ans];
+  const sh=shuffle([...choices]);
+  return{q:text,choices:sh,ans:sh.indexOf(correct),visual};
+}
+function makeBank(type){
+  return({money:moneyBank,time:timeBank,fractions:fractionBank,skip:skipBank,
+          place:placeBank,map:mapBank,graphs:graphBank,ela:elaBank,
+          measurement:measureBank,sentences:sentenceBank}[type]||moneyBank)();
+}
+
+// ── MONEY ─────────────────────────────────────────────────────
+function moneyBank(){
+  const coins=[["penny",1,"🟤"],["nickel",5,"⚪"],["dime",10,"🔘"],["quarter",25,"🪙"]];
+  let out=[];
+  for(let i=0;i<50;i++){
+    let a=rand(coins),b=rand(coins),c=Math.random()<.55?rand(coins):null;
+    let total=a[1]+b[1]+(c?c[1]:0);
+    out.push(q(`How much money is shown?`,[total+"¢",(total+5)+"¢",Math.max(1,total-5)+"¢",(total+10)+"¢"],0,a[2]+b[2]+(c?c[2]:"")));
+  }
+  [[30,35],[40,45],[50,55],[60,65],[75,80],[80,85],[90,95],[100,105]].forEach(([cost,pay])=>{
+    out.push(q(`A snack costs ${cost}¢. You pay ${pay}¢. How much change do you get?`,["5¢","10¢","15¢","20¢"],0,"🛒"));
+  });
+  [["penny","1 cent"],["nickel","5 cents"],["dime","10 cents"],["quarter","25 cents"]].forEach(([coin,val])=>{
+    out.push(q(`How much is a ${coin} worth?`,[val,"2 cents","50 cents","100 cents"],0,"💰"));
+  });
+  out.push(q("Which coins make 30¢?",["1 quarter + 1 nickel","3 dimes","2 dimes + 2 nickels","All of these"],3,"🪙"));
+  out.push(q("How many nickels equal one quarter?",["3","4","5","6"],2,"🪙"));
+  out.push(q("How many dimes equal one dollar?",["5","8","10","20"],2,"💵"));
+  return out;
+}
+
+// ── TIME ──────────────────────────────────────────────────────
+function timeBank(){
+  let out=[];
+  for(let h=1;h<=12;h++){
+    out.push(q(`The clock shows ${h} o'clock. What time is it?`,[h+":00",h+":30",h+":15",(h%12+1)+":00"],0,"⏰"));
+  }
+  for(let h=1;h<=12;h+=2){
+    out.push(q(`What time is half past ${h}?`,[h+":00",h+":30",h+":15",(h%12+1)+":00"],1,"🕰️"));
+  }
+  ["05","10","15","20","25","35","40","45","50","55"].forEach(m=>{
+    let h=rand([2,3,4,5,6,7,8,9]);
+    out.push(q(`What time does the clock show?`,[`${h}:${m}`,`${h}:00`,`${h}:30`,`${h+1}:${m}`],0,`🕐 ${h}:${m}`));
+  });
+  out.push(q("How many minutes are in an hour?",["30","50","60","100"],2,"⏱️"));
+  out.push(q("How many hours are in a day?",["12","20","24","36"],2,"📅"));
+  out.push(q("School starts at 8:00. It ends 7 hours later. What time does it end?",["2:00","3:00","4:00","15:00"],1,"🏫"));
+  out.push(q("What time is a quarter past 3?",["3:00","3:15","3:25","3:45"],1,"🕒"));
+  out.push(q("A movie starts at 2:00 and lasts 1 hour. When does it end?",["1:00","2:30","3:00","4:00"],2,"🎬"));
+  return out;
+}
+
+// ── FRACTIONS ────────────────────────────────────────────────
+function fractionBank(){
+  return shuffle([
+    q("Which shows one half?",["1 out of 2 equal parts","1 out of 3 equal parts","2 out of 2 parts","1 whole thing"],0,"🥧"),
+    q("Which shows one fourth?",["1 out of 2 equal parts","1 out of 4 equal parts","4 whole pies","3 out of 3 parts"],1,"🍫"),
+    q("A pizza has 4 equal slices. You eat 1. What fraction?",["1/2","1/3","1/4","4/1"],2,"🍕"),
+    q("Two equal parts of a whole are called…",["halves","thirds","fourths","ones"],0,"🍪"),
+    q("Four equal parts of a whole are called…",["halves","thirds","fourths","tens"],2,"🍰"),
+    q("Which fraction shows the whole thing?",["1/2","1/4","4/4","1/3"],2,"🥧"),
+    q("A sandwich is cut in half. How many pieces?",["1","2","3","4"],1,"🥪"),
+    q("Which is larger — 1/2 or 1/4?",["1/2","1/4","same size","can't tell"],0,"📐"),
+    q("A pie is cut into 4 equal pieces. You eat 2. How much is left?",["2/4","1/4","3/4","0/4"],0,"🥧"),
+    q("What does the bottom number in a fraction tell you?",["how many eaten","how many equal parts in all","the whole number","the size"],1,"🔢"),
+    q("3 out of 3 equal parts is the same as…",["one whole","one third","three thirds are less than a whole","a half"],0,"🍕"),
+    q("If a cookie is cut into 4 equal pieces and you eat 3, what fraction did you eat?",["1/4","2/4","3/4","4/4"],2,"🍪"),
+    q("Which shape is cut into equal halves?",["One big piece and one tiny piece","Two pieces the same size","Three equal pieces","Four unequal parts"],1,"✂️"),
+    q("You share a cake equally between 2 friends. Each friend gets…",["1/4 of the cake","1/2 of the cake","1/3 of the cake","1 whole cake"],1,"🎂"),
+  ]);
+}
+
+// ── SKIP COUNTING ────────────────────────────────────────────
+function skipBank(){
+  let out=[];
+  [2,5,10].forEach(by=>{
+    for(let s=by;s<=90;s+=by*2){
+      const next=s+by*3;
+      const wrongs=[next+1,next-1,s+by*2].map(String);
+      out.push(q(`${s}, ${s+by}, ${s+by*2}, ___`,[String(next),...wrongs],0,"🔢"));
+    }
+    for(let s=by*4;s<=80;s+=by*3){
+      out.push(q(`${s}, ___, ${s+by*2}, ${s+by*3}`,[String(s+by),String(s+by+1),String(s+1),String(s+by-1)],0,"🔢"));
+    }
+  });
+  out.push(q("Skip counting by 2s: 10, 12, 14, ___",["15","16","17","18"],1,"🔢"));
+  out.push(q("Skip counting by 5s: 25, 30, 35, ___",["36","40","38","45"],1,"🔢"));
+  out.push(q("Skip counting by 10s: 50, 60, 70, ___",["72","75","80","90"],2,"🔢"));
+  return out;
+}
+
+// ── PLACE VALUE ───────────────────────────────────────────────
+function placeBank(){
+  let out=[];
+  for(let n=126;n<999;n+=29){
+    let h=Math.floor(n/100),t=Math.floor((n%100)/10),o=n%10;
+    out.push(q(`In ${n}, how many hundreds?`,[String(h),String(t),String(o),String(h*100)],0,"🏦"));
+    out.push(q(`In ${n}, what digit is in the tens place?`,[String(h),String(t),String(o),String(n)],1,"🧱"));
+    out.push(q(`${h} hundreds + ${t} tens + ${o} ones = ?`,[String(n),String(n+10),String(n-1),String(h+t+o)],0,"🔢"));
+    out.push(q(`What is the value of the ${h} in ${n}?`,[String(h*100),String(h*10),String(h),String(h+100)],0,"💡"));
+  }
+  out.push(q("Which number has a 5 in the hundreds place?",["500","50","510","105"],0,"🔢"));
+  out.push(q("What does the 0 in 304 mean?",["No tens","No ones","No hundreds","It means ten"],0,"🔢"));
+  out.push(q("600 + 40 + 7 = ?",["647","674","467","764"],0,"🔢"));
+  out.push(q("In 832, which digit has the greatest value?",["2","3","8","All equal"],2,"🔢"));
+  return out;
+}
+
+// ── MAP ───────────────────────────────────────────────────────
+function mapBank(){
+  return shuffle([
+    q("Which arrow points east (right)?",["➡️","⬅️","⬆️","⬇️"],0,"🧭"),
+    q("Which arrow points west (left)?",["➡️","⬅️","⬆️","⬇️"],1,"🧭"),
+    q("Which arrow points north (up)?",["➡️","⬅️","⬆️","⬇️"],2,"🧭"),
+    q("Which arrow points south (down)?",["➡️","⬅️","⬆️","⬇️"],3,"🧭"),
+    q("What does a map key (legend) help you understand?",["What the symbols on the map mean","How fast to drive","The weather today","The name of the ocean"],0,"🗺️"),
+    q("The library is between the park and the store. Where is it?",["Far left","In the middle","Far right","Underground"],1,"🌳 📚 🏪"),
+    q("You go 3 blocks north then 2 blocks east. Which direction did you go first?",["East","North","South","West"],1,"🗺️"),
+    q("A map shows a school at the top. The top of a map usually points…",["South","East","North","West"],2,"🧭"),
+    q("What does a map scale tell you?",["Distances on the map compared to real distances","The colors of the map","Who made the map","How many roads there are"],0,"📏"),
+    q("On a city map, which symbol would most likely show a hospital?",["A red cross","A green tree","A blue wave","A yellow star"],0,"🗺️"),
+    q("Two friends start at the same spot. One goes north, one goes south. Are they going the same direction?",["Yes","No","Only sometimes","Only on maps"],1,"🧭"),
+    q("The park is north of the school. The school is north of the store. Which is furthest north?",["The store","The school","The park","They are all equal"],2,"🗺️"),
+    q("What does a compass rose show?",["Directions like north, south, east, west","The weather","How big the map is","The country name"],0,"🧭"),
+    q("On a treasure map, X marks the spot. What does X usually mean?",["Where to start","The treasure location","A danger zone","A road"],1,"🗺️"),
+    q("You walk east for 4 steps. To get back to the start, which way do you walk?",["North","South","East","West"],3,"🧭"),
+    q("A grid map uses letters and numbers. Where would B3 be?",["Column B, Row 3","Row B, Column 3","Third letter, second row","No such location"],0,"🗺️"),
+    q("Which direction does the sun rise?",["West","North","South","East"],3,"☀️"),
+    q("A map shows 1 inch = 10 miles. Two cities are 3 inches apart. How many miles apart are they?",["10 miles","20 miles","30 miles","13 miles"],2,"📏"),
+  ]);
+}
+
+// ── GRAPHS ────────────────────────────────────────────────────
+function graphBank(){
+  const sets=[
+    {a:"dogs",av:5,aemo:"🐶",b:"cats",bv:3,bemo:"🐱"},
+    {a:"apples",av:7,aemo:"🍎",b:"bananas",bv:4,bemo:"🍌"},
+    {a:"red votes",av:6,aemo:"🔴",b:"blue votes",bv:2,bemo:"🔵"},
+    {a:"cars",av:8,aemo:"🚗",b:"bikes",bv:5,bemo:"🚲"},
+    {a:"sunny days",av:9,aemo:"☀️",b:"rainy days",bv:3,bemo:"🌧️"},
+    {a:"soccer fans",av:7,aemo:"⚽",b:"basketball fans",bv:4,bemo:"🏀"},
+    {a:"boys",av:10,aemo:"👦",b:"girls",bv:6,bemo:"👧"},
+    {a:"pizza slices",av:8,aemo:"🍕",b:"taco bites",bv:5,bemo:"🌮"},
+  ];
+  let out=[];
+  sets.forEach(s=>{
+    const vis=`${s.aemo.repeat(s.av)}\n${s.bemo.repeat(s.bv)}`;
+    const diff=s.av-s.bv;
+    const total=s.av+s.bv;
+    out.push(q(
+      `Look at the data below.\n${s.a}: ${s.av} | ${s.b}: ${s.bv}\n\nWhich group has more?`,
+      [s.a,s.b,"They are the same","Not enough info"],0,
+      `${s.aemo.repeat(s.av)}\n${s.bemo.repeat(s.bv)}`
+    ));
+    out.push(q(
+      `${s.a}: ${s.aemo.repeat(s.av)}\n${s.b}: ${s.bemo.repeat(s.bv)}\n\nHow many more ${s.a} than ${s.b}?`,
+      [String(diff),String(s.av),String(s.bv),String(total)],0,""
+    ));
+    out.push(q(
+      `${s.a}: ${s.aemo.repeat(s.av)}\n${s.b}: ${s.bemo.repeat(s.bv)}\n\nHow many in all?`,
+      [String(total),String(diff),String(s.av),String(s.bv)],0,""
+    ));
+  });
+  return shuffle(out);
+}
+
+// ── ELA ───────────────────────────────────────────────────────
+function elaBank(){
+  return shuffle([
+    // NOUNS
+    q("Which word is a noun?",["jump","happy","dog","quickly"],2,"🐶"),
+    q("Which word is a noun?",["run","table","blue","slowly"],1,"🪑"),
+    q("Which word is a noun?",["bright","under","teacher","skip"],2,"👩‍🏫"),
+    q("Which word names a place?",["park","run","cold","loudly"],0,"🌳"),
+    q("In 'The big cat sat on the mat,' what is the noun?",["big","sat","cat","on"],2,"🐱"),
+    // VERBS
+    q("Which word is a verb (action word)?",["run","happy","table","green"],0,"🏃"),
+    q("Which word is a verb?",["slowly","cat","jump","red"],2,"🦘"),
+    q("In 'The dog barked loudly,' what is the verb?",["dog","barked","loudly","the"],1,"🐕"),
+    q("Which word shows action?",["blue","chair","swim","tiny"],2,"🏊"),
+    q("Which sentence has a verb?",["The big red apple.","She runs every day.","A happy little dog.","Under the tall tree."],1,"✏️"),
+    // ADJECTIVES
+    q("Which word describes a noun (adjective)?",["tiny","teacher","under","skip"],0,"⭐"),
+    q("In 'She has a fluffy cat,' what is the adjective?",["She","has","fluffy","cat"],2,"🐈"),
+    q("Which word describes how something looks?",["sparkling","running","when","table"],0,"✨"),
+    q("Which is an adjective?",["jump","enormous","she","quickly"],1,"📏"),
+    q("In 'The cold, windy day made us shiver,' name one adjective.",["day","shiver","cold","made"],2,"🌬️"),
+    // ADVERBS
+    q("Which word tells how (adverb)?",["slowly","cat","red","chair"],0,"🐢"),
+    q("In 'She sings loudly,' what is the adverb?",["She","sings","loudly","the"],2,"🎵"),
+    q("Which word is an adverb?",["quickly","book","green","table"],0,"⚡"),
+    q("Which word tells when?",["yesterday","table","blue","jump"],0,"📅"),
+    q("Which word tells where?",["outside","red","dog","sing"],0,"🏡"),
+    // SYNONYMS / ANTONYMS
+    q("What is the opposite (antonym) of hot?",["cold","warm","heat","sun"],0,"🔥"),
+    q("What is the opposite of happy?",["joyful","glad","sad","excited"],2,"😢"),
+    q("Which word means almost the same as big (synonym)?",["huge","tiny","cold","slow"],0,"📚"),
+    q("What is the opposite of dark?",["night","shadow","light","dim"],2,"💡"),
+    q("Which means almost the same as fast?",["slow","quick","tired","soft"],1,"⚡"),
+    q("What is the opposite of loud?",["noisy","shout","quiet","boom"],2,"🤫"),
+    // PARTS OF SPEECH MIX
+    q("In 'The tiny bird flew away,' which word is an adjective?",["The","tiny","flew","away"],1,"🐦"),
+    q("In 'He walks slowly to school,' which word is an adverb?",["He","walks","slowly","school"],2,"🚶"),
+    q("Which of these is a proper noun?",["city","Monday","river","school"],1,"📅"),
+    q("Which sentence uses a possessive correctly?",["The dogs tail wagged.","The dog's tail wagged.","The dogs' tail wagged.","The dog tail wagged."],1,"🐕"),
+  ]);
+}
+
+// ── MEASUREMENT ───────────────────────────────────────────────
+function measureBank(){
+  let out=[
+    q("Which unit is best for measuring a crayon?",["inch","mile","yard","kilometer"],0,"📏"),
+    q("Which unit is best for measuring a football field?",["inch","centimeter","yard","millimeter"],2,"🏈"),
+    q("Which unit is best for measuring a small bug?",["yard","foot","mile","centimeter"],3,"🐛"),
+    q("Which unit is best for measuring a bedroom rug?",["inch","centimeter","foot","kilometer"],2,"🛋️"),
+    q("A pencil is 7 inches. A marker is 9 inches. Which is longer?",["pencil","marker","same","can't tell"],1,"✏️"),
+    q("How many inches are in 1 foot?",["6","10","12","24"],2,"📏"),
+    q("How many feet are in 1 yard?",["2","3","4","12"],1,"📐"),
+    q("A desk is about 2 _____ wide.",["miles","yards","inches","feet"],3,"🪑"),
+    q("Which is the longest measurement?",["1 inch","1 foot","1 yard","1 centimeter"],2,"📏"),
+    q("A puppy is about 10 inches tall. A table is about 3 feet tall. Which is taller?",["puppy","table","same","can't tell"],1,"🐕"),
+    q("You measure a ribbon. It is 24 inches. How many feet is that?",["1 foot","2 feet","3 feet","4 feet"],1,"🎀"),
+    q("Which tool measures length?",["thermometer","scale","ruler","clock"],2,"📏"),
+    q("Which tool measures weight?",["ruler","thermometer","clock","scale"],3,"⚖️"),
+    q("Which tool measures temperature?",["ruler","thermometer","scale","measuring cup"],1,"🌡️"),
+  ];
+  for(let a=2;a<12;a++){
+    let b=a+Math.ceil(Math.random()*8);
+    out.push(q(`A pencil is ${a} inches. A marker is ${b} inches. How much longer is the marker?`,
+      [String(b-a),String(a),String(b),String(a+b)],0,"✏️"));
+  }
+  return out;
+}
+
+// ── SENTENCES ─────────────────────────────────────────────────
+function sentenceBank(){
+  return shuffle([
+    // CAPITALIZATION
+    q("Which sentence is capitalized correctly?",["i like pizza.","I like pizza.","i Like pizza.","I Like Pizza."],1,"✏️"),
+    q("Which sentence starts correctly?",["the cat sat.","The cat sat.","THE cat sat.","tHE cat sat."],1,"🐱"),
+    q("Which name is written correctly?",["sarah","SARAH","Sarah","sARAH"],2,"👧"),
+    q("Which day of the week is written correctly?",["monday","MONDAY","Monday","monDay"],2,"📅"),
+    // PUNCTUATION
+    q("Which sentence needs a question mark?",["I am happy.","Where is my bag?","The dog ran.","She has a hat."],1,"❓"),
+    q("Which sentence is an exclamation?",["I walk to school.","What time is it.","Watch out!","She has a pet."],2,"❗"),
+    q("Which sentence ends correctly?",["Where are you","Can you help me?","She runs fast","I love dogs"],1,"❓"),
+    q("Which sentence uses a period correctly?",["She runs fast.","She runs fast","she runs fast.","She runs fast!"],0,"📝"),
+    // COMPLETE SENTENCES
+    q("Which is a complete sentence?",["The big dog.","Ran to school.","The cat slept on the mat.","Because it rained."],2,"📚"),
+    q("Which is NOT a complete sentence?",["She jumped over the puddle.","A tiny, happy bird.","The book fell off the shelf.","We ate lunch together."],1,"✂️"),
+    q("Which sentence has both a subject and a verb?",["Happy birds.","Under the tree.","The frog jumped high.","Running fast."],2,"✅"),
+    // CORRECT SENTENCES
+    q("Choose the correct sentence.",["we went to Target.","We went to Target.","We went to target","we went to target."],1,"🛒"),
+    q("Choose the correct sentence.",["Her and me went.","She and I went.","Her and I went.","She and me went."],1,"👭"),
+    q("Choose the correct sentence.",["The two dog run.","The two dogs runs.","The two dogs run.","The two dog runs."],2,"🐕"),
+    q("Which sentence uses the correct verb?",["She don't like snakes.","She doesn't like snakes.","She doesn't likes snakes.","She don't likes snakes."],1,"🐍"),
+    q("Which sentence is written correctly?",["Him and Jake played.","He and Jake played.","He and Jake plays.","Him and Jake plays."],1,"⚽"),
+    // CONJUNCTIONS / STRUCTURE
+    q("Which word connects the two ideas: 'I was tired ___ I finished my homework.'",["but","so","or","because"],3,"📝"),
+    q("Which best completes: 'She likes dogs ___ she is afraid of big ones.'",["so","and","but","because"],2,"🐶"),
+    q("Which is a telling sentence (statement)?",["Is that your dog?","Wow, great catch!","My dog is fluffy.","Come here!"],2,"📖"),
+    q("Which is an asking sentence (question)?",["I eat lunch at noon.","Sit down please.","Did you see that?","What a great day!"],2,"❓"),
+  ]);
+}
+</script>
+</body>
+</html>
