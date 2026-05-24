@@ -1,0 +1,366 @@
+/* ── RESET ───────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --purple-deep:   #1a0535;
+  --purple-mid:    #3c1d66;
+  --purple-bright: #7c3aed;
+  --purple-light:  #a78bfa;
+  --purple-glow:   #c4b5fd;
+  --gold:          #fbbf24;
+  --gold-dark:     #d97706;
+  --white:         #f8f5ff;
+  --ink:           #1a0535;
+  --body:          'Nunito', sans-serif;
+  --display:       'Baloo 2', sans-serif;
+}
+
+html { font-size: 20px; }
+
+body {
+  font-family: var(--body);
+  background: var(--purple-deep);
+  color: var(--white);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── STARFIELD ───────────────────────────────────────── */
+#starfield {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+.star {
+  position: absolute;
+  border-radius: 50%;
+  background: white;
+}
+
+/* ── LAYOUT ──────────────────────────────────────────── */
+#app {
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* ── HEADER ──────────────────────────────────────────── */
+.hero-section {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 3rem 1.5rem 2.5rem;
+  text-align: center;
+  position: relative;
+}
+
+/* glow ring behind door */
+.door-glow {
+  position: absolute;
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(167,139,250,0.35) 0%, transparent 70%);
+  top: 2.2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  pointer-events: none;
+  animation: glowPulse 3s ease-in-out infinite;
+}
+@keyframes glowPulse {
+  0%,100% { opacity: .7; transform: translateX(-50%) scale(1); }
+  50%      { opacity: 1;  transform: translateX(-50%) scale(1.12); }
+}
+
+/* the door itself — Kenney UI panel as background */
+.door-icon {
+  position: relative;
+  width: 140px;
+  height: 140px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: default;
+  filter: drop-shadow(0 8px 24px rgba(167,139,250,0.5));
+  animation: doorFloat 3.5s ease-in-out infinite;
+}
+@keyframes doorFloat {
+  0%,100% { transform: translateY(0px); }
+  50%      { transform: translateY(-14px); }
+}
+.door-icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+/* purple tint overlay on the door sprite */
+.door-icon::after {
+  content: '🚪';
+  position: absolute;
+  font-size: 5.5rem;
+  filter: hue-rotate(260deg) saturate(2) brightness(0.85);
+}
+
+.hero-eyebrow {
+  font-family: var(--display);
+  font-size: clamp(0.75rem, 1.8vw, 0.95rem);
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--purple-glow);
+  margin-top: 1.2rem;
+  opacity: 0.85;
+}
+
+.hero-title {
+  font-family: var(--display);
+  font-size: clamp(2.8rem, 8vw, 5.5rem);
+  line-height: 1;
+  color: var(--white);
+  text-shadow:
+    0 0 40px rgba(167,139,250,0.6),
+    4px 4px 0 rgba(0,0,0,0.4);
+  margin-top: 0.3rem;
+}
+.hero-title span {
+  color: var(--purple-glow);
+}
+
+.hero-sub {
+  font-size: clamp(1rem, 2.5vw, 1.3rem);
+  font-weight: 800;
+  color: rgba(255,255,255,0.65);
+  margin-top: 0.8rem;
+  max-width: 520px;
+  line-height: 1.5;
+}
+
+/* star divider */
+.star-divider {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 1.4rem;
+  font-size: 1.3rem;
+}
+.star-divider span {
+  opacity: 0.5;
+  animation: twinkle 2.5s ease-in-out infinite;
+}
+.star-divider span:nth-child(2) { animation-delay: 0.4s; }
+.star-divider span:nth-child(3) { animation-delay: 0.8s; }
+@keyframes twinkle {
+  0%,100% { opacity: 0.3; transform: scale(1); }
+  50%      { opacity: 1;   transform: scale(1.3); }
+}
+
+/* ── CARDS ───────────────────────────────────────────── */
+.cards-section {
+  width: 100%;
+  max-width: 1100px;
+  padding: 0 1.5rem 4rem;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 22px;
+}
+@media (max-width: 860px) { .cards-section { grid-template-columns: 1fr; max-width: 480px; } }
+
+.game-card {
+  position: relative;
+  border-radius: 24px;
+  overflow: hidden;
+  cursor: pointer;
+  text-decoration: none;
+  color: var(--ink);
+  display: flex;
+  flex-direction: column;
+  /* Kenney panel as border via box-shadow trick */
+  box-shadow:
+    0 0 0 4px rgba(255,255,255,0.15),
+    0 12px 0 rgba(0,0,0,0.35),
+    0 20px 40px rgba(0,0,0,0.4);
+  transition: transform 0.15s, box-shadow 0.15s;
+  transform-origin: center bottom;
+}
+.game-card:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow:
+    0 0 0 4px rgba(255,255,255,0.25),
+    0 18px 0 rgba(0,0,0,0.35),
+    0 30px 50px rgba(0,0,0,0.5);
+}
+.game-card:active {
+  transform: translateY(2px) scale(0.99);
+  box-shadow:
+    0 0 0 4px rgba(255,255,255,0.15),
+    0 6px 0 rgba(0,0,0,0.35),
+    0 10px 20px rgba(0,0,0,0.3);
+}
+
+/* card colour themes */
+.card-portal  { background: linear-gradient(160deg, #fff8f0, #ffe0b0); }
+.card-math    { background: linear-gradient(160deg, #f0fff8, #b0f0d8); }
+.card-word    { background: linear-gradient(160deg, #f0f4ff, #c0ccff); }
+
+/* card top art strip */
+.card-art {
+  width: 100%;
+  height: 160px;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.card-portal .card-art { background: linear-gradient(160deg,#7c3aed,#4c1d95); }
+.card-math   .card-art { background: linear-gradient(160deg,#065f46,#1a4731); }
+.card-word   .card-art { background: linear-gradient(160deg,#1e3a8a,#1e1b4b); }
+
+/* Kenney button used as card action button */
+.card-art-icon {
+  font-size: 5rem;
+  filter: drop-shadow(0 4px 12px rgba(0,0,0,0.4));
+  animation: cardIconBob 3s ease-in-out infinite;
+  position: relative;
+  z-index: 1;
+}
+@keyframes cardIconBob {
+  0%,100% { transform: translateY(0) rotate(-2deg); }
+  50%      { transform: translateY(-10px) rotate(2deg); }
+}
+.game-card:nth-child(2) .card-art-icon { animation-delay: 0.4s; }
+.game-card:nth-child(3) .card-art-icon { animation-delay: 0.8s; }
+
+/* particle dots in card art */
+.card-art-dot {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.15);
+  animation: dotDrift 4s ease-in-out infinite;
+}
+@keyframes dotDrift {
+  0%,100% { transform: translate(0,0); }
+  33%      { transform: translate(8px,-12px); }
+  66%      { transform: translate(-6px,8px); }
+}
+
+/* card body */
+.card-body {
+  padding: 20px 22px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
+}
+
+.card-title {
+  font-family: var(--display);
+  font-size: clamp(1.5rem, 3.5vw, 2rem);
+  line-height: 1;
+  color: var(--ink);
+}
+.card-portal .card-title { color: #4c1d95; }
+.card-math   .card-title { color: #064e3b; }
+.card-word   .card-title { color: #1e3a8a; }
+
+.card-desc {
+  font-size: clamp(0.95rem, 2.2vw, 1.1rem);
+  font-weight: 800;
+  line-height: 1.45;
+  color: rgba(26,5,53,0.7);
+  flex: 1;
+}
+
+/* Kenney-style action button using their PNG as background */
+.card-btn {
+  display: block;
+  width: 100%;
+  padding: 14px 16px;
+  font-family: var(--display);
+  font-size: clamp(1rem, 2.5vw, 1.25rem);
+  font-weight: 800;
+  text-align: center;
+  border: none;
+  border-radius: 14px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: filter 0.1s, transform 0.1s;
+  /* Use Kenney button style via image-based background simulation */
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  background-position: center;
+  text-decoration: none;
+  letter-spacing: 0.5px;
+}
+.card-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(255,255,255,0.22) 0%, transparent 60%);
+  border-radius: 14px;
+  pointer-events: none;
+}
+.card-portal .card-btn {
+  background-color: #7c3aed;
+  color: #fff;
+  box-shadow: 0 5px 0 #4c1d95, 0 6px 12px rgba(124,58,237,0.3);
+}
+.card-math .card-btn {
+  background-color: #059669;
+  color: #fff;
+  box-shadow: 0 5px 0 #065f46, 0 6px 12px rgba(5,150,105,0.3);
+}
+.card-word .card-btn {
+  background-color: #2563eb;
+  color: #fff;
+  box-shadow: 0 5px 0 #1e3a8a, 0 6px 12px rgba(37,99,235,0.3);
+}
+.card-btn:hover  { filter: brightness(1.1); }
+.card-btn:active { transform: translateY(3px); box-shadow: 0 2px 0 currentColor !important; }
+
+/* Kenney star badges on completed cards */
+.card-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 36px;
+  height: 36px;
+  z-index: 10;
+}
+.card-badge img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+}
+
+/* ── FOOTER ──────────────────────────────────────────── */
+.footer {
+  width: 100%;
+  text-align: center;
+  padding: 1.5rem 1rem 2rem;
+  font-size: clamp(0.85rem, 1.8vw, 1rem);
+  font-weight: 800;
+  color: rgba(255,255,255,0.3);
+  letter-spacing: 1px;
+}
+
+/* ── KENNEY BUTTON HOVER RIPPLE ──────────────────────── */
+.ripple {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.35);
+  transform: scale(0);
+  animation: rippleOut 0.5s ease-out forwards;
+  pointer-events: none;
+}
+@keyframes rippleOut {
+  to { transform: scale(4); opacity: 0; }
+}

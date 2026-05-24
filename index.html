@@ -1,110 +1,14 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Mrs. Rogers’ Homebase Arcade</title>
-<link rel="stylesheet" href="css/arcade.css" />
-<style>
-*{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --ink:#241437;--deep:#21113d;--paper:#fff8ec;--cream:#fff3d6;
-  --purple:#6d3fb3;--purple2:#9f7aea;--gold:#ffd166;--orange:#f97316;
-  --green:#10b981;--blue:#3b82f6;--rose:#ec4899;--shadow:rgba(33,17,61,.24);
-  --display:ui-rounded,"Avenir Next",Nunito,system-ui,sans-serif;
-  --body:ui-rounded,"Avenir Next",Nunito,system-ui,sans-serif;
-}
-html{font-size:22px}
-body{
-  min-height:100vh;font-family:var(--body);font-size:22px;color:var(--ink);overflow-x:hidden;
-  background:
-    radial-gradient(circle at 9% 12%,rgba(255,209,102,.55),transparent 20rem),
-    radial-gradient(circle at 88% 8%,rgba(109,63,179,.55),transparent 22rem),
-    radial-gradient(circle at 50% 100%,rgba(16,185,129,.35),transparent 24rem),
-    linear-gradient(180deg,#27104d 0%,#4c1d95 42%,#f5e9ff 42%,#fff6df 100%);
-}
-a{color:inherit}.page{max-width:1180px;margin:0 auto;padding:24px 18px 36px;display:flex;flex-direction:column;gap:24px}
-.top-pill{align-self:center;display:inline-flex;gap:10px;align-items:center;background:rgba(255,255,255,.92);border:3px solid var(--deep);border-radius:999px;padding:8px 16px;font-weight:1000;font-size:clamp(1rem,2.3vw,1.2rem);box-shadow:0 5px 0 var(--deep)}
-.pill-dot{width:16px;height:16px;border-radius:50%;background:linear-gradient(135deg,var(--green),#8ef0c3);border:2px solid var(--deep)}
-.hero{position:relative;overflow:hidden;border:5px solid var(--deep);border-radius:38px;background:linear-gradient(180deg,rgba(255,255,255,.98),rgba(255,243,214,.96));box-shadow:0 12px 0 var(--deep),0 28px 50px var(--shadow);padding:28px clamp(18px,4vw,42px);display:grid;grid-template-columns:1.05fr .95fr;gap:20px;align-items:center}
-@media(max-width:820px){.hero{grid-template-columns:1fr;text-align:center}.hero-art{order:-1}}
-.hero-copy{position:relative;z-index:2}.eyebrow{font-weight:1000;letter-spacing:.08em;text-transform:uppercase;color:#6b4a90;font-size:clamp(.9rem,2vw,1.05rem);margin-bottom:8px}.hero h1{font-family:var(--display);font-size:clamp(2.7rem,8.4vw,5.4rem);line-height:.88;letter-spacing:-.05em;color:var(--deep);text-wrap:balance}.hero h1 span{display:block;color:var(--purple)}.hero p{margin-top:16px;font-size:clamp(1.1rem,2.8vw,1.5rem);line-height:1.35;font-weight:900;max-width:620px}.hero-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:20px}@media(max-width:820px){.hero-actions{justify-content:center}}
-.big-btn{display:inline-flex;align-items:center;justify-content:center;min-height:58px;padding:13px 20px;border:4px solid var(--deep);border-radius:20px;background:var(--gold);box-shadow:0 7px 0 var(--deep);font-weight:1000;text-decoration:none;font-size:clamp(1.1rem,3vw,1.45rem);transition:.12s}.big-btn:hover,.game-card:hover{transform:translateY(-5px)}.big-btn.secondary{background:#fff;color:var(--deep)}
-.hero-art{position:relative;min-height:300px}.hero-art svg{width:100%;height:auto;display:block;filter:drop-shadow(0 16px 0 rgba(33,17,61,.16))}.sparkle{position:absolute;border-radius:999px;background:#fff;box-shadow:0 0 26px #fff}.sp1{width:12px;height:12px;left:7%;top:20%;animation:float 3s ease-in-out infinite}.sp2{width:18px;height:18px;right:10%;top:12%;animation:float 4s ease-in-out infinite .3s}.sp3{width:10px;height:10px;right:30%;bottom:10%;animation:float 3.4s ease-in-out infinite .8s}@keyframes float{50%{transform:translateY(-12px) scale(1.1)}}
-.section-head{display:flex;justify-content:space-between;align-items:end;gap:18px;margin-top:4px}.section-head h2{font-size:clamp(1.8rem,4.4vw,3rem);line-height:1;color:var(--deep);letter-spacing:-.03em}.section-head p{font-size:clamp(1rem,2.4vw,1.25rem);font-weight:900;color:#5c496b;max-width:480px;text-align:right}@media(max-width:760px){.section-head{align-items:start;flex-direction:column}.section-head p{text-align:left}}
-.game-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}@media(max-width:930px){.game-grid{grid-template-columns:1fr}}.game-card{min-height:450px;display:flex;flex-direction:column;gap:14px;padding:18px;border:5px solid var(--deep);border-radius:34px;background:#fff;box-shadow:0 10px 0 var(--deep),0 24px 34px var(--shadow);text-decoration:none;overflow:hidden;transition:.13s}.game-card.portal{background:linear-gradient(180deg,#fff7e6,#ffe1b6)}.game-card.math{background:linear-gradient(180deg,#fffbe3,#fff08c)}.game-card.word{background:linear-gradient(180deg,#effff8,#bff3dc)}.banner{height:190px;border:4px solid var(--deep);border-radius:26px;overflow:hidden;background:#fff;box-shadow:0 6px 0 var(--deep)}.banner svg{width:100%;height:100%;display:block}.game-card h3{font-size:clamp(1.8rem,4.2vw,2.5rem);line-height:.96;letter-spacing:-.04em;color:var(--deep)}.game-card p{font-size:clamp(1.1rem,2.8vw,1.35rem);line-height:1.32;font-weight:950;color:#483558}.tag-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:auto}.tag{background:rgba(255,255,255,.78);border:3px solid var(--deep);border-radius:999px;padding:7px 11px;font-size:clamp(.9rem,2.2vw,1.05rem);font-weight:1000}.play-strip{margin-top:2px;border:4px solid var(--deep);border-radius:20px;padding:12px 14px;background:var(--deep);color:white;text-align:center;font-size:clamp(1.1rem,3vw,1.5rem);font-weight:1000;box-shadow:0 5px 0 rgba(0,0,0,.22)}
-.teacher-note{border:4px solid var(--deep);border-radius:28px;background:rgba(255,255,255,.9);box-shadow:0 8px 0 var(--deep);padding:18px 20px;text-align:center;font-weight:950;font-size:clamp(1rem,2.4vw,1.25rem);color:#4a365f}.footer{text-align:center;color:#5c496b;font-weight:950;font-size:clamp(.95rem,2.2vw,1.1rem);padding:0 0 8px}
-@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
-</style>
+  <meta charset="UTF-8"/>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Mrs. Rogers' Purple Door</title>
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&family=Nunito:wght@700;800;900&display=swap" rel="stylesheet"/>
 </head>
 <body>
-<main class="page">
-  <div class="top-pill"><span class="pill-dot" aria-hidden="true"></span> Arcade Mode Ready</div>
-  <section class="hero" aria-label="Mrs. Rogers Homebase Arcade">
-    <div class="hero-copy">
-      <div class="eyebrow">Mrs. Rogers’ Classroom Arcade</div>
-      <h1>Pick a quest.<span>Start the adventure.</span></h1>
-      <p>Choose a game, answer big kid questions, earn rewards, and keep your best thinking going.</p>
-      <div class="hero-actions">
-        <a class="big-btn" href="portalpark.html">Enter Portal Park</a>
-        <a class="big-btn secondary" href="#games">See All Games</a>
-      </div>
-    </div>
-    <div class="hero-art" aria-hidden="true">
-      <span class="sparkle sp1"></span><span class="sparkle sp2"></span><span class="sparkle sp3"></span>
-      <svg viewBox="0 0 640 430" role="img">
-        <defs>
-          <linearGradient id="sky" x1="0" x2="1" y1="0" y2="1"><stop stop-color="#7dd3fc"/><stop offset="1" stop-color="#c084fc"/></linearGradient>
-          <linearGradient id="portal" x1="0" x2="1"><stop stop-color="#f59e0b"/><stop offset=".5" stop-color="#ec4899"/><stop offset="1" stop-color="#8b5cf6"/></linearGradient>
-          <radialGradient id="glow" cx="50%" cy="48%" r="60%"><stop stop-color="#fff"/><stop offset=".42" stop-color="#fde68a"/><stop offset="1" stop-color="#8b5cf6"/></radialGradient>
-        </defs>
-        <rect width="640" height="430" rx="34" fill="url(#sky)"/>
-        <circle cx="528" cy="72" r="44" fill="#fff7ad" opacity=".95"/>
-        <path d="M0 332 C105 282 178 356 286 303 C392 251 470 315 640 260 L640 430 L0 430 Z" fill="#45c486"/>
-        <path d="M0 372 C102 338 204 382 328 342 C457 300 528 361 640 327 L640 430 L0 430 Z" fill="#1e9b62"/>
-        <g transform="translate(188 54)">
-          <path d="M132 326 L132 172 C132 71 204 18 264 18 C324 18 396 71 396 172 L396 326 Z" fill="#2a174d" stroke="#21113d" stroke-width="18"/>
-          <path d="M174 326 L174 178 C174 100 223 64 264 64 C305 64 354 100 354 178 L354 326 Z" fill="url(#glow)" opacity=".98"/>
-          <path d="M174 326 L174 178 C174 100 223 64 264 64 C305 64 354 100 354 178 L354 326" fill="none" stroke="url(#portal)" stroke-width="22" stroke-linecap="round"/>
-          <ellipse cx="264" cy="232" rx="70" ry="112" fill="none" stroke="#fff" stroke-width="8" opacity=".6"/>
-          <ellipse cx="264" cy="232" rx="36" ry="64" fill="none" stroke="#fff" stroke-width="5" opacity=".5"/>
-          <rect x="76" y="320" width="376" height="46" rx="20" fill="#ffd166" stroke="#21113d" stroke-width="12"/>
-          <text x="264" y="350" text-anchor="middle" font-family="ui-rounded, system-ui, sans-serif" font-size="28" font-weight="900" fill="#21113d">HOMEBASE</text>
-        </g>
-        <g fill="#fff" opacity=".9"><circle cx="96" cy="95" r="7"/><circle cx="136" cy="61" r="4"/><circle cx="520" cy="160" r="6"/><circle cx="558" cy="205" r="4"/><circle cx="88" cy="230" r="5"/></g>
-      </svg>
-    </div>
-  </section>
-  <section class="section-head" id="games">
-    <h2>Choose Your Game</h2>
-    <p>Big buttons, clear text, and game-style art made for classroom screens and Chromebooks.</p>
-  </section>
-  <section class="game-grid" aria-label="Game choices">
-    <a class="game-card portal" href="portalpark.html">
-      <div class="banner" aria-hidden="true">
-        <svg viewBox="0 0 520 250"><defs><linearGradient id="pbg" x1="0" x2="1"><stop stop-color="#fee2e2"/><stop offset="1" stop-color="#fed7aa"/></linearGradient><linearGradient id="pg" x1="0" x2="1"><stop stop-color="#fb7185"/><stop offset="1" stop-color="#8b5cf6"/></linearGradient></defs><rect width="520" height="250" fill="url(#pbg)"/><path d="M0 192 C90 152 170 222 270 172 C360 128 440 172 520 134 L520 250 L0 250 Z" fill="#34d399"/><g transform="translate(65 28)"><path d="M80 185 L80 93 C80 36 123 10 160 10 C197 10 240 36 240 93 L240 185 Z" fill="#2b174d" stroke="#21113d" stroke-width="10"/><path d="M108 185 L108 99 C108 59 137 42 160 42 C183 42 212 59 212 99 L212 185 Z" fill="#fff7ad"/><path d="M108 185 L108 99 C108 59 137 42 160 42 C183 42 212 59 212 99 L212 185" fill="none" stroke="url(#pg)" stroke-width="15" stroke-linecap="round"/><rect x="35" y="178" width="250" height="32" rx="14" fill="#ffd166" stroke="#21113d" stroke-width="8"/><text x="160" y="201" text-anchor="middle" font-size="24" font-weight="900" fill="#21113d" font-family="ui-rounded, system-ui">PORTAL PARK</text></g><g fill="#21113d" opacity=".18"><circle cx="420" cy="55" r="32"/><circle cx="466" cy="92" r="12"/><circle cx="382" cy="111" r="18"/></g></svg>
-      </div>
-      <h3>Portal Park</h3><p>Travel through themed worlds, solve mixed math and reading questions, and collect badges.</p>
-      <div class="tag-row"><span class="tag">Mixed Practice</span><span class="tag">Badges</span><span class="tag">Worlds</span></div><span class="play-strip">Open the Gates</span>
-    </a>
-    <a class="game-card math" href="pokemonmath.html">
-      <div class="banner" aria-hidden="true">
-        <svg viewBox="0 0 520 250"><defs><linearGradient id="mbg" x1="0" x2="1"><stop stop-color="#fff7ad"/><stop offset="1" stop-color="#bfdbfe"/></linearGradient></defs><rect width="520" height="250" fill="url(#mbg)"/><path d="M0 205 C110 173 188 216 288 180 C393 142 451 184 520 164 L520 250 L0 250 Z" fill="#60a5fa"/><g transform="translate(122 32)"><rect x="0" y="20" width="276" height="158" rx="26" fill="#fff" stroke="#21113d" stroke-width="10"/><rect x="18" y="38" width="240" height="42" rx="18" fill="#3b82f6"/><text x="138" y="68" text-anchor="middle" font-size="26" font-weight="900" fill="white" font-family="ui-rounded, system-ui">MATH BATTLE</text><circle cx="86" cy="126" r="38" fill="#ffd166" stroke="#21113d" stroke-width="8"/><path d="M82 96 L123 124 L94 129 L103 158 L62 128 L91 123 Z" fill="#f97316" stroke="#21113d" stroke-width="5"/><rect x="148" y="102" width="88" height="18" rx="9" fill="#10b981" stroke="#21113d" stroke-width="5"/><rect x="148" y="132" width="66" height="18" rx="9" fill="#f97316" stroke="#21113d" stroke-width="5"/></g><g fill="#21113d" opacity=".16"><circle cx="66" cy="57" r="22"/><circle cx="442" cy="71" r="34"/><circle cx="460" cy="164" r="14"/></g></svg>
-      </div>
-      <h3>Pokémon Math Quest</h3><p>Battle through addition, place value, money, time, shapes, fractions, and more.</p>
-      <div class="tag-row"><span class="tag">Math Skills</span><span class="tag">Battles</span><span class="tag">Progress</span></div><span class="play-strip">Start Math Quest</span>
-    </a>
-    <a class="game-card word" href="wordquest.html">
-      <div class="banner" aria-hidden="true">
-        <svg viewBox="0 0 520 250"><defs><linearGradient id="wbg" x1="0" x2="1"><stop stop-color="#ccfbf1"/><stop offset="1" stop-color="#e9d5ff"/></linearGradient></defs><rect width="520" height="250" fill="url(#wbg)"/><path d="M0 202 C110 168 205 214 318 174 C420 138 468 170 520 150 L520 250 L0 250 Z" fill="#34d399"/><g transform="translate(110 30)"><path d="M18 36 C78 12 126 21 158 48 C193 22 247 15 300 38 L300 178 C249 154 199 159 158 190 C118 158 70 154 18 178 Z" fill="#fffaf0" stroke="#21113d" stroke-width="10"/><path d="M158 50 L158 188" stroke="#21113d" stroke-width="5"/><path d="M48 72 L130 62 M48 98 L130 92 M48 124 L126 118 M190 72 L270 64 M190 98 L268 92 M190 124 L258 119" stroke="#8b5cf6" stroke-width="8" stroke-linecap="round" opacity=".7"/><rect x="86" y="151" width="142" height="36" rx="16" fill="#ffd166" stroke="#21113d" stroke-width="8"/><text x="157" y="176" text-anchor="middle" font-size="24" font-weight="900" fill="#21113d" font-family="ui-rounded, system-ui">WORD QUEST</text></g><g fill="#21113d" opacity=".15"><circle cx="64" cy="74" r="24"/><circle cx="440" cy="61" r="28"/><circle cx="464" cy="135" r="12"/></g></svg>
-      </div>
-      <h3>Word Quest</h3><p>Build grammar and vocabulary power through nouns, verbs, adjectives, sentences, and word pairs.</p>
-      <div class="tag-row"><span class="tag">ELA</span><span class="tag">Tap & Sort</span><span class="tag">Stars</span></div><span class="play-strip">Begin Word Quest</span>
-    </a>
-  </section>
-  <p class="teacher-note">Tip: open a game, play one round, then come back here to choose another challenge.</p>
-  <p class="footer">Made for classroom screens, clear reading, and second-grade game time.</p>
-</main>
-<script src="js/arcade.js"></script>
+  <div id="app"></div>
+  <script type="module" src="/src/main.js"></script>
 </body>
 </html>
