@@ -492,6 +492,9 @@ svg{max-width:100%;height:auto}
 .pcbox-title,.pc-card-name,.pc-stat-lbl,.pc-stat-val,.pc-total-num,.pc-tab{font-family:var(--body-font)!important;font-size:clamp(1rem,2.5vw,1.35rem)!important;letter-spacing:.5px!important;line-height:1.25!important}
 .pc-stat-bg{height:18px!important}
 </style>
+
+<!-- Shared offline arcade polish layer -->
+<link rel="stylesheet" href="css/arcade.css">
 </head>
 <body>
 
@@ -1847,5 +1850,8 @@ document.addEventListener('DOMContentLoaded',()=>{loadSave();});
   <button class="pxbtn" style="background:var(--poke-yellow);color:#000;font-size:clamp(.52rem,1.3vw,.68rem);margin-top:1rem" onclick="buildMap();showScreen('pokedex')">◀ BACK TO MAP</button>
 </div>
 
+
+<!-- Shared offline arcade helpers -->
+<script src="js/arcade.js"></script>
 </body>
 </html>
