@@ -1,4 +1,4 @@
-# Mrs. Rogers Homebase Arcade
+# Mrs. Rogers’ Homebase Arcade
 
 Static GitHub Pages classroom games. No build step. No external assets required.
 

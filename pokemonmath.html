@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Pokémon Math Quest — Mrs. Rogers</title>
+<title>Pokémon Math Quest — Mrs. Rogers’ Class</title>
 <style>
 /* ═══════════════════════════════════════════
    RESET & VARS
@@ -1202,10 +1202,16 @@ function dedupeChoices(choices, ansIndex){
   const unique=[];
   choices.map(String).forEach(c=>{if(!unique.includes(c)) unique.push(c);});
   if(!unique.includes(correct)) unique.unshift(correct);
-  while(unique.length<4){const filler=String(Number(correct||0)+unique.length+1);if(!unique.includes(filler))unique.push(filler);}
+  let seed=1;
+  while(unique.length<4){
+    const numeric=Number(correct);
+    const filler=Number.isFinite(numeric)?String(numeric+seed):`Choice ${seed}`;
+    if(!unique.includes(filler)) unique.push(filler);
+    seed++;
+  }
   const shuffled=sh(unique).slice(0,4);
   const newAns=shuffled.indexOf(correct);
-  if(newAns>=0) choices.__newAns=newAns;
+  shuffled.__newAns=newAns>=0?newAns:0;
   return shuffled;
 }
 
@@ -1229,6 +1235,7 @@ function renderMC(q, area){
   const fb=addFeedback(area);
 
   q.choices = dedupeChoices(q.choices, q.ans);
+  q.ans = q.choices.__newAns;
   q.choices.forEach((c,i)=>{
     const btn=document.createElement('button');
     btn.className='battle-btn';
@@ -1236,8 +1243,6 @@ function renderMC(q, area){
     btn.onclick=()=>{
       if(questionAnswered)return;
       questionAnswered=true;
-      if(q.choices.__newAns!==undefined) q.ans=q.choices.__newAns;
-      if(q.choices.__newAns!==undefined) q.ans=q.choices.__newAns;
       const ok=i===q.ans;
       grid.querySelectorAll('.battle-btn').forEach((b,j)=>{b.disabled=true;if(j===q.ans)b.classList.add('correct');else if(j===i&&!ok)b.classList.add('wrong');});
       if(ok){correctAnswer();setFeedback(true,'✓ CORRECT! Great job!');}
@@ -1305,6 +1310,7 @@ function renderPlaceVal(q, area){
   const grid=document.createElement('div');grid.className='ans-grid-4';
   const fb=addFeedback(area);
   q.choices = dedupeChoices(q.choices, q.ans);
+  q.ans = q.choices.__newAns;
   q.choices.forEach((c,i)=>{
     const btn=document.createElement('button');btn.className='battle-btn';btn.textContent=c;
     btn.onclick=()=>{

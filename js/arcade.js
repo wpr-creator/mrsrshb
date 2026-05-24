@@ -1,4 +1,4 @@
-/* Mrs. Rogers Arcade — shared offline helpers.
+/* Mrs. Rogers’ Arcade — shared offline helpers.
    This file intentionally has no external dependencies. */
 (function(){
   'use strict';
@@ -26,9 +26,12 @@
   }
 
   window.MrsRogersArcade = Object.freeze({
-    version:'2026-05-24-repair',
+    version:'2026-05-24-repair-2',
     refresh(){ removeDuplicateAnswerText(); improveTapTargets(); }
   });
+
+
+  console.info('🎮 Mrs. Rogers’ Arcade Loaded', window.MrsRogersArcade.version);
 
   if(document.readyState === 'loading'){
     document.addEventListener('DOMContentLoaded', window.MrsRogersArcade.refresh, {once:true});
