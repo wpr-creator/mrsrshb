@@ -3,147 +3,163 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>Portal Park</title>
+<title>Portal Park — Mrs. Rogers</title>
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --ink:#1f2937;--muted:#526174;--paper:#fffaf0;--line:#1f2937;
-  --blue:#3b82f6;--cyan:#38bdf8;--mint:#6ee7b7;--green:#22c55e;
-  --gold:#fbbf24;--orange:#fb923c;--pink:#f472b6;--purple:#a78bfa;--red:#ef4444;
+  --ink:#1f2937;--line:#1f2937;--paper:#fffaf0;
+  --body:'Nunito',sans-serif;--display:'Baloo 2',sans-serif;
+  --green:#16a34a;--red:#dc2626;--gold:#f59e0b;--blue:#2563eb;
   --shadow:rgba(31,41,55,.18);
-  --display:'Baloo 2',system-ui,sans-serif;
-  --body:'Nunito',system-ui,sans-serif;
 }
 html{font-size:22px}
-body{font-family:var(--body);color:var(--ink);min-height:100vh;overflow-x:hidden;background:#f5efe2;font-size:22px;line-height:1.4}
-button{font-family:var(--display);font-weight:800;color:var(--ink);cursor:pointer}
+body{font-family:var(--body);color:var(--ink);min-height:100vh;overflow-x:hidden;background:#f5efe2}
+button{font-family:var(--body);font-weight:900;color:var(--ink);cursor:pointer}
 .screen{display:none;min-height:100vh;flex-direction:column;align-items:center}
 .screen.active{display:flex}
 .hidden{display:none!important}
-.card{background:rgba(255,255,255,.96);border:4px solid var(--line);border-radius:30px;box-shadow:0 8px 0 var(--line),0 18px 30px var(--shadow)}
-.btn{
-  font-size:clamp(1.2rem,3vw,1.75rem);line-height:1.05;
-  padding:16px 28px;border:4px solid var(--line);border-radius:22px;
-  background:var(--gold);box-shadow:0 7px 0 var(--line);transition:.08s
-}
+
+/* ── CARDS & BUTTONS ── */
+.card{background:rgba(255,255,255,.96);border:4px solid var(--line);border-radius:28px;box-shadow:0 8px 0 var(--line),0 16px 28px var(--shadow)}
+.btn{font-family:var(--display);font-size:clamp(1.1rem,2.8vw,1.6rem);padding:14px 26px;border:4px solid var(--line);border-radius:20px;background:var(--gold);box-shadow:0 7px 0 var(--line);transition:.08s;line-height:1}
 .btn:hover{transform:translateY(-2px);box-shadow:0 9px 0 var(--line)}
 .btn:active{transform:translateY(4px);box-shadow:0 3px 0 var(--line)}
-.btn.secondary{background:#fff}
-.btn.small{font-size:clamp(1rem,2.5vw,1.2rem);padding:10px 18px;border-radius:18px;box-shadow:0 5px 0 var(--line)}
+.btn.ghost{background:#fff}
+.btn.sm{font-size:clamp(.9rem,2.2vw,1.1rem);padding:9px 16px;border-radius:14px;box-shadow:0 5px 0 var(--line)}
+
+/* ── ANIMATIONS ── */
 @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
-@keyframes pop{0%{transform:scale(.72);opacity:0}80%{transform:scale(1.08)}100%{transform:scale(1);opacity:1}}
+@keyframes pop{0%{transform:scale(.7);opacity:0}80%{transform:scale(1.07)}100%{transform:scale(1);opacity:1}}
 @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
-@keyframes pulse{0%,100%{filter:brightness(1)}50%{filter:brightness(1.13)}}
-@keyframes drift{0%{transform:translateX(-10px)}50%{transform:translateX(10px)}100%{transform:translateX(-10px)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.65}}
+@keyframes glow{0%,100%{box-shadow:0 8px 0 var(--line),0 0 0 rgba(255,255,255,0)}50%{box-shadow:0 8px 0 var(--line),0 0 22px rgba(255,255,255,.5)}}
+@keyframes shimmer{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
 
-/* ── TITLE ── */
+/* ══════════════════════════════════
+   TITLE
+══════════════════════════════════ */
 #title{
-  justify-content:center;text-align:center;gap:22px;padding:28px 16px;
-  background:
-    radial-gradient(circle at 24% 22%,rgba(59,130,246,.3),transparent 26%),
-    radial-gradient(circle at 78% 30%,rgba(251,191,36,.26),transparent 25%),
-    linear-gradient(180deg,#e9f5ff,#fff2d2);
+  background:linear-gradient(180deg,#1a0a3d 0%,#2d1565 50%,#4c1d95 100%);
+  justify-content:center;align-items:center;text-align:center;
+  gap:20px;padding:28px 16px;position:relative;overflow:hidden;
 }
-.logo-card{padding:28px;max-width:860px;width:100%;position:relative;overflow:hidden}
-.logo-card::before{content:"";position:absolute;inset:-20%;background:radial-gradient(circle,rgba(59,130,246,.12),transparent 40%);animation:drift 7s ease-in-out infinite}
-.logo-card>*{position:relative}
-.logo-mark{font-size:clamp(4rem,12vw,7.5rem);animation:bob 2.4s ease-in-out infinite}
-.game-title{font-family:var(--display);font-size:clamp(3.2rem,9.5vw,6rem);line-height:.88;color:#215fa8;text-shadow:4px 5px 0 rgba(255,255,255,.95)}
-.tagline{font-size:clamp(1.2rem,3vw,1.6rem);font-weight:900;line-height:1.35;max-width:720px;margin:12px auto 0;color:#34465d}
+#title::before{
+  content:"✦ ✧ ✦ ✧ ✦ ✧ ✦ ✧ ✦";position:absolute;top:14px;left:0;right:0;
+  color:rgba(255,255,255,.15);font-size:1.4rem;letter-spacing:18px;pointer-events:none;
+}
+.title-card{padding:28px;max-width:800px;width:100%;background:rgba(255,255,255,.95)}
+.title-portals{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-bottom:8px}
+.title-portals span{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:60px;height:60px;border:3px solid var(--line);border-radius:16px;
+  background:#fff;box-shadow:0 5px 0 var(--line);font-size:2rem;
+  animation:bob 2.8s ease-in-out infinite;
+}
+.title-portals span:nth-child(2){animation-delay:.2s}
+.title-portals span:nth-child(3){animation-delay:.4s}
+.title-portals span:nth-child(4){animation-delay:.6s}
+.title-portals span:nth-child(5){animation-delay:.8s}
+.title-portals span:nth-child(6){animation-delay:1s}
+.title-portals span:nth-child(7){animation-delay:1.2s}
+.game-title{font-family:var(--display);font-size:clamp(3rem,9vw,5.5rem);line-height:.9;color:#4c1d95;text-shadow:4px 5px 0 rgba(255,255,255,.9)}
+.tagline{font-size:clamp(1.1rem,2.8vw,1.5rem);font-weight:900;color:#4a365f;max-width:640px;margin:10px auto 0;line-height:1.4}
 
-/* ── HUB ── */
-#hub{padding:16px;gap:14px;background:linear-gradient(180deg,#e7f4ff,#fff3d6)}
+/* ══════════════════════════════════
+   HUB
+══════════════════════════════════ */
+#hub{padding:14px;gap:12px;background:linear-gradient(180deg,#e7f4ff,#fff3d6);overflow-y:auto}
 .topbar{
   width:100%;position:sticky;top:0;z-index:20;
-  display:flex;gap:10px;align-items:center;justify-content:center;flex-wrap:wrap;
-  padding:12px;background:rgba(255,255,255,.94);border-bottom:4px solid var(--line)
+  display:flex;gap:8px;align-items:center;justify-content:center;flex-wrap:wrap;
+  padding:10px 12px;background:rgba(255,255,255,.95);border-bottom:4px solid var(--line);
 }
-.stat{font-family:var(--display);font-size:clamp(1rem,2.5vw,1.35rem);background:#fff;border:3px solid var(--line);border-radius:16px;padding:8px 14px}
-.hub-title{font-family:var(--display);font-size:clamp(2.2rem,6.5vw,3.8rem);color:#215fa8;line-height:1;text-align:center}
-.hub-sub{font-size:clamp(1.1rem,2.5vw,1.4rem);font-weight:900;text-align:center;max-width:880px;line-height:1.35;color:#415166}
-.portal-grid{width:100%;max-width:1160px;display:grid;grid-template-columns:repeat(3,1fr);gap:20px;padding:10px 0 42px}
-@media(max-width:900px){.portal-grid{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:600px){.portal-grid{grid-template-columns:1fr}}
-.portal{
-  min-height:230px;padding:20px;text-align:center;
-  display:flex;flex-direction:column;gap:10px;align-items:center;justify-content:center;
-  overflow:hidden;position:relative;border-radius:32px;cursor:pointer;
-  transition:transform .12s,box-shadow .12s;
-}
-.portal::before{content:"";position:absolute;inset:-45%;background:radial-gradient(circle,rgba(255,255,255,.5),transparent 48%);opacity:.7;animation:pulse 3.2s ease-in-out infinite}
-.portal::after{content:"ENTER";position:absolute;top:12px;right:12px;font-family:var(--display);font-size:clamp(.8rem,1.8vw,.95rem);background:rgba(255,255,255,.8);border:2px solid var(--line);border-radius:999px;padding:4px 10px}
-.portal>*{position:relative}
-.portal:hover{transform:translateY(-4px);box-shadow:0 12px 0 var(--line),0 22px 32px var(--shadow)}
-.portal-emoji{font-size:clamp(3.5rem,9vw,5.5rem);animation:bob 2.7s ease-in-out infinite}
-.portal-name{font-family:var(--display);font-size:clamp(1.7rem,4.2vw,2.4rem);line-height:.96;color:#153e75}
-.portal-story{font-size:clamp(1rem,2.3vw,1.22rem);font-weight:900;line-height:1.25;color:#34465d}
-.portal-status{font-size:clamp(.88rem,2vw,1.05rem);color:#526174;font-weight:900}
-.candy{background:linear-gradient(160deg,#fff,#ffe1ee 45%,#dffdea)}
-.space{background:linear-gradient(160deg,#f4fbff,#e3e8ff 45%,#dff7ff)}
-.zoo{background:linear-gradient(160deg,#fff,#e0f5ed 45%,#fff0cd)}
-.island{background:linear-gradient(160deg,#e1fbff,#fff1d7 45%,#d8f7e7)}
-.block{background:linear-gradient(160deg,#eef6ff,#e8ffe6 45%,#fff3c4)}
-.pop{background:linear-gradient(160deg,#fff1fb,#eee9ff 45%,#ffe6ba)}
+.stat{font-family:var(--display);font-size:clamp(.9rem,2.3vw,1.2rem);background:#fff;border:3px solid var(--line);border-radius:14px;padding:7px 12px;white-space:nowrap}
+.hub-title{font-family:var(--display);font-size:clamp(2rem,6vw,3.5rem);color:#1e3a5f;line-height:1;text-align:center}
+.hub-sub{font-size:clamp(1rem,2.4vw,1.3rem);font-weight:900;text-align:center;max-width:860px;line-height:1.4;color:#374151}
+.portal-grid{width:100%;max-width:1180px;display:grid;grid-template-columns:repeat(4,1fr);gap:16px;padding:6px 0 40px}
+@media(max-width:960px){.portal-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:520px){.portal-grid{grid-template-columns:1fr}}
 
-/* ── GAME ── */
-#game{background:linear-gradient(180deg,#e4f4ff,#fff6df)}
+/* portal cards */
+.portal{
+  border:4px solid var(--line);border-radius:28px;cursor:pointer;
+  overflow:hidden;position:relative;box-shadow:0 8px 0 var(--line),0 16px 24px var(--shadow);
+  transition:transform .12s,box-shadow .12s;display:flex;flex-direction:column;
+}
+.portal:hover{transform:translateY(-5px);box-shadow:0 13px 0 var(--line),0 22px 32px var(--shadow)}
+.portal-art{width:100%;height:160px;position:relative;overflow:hidden;flex-shrink:0}
+.portal-art svg{width:100%;height:100%}
+.portal-info{padding:14px;background:rgba(255,255,255,.96);flex:1;display:flex;flex-direction:column;gap:6px}
+.portal-name{font-family:var(--display);font-size:clamp(1.3rem,3vw,1.7rem);line-height:1;color:#1e3a5f}
+.portal-desc{font-size:clamp(.9rem,2.1vw,1.05rem);font-weight:900;color:#374151;line-height:1.3}
+.portal-status{font-size:clamp(.8rem,1.8vw,.95rem);font-weight:900;color:#6b7280;margin-top:2px}
+.portal.done .portal-info{background:linear-gradient(180deg,rgba(255,255,255,.96),rgba(255,240,180,.6))}
+
+/* ══════════════════════════════════
+   GAME
+══════════════════════════════════ */
+#game{min-height:100vh;overflow-y:auto}
 .hud{
   width:100%;position:sticky;top:0;z-index:30;
-  display:flex;align-items:center;justify-content:space-between;
-  gap:12px;flex-wrap:wrap;padding:14px 16px;
-  background:rgba(255,255,255,.95);border-bottom:4px solid var(--line)
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  padding:12px 14px;background:rgba(255,255,255,.96);border-bottom:4px solid var(--line);
 }
-.hud-left{display:flex;align-items:center;gap:12px}
-.hud-emoji{font-size:clamp(2rem,5vw,2.8rem)}
-.hud-title{font-family:var(--display);font-size:clamp(1.2rem,3vw,1.75rem);color:#215fa8;line-height:1}
-.hud-sub{font-size:clamp(.95rem,2.2vw,1.18rem);font-weight:900;color:var(--muted)}
-.hearts{font-size:clamp(1.2rem,3vw,1.45rem);letter-spacing:2px}
-.progress{width:100%;height:18px;background:#fff;border:3px solid var(--line);border-radius:999px;overflow:hidden;max-width:700px}
-.progress-fill{height:100%;background:linear-gradient(90deg,var(--green),var(--gold));width:0%;transition:.28s}
-.game-wrap{width:100%;max-width:920px;padding:20px 16px 80px;display:flex;flex-direction:column;gap:16px;align-items:center}
-.event{width:100%;font-size:clamp(1.1rem,2.8vw,1.42rem);font-weight:900;text-align:center;padding:12px 16px;border-radius:22px;background:#fff;border:3px solid var(--line)}
-.question{width:100%;padding:22px}
-.q-text{font-size:clamp(1.5rem,4.5vw,2.4rem);line-height:1.25;font-weight:900;text-align:center}
-.visual{font-size:clamp(1.8rem,5vw,3rem);line-height:1.4;margin-top:10px;word-break:break-word;text-align:center}
-.answers{width:100%;display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
-@media(max-width:600px){.answers{grid-template-columns:1fr}}
-.answer{
-  font-size:clamp(1.3rem,3.8vw,1.9rem);line-height:1.1;
-  min-height:84px;padding:18px 14px;
-  border:4px solid var(--line);border-radius:24px;
-  background:#fff;box-shadow:0 7px 0 var(--line);
-  font-family:var(--body);font-weight:900;
-}
-.answer:hover:not(:disabled){background:#fff0bd;transform:translateY(-2px)}
-.answer.correct{background:#c9f7dc;border-color:#157a48;color:#105b36;animation:pop .25s}
-.answer.wrong{background:#ffd3d3;border-color:#c82333;color:#8d1520;animation:shake .25s}
-.answer:disabled{cursor:default}
-.feedback{min-height:40px;font-family:var(--display);font-size:clamp(1.2rem,3vw,1.75rem);font-weight:800;text-align:center}
-.good{color:#157a48}.bad{color:#c82333}
+.hud-left{display:flex;align-items:center;gap:10px;flex:1;min-width:0}
+.hud-icon{width:48px;height:48px;border-radius:12px;border:3px solid var(--line);overflow:hidden;flex-shrink:0}
+.hud-icon svg{width:100%;height:100%}
+.hud-name{font-family:var(--display);font-size:clamp(1rem,2.5vw,1.4rem);color:#1e3a5f;line-height:1.1}
+.hud-q{font-size:clamp(.85rem,2vw,1rem);font-weight:900;color:#6b7280}
+.hearts{font-size:clamp(1rem,2.5vw,1.3rem);letter-spacing:2px;flex-shrink:0}
+.hud-coins{font-family:var(--display);font-size:clamp(.9rem,2.2vw,1.1rem);background:#fff;border:3px solid var(--line);border-radius:12px;padding:6px 10px;white-space:nowrap}
+.prog-wrap{width:100%;height:16px;background:#f3f4f6;border:3px solid var(--line);border-radius:999px;overflow:hidden;flex-shrink:0}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--green),#84cc16);border-radius:999px;transition:.3s}
+.game-wrap{width:100%;max-width:880px;padding:18px 14px 80px;display:flex;flex-direction:column;gap:14px;align-items:center}
+.event-bar{width:100%;font-size:clamp(1rem,2.5vw,1.25rem);font-weight:900;text-align:center;padding:10px 14px;border-radius:18px;background:#fff;border:3px solid var(--line);color:#374151}
 
-/* ── MODALS ── */
-.modal{position:fixed;inset:0;z-index:90;display:flex;align-items:center;justify-content:center;background:rgba(255,250,240,.9);padding:20px}
-.modal-card{max-width:660px;width:100%;padding:28px;text-align:center;display:flex;flex-direction:column;gap:14px;align-items:center}
-.modal-emoji{font-size:clamp(3.5rem,10vw,5rem)}
-.modal-title{font-family:var(--display);font-size:clamp(2.2rem,6.5vw,3.8rem);color:#215fa8;line-height:1}
-.modal-text{font-size:clamp(1.15rem,2.8vw,1.5rem);font-weight:900;line-height:1.4}
-.theme-candy{background:linear-gradient(180deg,#fff3f8,#e4fff1)}
-.theme-space{background:linear-gradient(180deg,#eef8ff,#e6eaff)}
-.theme-zoo{background:linear-gradient(180deg,#fff8e9,#e3f8ee)}
-.theme-island{background:linear-gradient(180deg,#e6fbff,#fff1d8)}
-.theme-block{background:linear-gradient(180deg,#eef6ff,#e9ffe9)}
-.theme-pop{background:linear-gradient(180deg,#fff0fa,#f0edff)}
+/* question */
+.q-card{width:100%;padding:20px}
+.q-text{font-size:clamp(1.3rem,3.5vw,2rem);line-height:1.3;font-weight:900;text-align:center;color:#1f2937}
+.q-visual{display:flex;justify-content:center;align-items:center;flex-wrap:wrap;gap:12px;margin-top:14px}
+.q-visual svg{display:block}
+
+/* answers */
+.ans-grid{width:100%;display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+@media(max-width:520px){.ans-grid{grid-template-columns:1fr}}
+.ans-btn{
+  font-size:clamp(1.1rem,3vw,1.5rem);font-weight:900;min-height:72px;
+  padding:16px 12px;border:4px solid var(--line);border-radius:20px;
+  background:#fff;box-shadow:0 6px 0 var(--line);transition:.08s;
+  display:flex;align-items:center;justify-content:center;gap:10px;
+}
+.ans-btn:hover:not(:disabled){background:#fef9c3;transform:translateY(-2px);box-shadow:0 8px 0 var(--line)}
+.ans-btn.correct{background:#dcfce7!important;border-color:var(--green)!important;color:#14532d!important;animation:pop .25s}
+.ans-btn.wrong{background:#fee2e2!important;border-color:var(--red)!important;color:#7f1d1d!important;animation:shake .25s}
+.ans-btn:disabled{cursor:default}
+.ans-btn svg{flex-shrink:0}
+.feedback{min-height:38px;font-family:var(--display);font-size:clamp(1.1rem,2.8vw,1.6rem);text-align:center}
+.good{color:var(--green)}.bad{color:var(--red)}
+
+/* ══════════════════════════════════
+   MODALS
+══════════════════════════════════ */
+.modal{position:fixed;inset:0;z-index:90;display:flex;align-items:center;justify-content:center;background:rgba(249,245,235,.92);padding:18px}
+.modal-card{max-width:620px;width:100%;padding:26px;text-align:center;display:flex;flex-direction:column;gap:14px;align-items:center}
+.modal-icon{font-size:4.5rem}
+.modal-title{font-family:var(--display);font-size:clamp(2rem,6vw,3.2rem);color:#1e3a5f;line-height:1}
+.modal-text{font-size:clamp(1rem,2.5vw,1.3rem);font-weight:900;line-height:1.45;color:#374151}
 </style>
 </head>
 <body>
 
 <!-- TITLE -->
 <section id="title" class="screen active">
-  <div class="logo-card card">
-    <div class="logo-mark">🚪</div>
+  <div class="title-card card">
+    <div class="title-portals">
+      <span>🍬</span><span>🦒</span><span>🚀</span><span>🦊</span><span>👽</span><span>🎮</span><span>🎤</span>
+    </div>
     <h1 class="game-title">Portal Park</h1>
-    <p class="tagline">Six doors. Six worlds. Each run is different — coins, hearts, and a badge waiting inside.</p>
+    <p class="tagline">Seven worlds. Seven doors. Coins, hearts, and a badge waiting inside each one.</p>
   </div>
   <button class="btn" onclick="startGame()">Open the Gates ▶</button>
 </section>
@@ -153,11 +169,11 @@ button{font-family:var(--display);font-weight:800;color:var(--ink);cursor:pointe
   <div class="topbar">
     <div class="stat" id="rankStat">🌟 Rank 1</div>
     <div class="stat" id="coinStat">🪙 0</div>
-    <div class="stat" id="badgeStat">🏅 0 / 6</div>
-    <button class="btn small secondary" onclick="resetAll()">Reset</button>
+    <div class="stat" id="badgeStat">🏅 0 / 7</div>
+    <button class="btn sm ghost" onclick="resetAll()">↺ Reset</button>
   </div>
   <h2 class="hub-title">Pick Your Portal</h2>
-  <p class="hub-sub">Each world has its own challenge mix. Find the badge to unlock it for good.</p>
+  <p class="hub-sub">Find the badge in each world to unlock the next one.</p>
   <div class="portal-grid" id="portalGrid"></div>
 </section>
 
@@ -165,26 +181,26 @@ button{font-family:var(--display);font-weight:800;color:var(--ink);cursor:pointe
 <section id="game" class="screen">
   <div class="hud">
     <div class="hud-left">
-      <div class="hud-emoji" id="hudEmoji">🍭</div>
+      <div class="hud-icon" id="hudIcon"></div>
       <div>
-        <div class="hud-title" id="hudTitle">Candy Animals</div>
-        <div class="hud-sub" id="hudSub">Challenge 1 of 8</div>
+        <div class="hud-name" id="hudName">World</div>
+        <div class="hud-q" id="hudQ">Challenge 1 of 8</div>
       </div>
     </div>
     <div class="hearts" id="hearts">❤️❤️❤️</div>
-    <div class="stat" id="hudCoins">🪙 0</div>
-    <div class="progress"><div class="progress-fill" id="progress"></div></div>
+    <div class="hud-coins" id="hudCoins">🪙 0</div>
+    <div class="prog-wrap" style="flex-basis:100%"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
   </div>
   <main class="game-wrap">
-    <div class="event" id="eventText">A portal opens...</div>
-    <div id="gameArea" style="width:100%;display:flex;flex-direction:column;gap:16px;align-items:center"></div>
+    <div class="event-bar" id="eventBar">Loading...</div>
+    <div id="gameArea" style="width:100%;display:flex;flex-direction:column;gap:12px;align-items:center"></div>
   </main>
 </section>
 
 <!-- TREASURE -->
 <div id="treasure" class="modal hidden">
   <div class="modal-card card">
-    <div class="modal-emoji" id="treasureEmoji">🎁</div>
+    <div class="modal-icon" id="treasureIcon">🎁</div>
     <div class="modal-title">Portal Prize!</div>
     <div class="modal-text" id="treasureText">You found coins!</div>
     <button class="btn" onclick="closeTreasure()">Keep Going ▶</button>
@@ -194,67 +210,553 @@ button{font-family:var(--display);font-weight:800;color:var(--ink);cursor:pointe
 <!-- COMPLETE -->
 <div id="complete" class="modal hidden">
   <div class="modal-card card">
-    <div class="modal-emoji" id="completeEmoji">🏅</div>
+    <div class="modal-icon" id="completeIcon">🏅</div>
     <div class="modal-title" id="completeTitle">Badge Found!</div>
     <div class="modal-text" id="completeText">Great work!</div>
     <button class="btn" onclick="finishRun()">Back to Portal Park ▶</button>
-    <button class="btn secondary" onclick="restartRun()">Play This World Again ↺</button>
+    <button class="btn ghost" onclick="restartRun()">Play Again ↺</button>
   </div>
 </div>
 
 <!-- GAME OVER -->
 <div id="gameover" class="modal hidden">
   <div class="modal-card card">
-    <div class="modal-emoji">💤</div>
+    <div class="modal-icon">💤</div>
     <div class="modal-title">Portal Closed!</div>
-    <div class="modal-text">You ran out of hearts. New challenges are waiting — try again!</div>
+    <div class="modal-text">You ran out of hearts. Try again!</div>
     <button class="btn" onclick="restartRun()">Try Again ▶</button>
-    <button class="btn secondary" onclick="gameOverHub()">Back to Park</button>
+    <button class="btn ghost" onclick="goHub()">Back to Park</button>
   </div>
 </div>
 
 <script>
-const SAVE_KEY="portal_park_v3";
-let state={coins:0,badges:{},rank:1};
-let current=null,deck=[],index=0,hearts=3,correct=0,locked=false;
+// ═══════════════════════════════════════════════════════
+// SVG COMPONENT LIBRARY
+// ═══════════════════════════════════════════════════════
 
+// ── COINS ────────────────────────────────────────────────
+function svgPenny(size=60){
+  return`<svg width="${size}" height="${size}" viewBox="0 0 60 60">
+    <circle cx="30" cy="30" r="28" fill="#b87333" stroke="#7a4a1e" stroke-width="3"/>
+    <circle cx="30" cy="30" r="22" fill="#c97c3a" stroke="#9a5c25" stroke-width="1.5"/>
+    <text x="30" y="24" text-anchor="middle" font-family="serif" font-size="7" font-weight="bold" fill="#7a4a1e">LIBERTY</text>
+    <text x="30" y="36" text-anchor="middle" font-family="serif" font-size="9" font-weight="bold" fill="#7a4a1e">1¢</text>
+    <text x="30" y="46" text-anchor="middle" font-family="serif" font-size="5.5" fill="#7a4a1e">PENNY</text>
+  </svg>`;
+}
+function svgNickel(size=60){
+  return`<svg width="${size}" height="${size}" viewBox="0 0 60 60">
+    <circle cx="30" cy="30" r="28" fill="#d0cfc8" stroke="#888" stroke-width="3"/>
+    <circle cx="30" cy="30" r="22" fill="#c8c7c0" stroke="#999" stroke-width="1.5"/>
+    <text x="30" y="24" text-anchor="middle" font-family="serif" font-size="7" font-weight="bold" fill="#444">LIBERTY</text>
+    <text x="30" y="36" text-anchor="middle" font-family="serif" font-size="9" font-weight="bold" fill="#444">5¢</text>
+    <text x="30" y="46" text-anchor="middle" font-family="serif" font-size="5.5" fill="#444">NICKEL</text>
+  </svg>`;
+}
+function svgDime(size=48){
+  return`<svg width="${size}" height="${size}" viewBox="0 0 60 60">
+    <circle cx="30" cy="30" r="26" fill="#d8d8d8" stroke="#888" stroke-width="3"/>
+    <circle cx="30" cy="30" r="20" fill="#cccccc" stroke="#999" stroke-width="1.5"/>
+    <text x="30" y="24" text-anchor="middle" font-family="serif" font-size="7" font-weight="bold" fill="#333">LIBERTY</text>
+    <text x="30" y="36" text-anchor="middle" font-family="serif" font-size="9" font-weight="bold" fill="#333">10¢</text>
+    <text x="30" y="46" text-anchor="middle" font-family="serif" font-size="5.5" fill="#333">DIME</text>
+  </svg>`;
+}
+function svgQuarter(size=68){
+  return`<svg width="${size}" height="${size}" viewBox="0 0 60 60">
+    <circle cx="30" cy="30" r="28" fill="#c8c8c8" stroke="#777" stroke-width="3"/>
+    <circle cx="30" cy="30" r="22" fill="#bdbdbd" stroke="#888" stroke-width="1.5"/>
+    <text x="30" y="22" text-anchor="middle" font-family="serif" font-size="6.5" font-weight="bold" fill="#333">LIBERTY</text>
+    <text x="30" y="34" text-anchor="middle" font-family="serif" font-size="9" font-weight="bold" fill="#333">25¢</text>
+    <text x="30" y="44" text-anchor="middle" font-family="serif" font-size="5.5" fill="#333">QUARTER</text>
+  </svg>`;
+}
+function svgDollar(size=68){
+  return`<svg width="${size}" height="${size}" viewBox="0 0 60 60">
+    <circle cx="30" cy="30" r="28" fill="#d4af37" stroke="#a07820" stroke-width="3"/>
+    <circle cx="30" cy="30" r="22" fill="#c9a227" stroke="#b08020" stroke-width="1.5"/>
+    <text x="30" y="22" text-anchor="middle" font-family="serif" font-size="6.5" font-weight="bold" fill="#5c3a00">LIBERTY</text>
+    <text x="30" y="34" text-anchor="middle" font-family="serif" font-size="9" font-weight="bold" fill="#5c3a00">$1</text>
+    <text x="30" y="44" text-anchor="middle" font-family="serif" font-size="5.5" fill="#5c3a00">DOLLAR</text>
+  </svg>`;
+}
+
+// ── CLOCK ─────────────────────────────────────────────────
+function svgClock(h,m,size=130){
+  const angle=(h%12+m/60)*30-90;
+  const mAngle=m*6-90;
+  const hx=30+22*Math.cos(angle*Math.PI/180);
+  const hy=30+22*Math.sin(angle*Math.PI/180);
+  const mx=30+27*Math.cos(mAngle*Math.PI/180);
+  const my=30+27*Math.sin(mAngle*Math.PI/180);
+  let ticks='';
+  for(let i=0;i<12;i++){
+    const a=(i*30-90)*Math.PI/180;
+    const x1=30+24*Math.cos(a),y1=30+24*Math.sin(a);
+    const x2=30+28*Math.cos(a),y2=30+28*Math.sin(a);
+    ticks+=`<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="#374151" stroke-width="${i%3===0?2:1}"/>`;
+  }
+  let nums='';
+  [12,1,2,3,4,5,6,7,8,9,10,11].forEach((n,i)=>{
+    const a=(i*30-90)*Math.PI/180;
+    const nx=30+20*Math.cos(a),ny=30+20*Math.sin(a);
+    nums+=`<text x="${nx.toFixed(1)}" y="${(ny+2.5).toFixed(1)}" text-anchor="middle" font-size="5" font-family="sans-serif" font-weight="bold" fill="#1f2937">${n}</text>`;
+  });
+  return`<svg width="${size}" height="${size}" viewBox="0 0 60 60">
+    <circle cx="30" cy="30" r="29" fill="#fff" stroke="#1f2937" stroke-width="2.5"/>
+    <circle cx="30" cy="30" r="26" fill="#fffef0" stroke="#d1d5db" stroke-width="1"/>
+    ${ticks}${nums}
+    <line x1="30" y1="30" x2="${hx.toFixed(1)}" y2="${hy.toFixed(1)}" stroke="#1f2937" stroke-width="3" stroke-linecap="round"/>
+    <line x1="30" y1="30" x2="${mx.toFixed(1)}" y2="${my.toFixed(1)}" stroke="#374151" stroke-width="2" stroke-linecap="round"/>
+    <circle cx="30" cy="30" r="2.5" fill="#1f2937"/>
+  </svg>`;
+}
+
+// ── BAR CHART ─────────────────────────────────────────────
+function svgBarChart(labels,values,colors,w=320,h=160){
+  const max=Math.max(...values);
+  const bw=Math.floor((w-60)/(labels.length*1.6));
+  const gap=Math.floor(bw*0.6);
+  const chartH=h-44;
+  let bars='',axes='',lbls='';
+  labels.forEach((lbl,i)=>{
+    const bh=Math.round((values[i]/max)*chartH);
+    const x=40+i*(bw+gap);
+    const y=chartH-bh+10;
+    bars+=`<rect x="${x}" y="${y}" width="${bw}" height="${bh}" fill="${colors[i%colors.length]}" rx="4" stroke="#1f2937" stroke-width="1.5"/>`;
+    bars+=`<text x="${x+bw/2}" y="${y-5}" text-anchor="middle" font-size="11" font-weight="900" font-family="sans-serif" fill="#1f2937">${values[i]}</text>`;
+    const shortLbl=lbl.length>8?lbl.slice(0,7)+'…':lbl;
+    lbls+=`<text x="${x+bw/2}" y="${chartH+24}" text-anchor="middle" font-size="10" font-weight="700" font-family="sans-serif" fill="#374151">${shortLbl}</text>`;
+  });
+  axes=`<line x1="36" y1="10" x2="36" y2="${chartH+10}" stroke="#374151" stroke-width="2"/>
+  <line x1="36" y1="${chartH+10}" x2="${w-8}" y2="${chartH+10}" stroke="#374151" stroke-width="2"/>`;
+  return`<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" style="overflow:visible">
+    <rect width="${w}" height="${h}" fill="#fffef0" rx="8" stroke="#d1d5db" stroke-width="1.5"/>
+    ${axes}${bars}${lbls}
+  </svg>`;
+}
+
+// ═══════════════════════════════════════════════════════
+// WORLD PORTAL ART (SVG scenes)
+// ═══════════════════════════════════════════════════════
+const PORTAL_ART={
+  candy:`<svg viewBox="0 0 300 160" preserveAspectRatio="xMidYMid slice">
+    <defs><linearGradient id="csky" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#ffd6e8"/><stop offset="100%" stop-color="#fff0f8"/></linearGradient></defs>
+    <rect width="300" height="160" fill="url(#csky)"/>
+    <!-- rolling candy hills -->
+    <ellipse cx="80" cy="145" rx="90" ry="40" fill="#ffb3d1"/>
+    <ellipse cx="220" cy="148" rx="100" ry="38" fill="#ff80b0"/>
+    <!-- candy cane path -->
+    <path d="M30 160 Q50 100 70 120 Q90 140 110 100 Q130 60 150 90 Q170 120 190 80 Q210 40 230 70 Q250 100 270 60" stroke="#ff3399" stroke-width="8" fill="none" stroke-linecap="round"/>
+    <path d="M30 160 Q50 100 70 120 Q90 140 110 100 Q130 60 150 90 Q170 120 190 80 Q210 40 230 70 Q250 100 270 60" stroke="white" stroke-width="4" fill="none" stroke-linecap="round" stroke-dasharray="12 12"/>
+    <!-- gumdrops -->
+    <circle cx="60" cy="105" r="14" fill="#ff6eb4" stroke="#cc0066" stroke-width="2"/>
+    <circle cx="60" cy="105" r="7" fill="#ffaacc" opacity=".6"/>
+    <circle cx="140" cy="82" r="14" fill="#ff9f1c" stroke="#cc6600" stroke-width="2"/>
+    <circle cx="140" cy="82" r="7" fill="#ffd17c" opacity=".6"/>
+    <circle cx="220" cy="62" r="14" fill="#9b5de5" stroke="#6600cc" stroke-width="2"/>
+    <circle cx="220" cy="62" r="7" fill="#c77dff" opacity=".6"/>
+    <!-- candy cane poles -->
+    <rect x="88" y="70" width="8" height="50" rx="4" fill="white" stroke="#ff3399" stroke-width="1.5"/>
+    <rect x="88" y="70" width="8" height="10" rx="4" fill="#ff3399"/>
+    <rect x="88" y="90" width="8" height="10" rx="4" fill="#ff3399"/>
+    <rect x="88" y="110" width="8" height="10" rx="4" fill="#ff3399"/>
+    <!-- lollipop -->
+    <line x1="255" y1="155" x2="255" y2="85" stroke="#cc44aa" stroke-width="3"/>
+    <circle cx="255" cy="80" r="18" fill="#ff6eb4" stroke="#cc0066" stroke-width="2"/>
+    <path d="M255 62 A18 18 0 0 1 273 80" stroke="white" stroke-width="5" fill="none" stroke-linecap="round"/>
+    <!-- stars/sparkles -->
+    <text x="170" y="45" font-size="18" fill="#ff3399" opacity=".8">✦</text>
+    <text x="40" y="55" font-size="14" fill="#ff9f1c" opacity=".8">✧</text>
+  </svg>`,
+
+  animals:`<svg viewBox="0 0 300 160" preserveAspectRatio="xMidYMid slice">
+    <defs>
+      <linearGradient id="asky" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#ff9f1c"/><stop offset="40%" stop-color="#ffbf69"/><stop offset="100%" stop-color="#e07b39"/></linearGradient>
+    </defs>
+    <rect width="300" height="160" fill="url(#asky)"/>
+    <!-- sun -->
+    <circle cx="240" cy="30" r="22" fill="#ffd166" opacity=".9"/>
+    <circle cx="240" cy="30" r="16" fill="#ffec8b"/>
+    <!-- savanna ground -->
+    <ellipse cx="150" cy="175" rx="180" ry="55" fill="#c8843a"/>
+    <ellipse cx="150" cy="168" rx="180" ry="42" fill="#d4924a"/>
+    <!-- grass tufts -->
+    <g fill="#7cb518">
+      <path d="M20 135 Q22 115 24 135"/><path d="M23 135 Q26 110 29 135"/>
+      <path d="M80 130 Q82 112 84 130"/><path d="M83 130 Q86 108 89 130"/>
+      <path d="M200 128 Q202 110 204 128"/><path d="M203 128 Q206 106 209 128"/>
+    </g>
+    <!-- acacia tree -->
+    <rect x="118" y="80" width="10" height="60" fill="#8b4513"/>
+    <ellipse cx="123" cy="68" rx="32" ry="18" fill="#5a8a1a"/>
+    <ellipse cx="105" cy="72" rx="20" ry="12" fill="#4a7a14"/>
+    <ellipse cx="142" cy="72" rx="20" ry="12" fill="#4a7a14"/>
+    <!-- giraffe simplified -->
+    <rect x="38" y="72" width="8" height="52" rx="3" fill="#f4a030"/>
+    <rect x="38" y="62" width="8" height="16" rx="3" fill="#f4a030"/>
+    <!-- giraffe spots -->
+    <rect x="39" y="75" width="5" height="5" rx="1" fill="#c87820" opacity=".7"/>
+    <rect x="40" y="88" width="4" height="4" rx="1" fill="#c87820" opacity=".7"/>
+    <rect x="38" y="100" width="5" height="5" rx="1" fill="#c87820" opacity=".7"/>
+    <!-- head -->
+    <rect x="36" y="54" width="12" height="10" rx="4" fill="#f4a030"/>
+    <line x1="40" y1="54" x2="40" y2="48" stroke="#f4a030" stroke-width="3"/>
+    <line x1="46" y1="54" x2="46" y2="48" stroke="#f4a030" stroke-width="3"/>
+    <!-- elephant -->
+    <ellipse cx="218" cy="122" rx="26" ry="22" fill="#9e9e9e"/>
+    <circle cx="210" cy="106" r="16" fill="#ababab"/>
+    <!-- trunk -->
+    <path d="M205 115 Q195 120 192 132 Q196 136 200 132 Q200 124 208 118" fill="#9e9e9e" stroke="#888" stroke-width="1"/>
+    <circle cx="197" cy="108" r="4" fill="#888"/><!-- eye -->
+    <!-- zebra -->
+    <ellipse cx="265" cy="128" rx="18" ry="14" fill="white" stroke="#333" stroke-width="1.5"/>
+    <circle cx="258" cy="116" r="10" fill="white" stroke="#333" stroke-width="1.5"/>
+    <path d="M260 110 L258 104" stroke="#333" stroke-width="2.5"/>
+    <path d="M263 109 L262 103" stroke="#333" stroke-width="2.5"/>
+    <!-- zebra stripes -->
+    <path d="M250 120 Q255 115 260 120" stroke="#333" stroke-width="2" fill="none"/>
+    <path d="M255 128 Q260 122 267 127" stroke="#333" stroke-width="2" fill="none"/>
+    <circle cx="257" cy="115" r="2" fill="#333"/>
+  </svg>`,
+
+  space:`<svg viewBox="0 0 300 160" preserveAspectRatio="xMidYMid slice">
+    <defs>
+      <radialGradient id="spaceBg" cx="50%" cy="50%" r="70%"><stop offset="0%" stop-color="#1a1a4e"/><stop offset="100%" stop-color="#050520"/></radialGradient>
+      <radialGradient id="planetGlow" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#ff6b35"/><stop offset="100%" stop-color="#cc3300"/></radialGradient>
+    </defs>
+    <rect width="300" height="160" fill="url(#spaceBg)"/>
+    <!-- stars -->
+    <g fill="white">
+      <circle cx="15" cy="12" r="1.5"/><circle cx="40" cy="28" r="1"/><circle cx="75" cy="8" r="2"/>
+      <circle cx="110" cy="18" r="1.5"/><circle cx="155" cy="5" r="1"/><circle cx="190" cy="22" r="2"/>
+      <circle cx="225" cy="10" r="1.5"/><circle cx="265" cy="18" r="1"/><circle cx="285" cy="8" r="2"/>
+      <circle cx="30" cy="50" r="1"/><circle cx="95" cy="40" r="1.5"/><circle cx="175" cy="38" r="1"/>
+      <circle cx="248" cy="45" r="1.5"/><circle cx="280" cy="55" r="1"/>
+      <circle cx="8" cy="80" r="1"/><circle cx="52" cy="72" r="1.5"/><circle cx="130" cy="65" r="1"/>
+    </g>
+    <!-- milky way streak -->
+    <path d="M0 70 Q75 55 150 70 Q225 85 300 68" stroke="rgba(200,200,255,.18)" stroke-width="18" fill="none"/>
+    <!-- big planet -->
+    <circle cx="72" cy="88" r="38" fill="#e8621a"/>
+    <ellipse cx="72" cy="88" rx="38" ry="38" fill="url(#planetGlow)"/>
+    <!-- planet bands -->
+    <path d="M34 80 Q72 74 110 80" stroke="#c84a08" stroke-width="7" fill="none" opacity=".6"/>
+    <path d="M36 92 Q72 98 108 92" stroke="#ff8844" stroke-width="5" fill="none" opacity=".5"/>
+    <!-- planet rings -->
+    <ellipse cx="72" cy="88" rx="56" ry="12" fill="none" stroke="#f0a060" stroke-width="5" opacity=".7"/>
+    <ellipse cx="72" cy="88" rx="56" ry="12" fill="none" stroke="#ffcf9e" stroke-width="2" opacity=".4"/>
+    <!-- rocket -->
+    <path d="M218 130 L225 70 L232 130 Z" fill="#e8e8f0" stroke="#555" stroke-width="1.5"/>
+    <rect x="219" y="108" width="12" height="24" rx="2" fill="#c8c8d8" stroke="#555" stroke-width="1.5"/>
+    <!-- rocket window -->
+    <circle cx="225" cy="98" r="5" fill="#66aaff" stroke="#3366cc" stroke-width="1.5"/>
+    <!-- rocket flame -->
+    <path d="M220 132 Q225 148 230 132" fill="#ff6600" opacity=".85"/>
+    <path d="M221 132 Q225 143 229 132" fill="#ffcc00"/>
+    <!-- rocket fins -->
+    <path d="M219 128 L213 136 L219 128" fill="#aaaacc" stroke="#555" stroke-width="1"/>
+    <path d="M231 128 L237 136 L231 128" fill="#aaaacc" stroke="#555" stroke-width="1"/>
+    <!-- moon -->
+    <circle cx="260" cy="45" r="20" fill="#f0e8c8" stroke="#d4c090" stroke-width="1.5"/>
+    <circle cx="253" cy="38" r="5" fill="#e0d4aa" opacity=".6"/>
+    <circle cx="266" cy="50" r="4" fill="#e0d4aa" opacity=".5"/>
+    <circle cx="258" cy="54" r="3" fill="#e0d4aa" opacity=".5"/>
+    <!-- small planet -->
+    <circle cx="155" cy="110" r="15" fill="#9b5de5"/>
+    <path d="M140 108 Q155 104 170 108" stroke="#6a0dad" stroke-width="4" fill="none" opacity=".6"/>
+  </svg>`,
+
+  zootopia:`<svg viewBox="0 0 300 160" preserveAspectRatio="xMidYMid slice">
+    <defs>
+      <linearGradient id="zsky" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#87ceeb"/><stop offset="100%" stop-color="#b0e0ff"/></linearGradient>
+    </defs>
+    <rect width="300" height="160" fill="url(#zsky)"/>
+    <!-- city buildings back -->
+    <rect x="0" y="55" width="40" height="105" fill="#5b8fd4"/>
+    <rect x="5" y="45" width="30" height="20" fill="#4a7ec3"/>
+    <!-- windows -->
+    <g fill="#ffd166" opacity=".8">
+      <rect x="8" y="58" width="7" height="7" rx="1"/>
+      <rect x="20" y="58" width="7" height="7" rx="1"/>
+      <rect x="8" y="72" width="7" height="7" rx="1"/>
+      <rect x="20" y="72" width="7" height="7" rx="1"/>
+      <rect x="8" y="86" width="7" height="7" rx="1"/>
+      <rect x="20" y="86" width="7" height="7" rx="1"/>
+    </g>
+    <rect x="44" y="35" width="50" height="125" fill="#7d9ec0"/>
+    <rect x="48" y="25" width="42" height="16" fill="#6888aa"/>
+    <g fill="#fef3c7" opacity=".85">
+      <rect x="50" y="40" width="10" height="10" rx="1"/>
+      <rect x="66" y="40" width="10" height="10" rx="1"/>
+      <rect x="80" y="40" width="8" height="10" rx="1"/>
+      <rect x="50" y="57" width="10" height="10" rx="1"/>
+      <rect x="66" y="57" width="10" height="10" rx="1"/>
+      <rect x="50" y="74" width="10" height="10" rx="1"/>
+      <rect x="66" y="74" width="10" height="10" rx="1"/>
+      <rect x="80" y="74" width="8" height="10" rx="1"/>
+    </g>
+    <!-- big center tower -->
+    <rect x="105" y="20" width="65" height="140" fill="#9ab8d4"/>
+    <polygon points="105,20 137,0 170,20" fill="#7da0bc"/>
+    <rect x="128" y="25" width="18" height="18" rx="2" fill="#ffd166" opacity=".9"/>
+    <g fill="#fef3c7" opacity=".85">
+      <rect x="110" y="48" width="12" height="12" rx="1"/>
+      <rect x="130" y="48" width="12" height="12" rx="1"/>
+      <rect x="150" y="48" width="12" height="12" rx="1"/>
+      <rect x="110" y="68" width="12" height="12" rx="1"/>
+      <rect x="130" y="68" width="12" height="12" rx="1"/>
+      <rect x="150" y="68" width="12" height="12" rx="1"/>
+      <rect x="110" y="88" width="12" height="12" rx="1"/>
+      <rect x="130" y="88" width="12" height="12" rx="1"/>
+      <rect x="150" y="88" width="12" height="12" rx="1"/>
+    </g>
+    <!-- right buildings -->
+    <rect x="178" y="45" width="45" height="115" fill="#6888b8"/>
+    <g fill="#fef3c7" opacity=".8">
+      <rect x="183" y="52" width="10" height="10" rx="1"/>
+      <rect x="198" y="52" width="10" height="10" rx="1"/>
+      <rect x="210" y="52" width="8" height="10" rx="1"/>
+      <rect x="183" y="70" width="10" height="10" rx="1"/>
+      <rect x="198" y="70" width="10" height="10" rx="1"/>
+    </g>
+    <rect x="228" y="60" width="38" height="100" fill="#8aaac8"/>
+    <g fill="#fef3c7" opacity=".8">
+      <rect x="232" y="68" width="9" height="9" rx="1"/>
+      <rect x="247" y="68" width="9" height="9" rx="1"/>
+      <rect x="232" y="84" width="9" height="9" rx="1"/>
+      <rect x="247" y="84" width="9" height="9" rx="1"/>
+    </g>
+    <rect x="268" y="50" width="32" height="110" fill="#5878a8"/>
+    <!-- street -->
+    <rect x="0" y="138" width="300" height="22" fill="#555"/>
+    <rect x="0" y="147" width="300" height="4" fill="#666"/>
+    <!-- dashes -->
+    <g fill="#ffd166"><rect x="30" y="149" width="20" height="2" rx="1"/><rect x="80" y="149" width="20" height="2" rx="1"/><rect x="130" y="149" width="20" height="2" rx="1"/><rect x="180" y="149" width="20" height="2" rx="1"/><rect x="230" y="149" width="20" height="2" rx="1"/></g>
+    <!-- ZPD sign -->
+    <rect x="192" y="108" width="60" height="26" rx="6" fill="#2563eb" stroke="#1e40af" stroke-width="2"/>
+    <text x="222" y="126" text-anchor="middle" font-family="sans-serif" font-size="13" font-weight="900" fill="white">ZPD</text>
+  </svg>`,
+
+  stitch:`<svg viewBox="0 0 300 160" preserveAspectRatio="xMidYMid slice">
+    <defs>
+      <linearGradient id="ssky" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#0096c7"/><stop offset="60%" stop-color="#48cae4"/><stop offset="100%" stop-color="#90e0ef"/></linearGradient>
+    </defs>
+    <rect width="300" height="160" fill="url(#ssky)"/>
+    <!-- sun rays -->
+    <g stroke="#ffd166" stroke-width="3" opacity=".35">
+      <line x1="255" y1="28" x2="245" y2="8"/><line x1="255" y1="28" x2="272" y2="12"/>
+      <line x1="255" y1="28" x2="278" y2="28"/><line x1="255" y1="28" x2="270" y2="44"/>
+    </g>
+    <circle cx="255" cy="28" r="18" fill="#ffd166"/>
+    <!-- ocean -->
+    <path d="M0 118 Q50 108 100 118 Q150 128 200 118 Q250 108 300 118 L300 160 L0 160 Z" fill="#0077b6"/>
+    <path d="M0 122 Q40 115 80 122 Q120 129 160 122 Q200 115 240 122 Q270 129 300 124 L300 160 L0 160 Z" fill="#0096c7" opacity=".6"/>
+    <!-- palm trees -->
+    <rect x="30" y="75" width="8" height="60" rx="3" fill="#8b6343"/>
+    <ellipse cx="34" cy="68" rx="28" ry="14" fill="#52b788" transform="rotate(-15 34 68)"/>
+    <ellipse cx="34" cy="68" rx="25" ry="12" fill="#74c69d" transform="rotate(10 34 68)"/>
+    <ellipse cx="34" cy="68" rx="22" ry="10" fill="#52b788" transform="rotate(-30 34 68)"/>
+    <rect x="245" y="85" width="7" height="50" rx="3" fill="#8b6343"/>
+    <ellipse cx="248" cy="78" rx="24" ry="12" fill="#52b788" transform="rotate(-10 248 78)"/>
+    <ellipse cx="248" cy="78" rx="22" ry="11" fill="#74c69d" transform="rotate(15 248 78)"/>
+    <!-- Stitch simplified face -->
+    <ellipse cx="148" cy="105" rx="36" ry="32" fill="#0077b6"/>
+    <!-- body blue -->
+    <ellipse cx="148" cy="118" rx="30" ry="22" fill="#0096c7"/>
+    <!-- big blue head -->
+    <circle cx="148" cy="88" r="30" fill="#0077b6"/>
+    <!-- ears -->
+    <ellipse cx="122" cy="65" rx="10" ry="18" fill="#0077b6" transform="rotate(-20 122 65)"/>
+    <ellipse cx="122" cy="65" rx="6" ry="12" fill="#48cae4" transform="rotate(-20 122 65)"/>
+    <ellipse cx="174" cy="65" rx="10" ry="18" fill="#0077b6" transform="rotate(20 174 65)"/>
+    <ellipse cx="174" cy="65" rx="6" ry="12" fill="#48cae4" transform="rotate(20 174 65)"/>
+    <!-- face -->
+    <ellipse cx="148" cy="92" rx="22" ry="18" fill="#48cae4" opacity=".5"/>
+    <!-- eyes -->
+    <circle cx="138" cy="82" r="7" fill="white"/>
+    <circle cx="158" cy="82" r="7" fill="white"/>
+    <circle cx="139" cy="83" r="4" fill="#1a1a2e"/>
+    <circle cx="159" cy="83" r="4" fill="#1a1a2e"/>
+    <circle cx="140" cy="81" r="1.5" fill="white"/>
+    <circle cx="160" cy="81" r="1.5" fill="white"/>
+    <!-- nose -->
+    <ellipse cx="148" cy="90" rx="5" ry="3.5" fill="#1a3a5c"/>
+    <!-- smile -->
+    <path d="M136 97 Q148 106 160 97" stroke="#1a3a5c" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+    <!-- claws/feet suggestion -->
+    <path d="M125 125 Q118 135 122 140" stroke="#0066aa" stroke-width="4" fill="none" stroke-linecap="round"/>
+    <path d="M135 128 Q130 138 132 144" stroke="#0066aa" stroke-width="4" fill="none" stroke-linecap="round"/>
+    <path d="M165 128 Q168 138 166 144" stroke="#0066aa" stroke-width="4" fill="none" stroke-linecap="round"/>
+    <!-- Hawaii flower -->
+    <circle cx="52" cy="108" r="8" fill="#ff6eb4"/>
+    <circle cx="52" cy="108" r="4" fill="#ffd166"/>
+    <circle cx="44" cy="108" r="6" fill="#ff9f1c" opacity=".8"/>
+    <circle cx="60" cy="108" r="6" fill="#ff9f1c" opacity=".8"/>
+    <circle cx="52" cy="100" r="6" fill="#ff9f1c" opacity=".8"/>
+    <circle cx="52" cy="116" r="6" fill="#ff9f1c" opacity=".8"/>
+    <!-- 626 tag -->
+    <rect x="168" y="58" width="34" height="18" rx="5" fill="#e63946" stroke="#9b1c1c" stroke-width="1.5"/>
+    <text x="185" y="71" text-anchor="middle" font-family="sans-serif" font-size="10" font-weight="900" fill="white">626</text>
+  </svg>`,
+
+  roblox:`<svg viewBox="0 0 300 160" preserveAspectRatio="xMidYMid slice">
+    <defs>
+      <linearGradient id="rbg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1a1a1a"/><stop offset="100%" stop-color="#2d2d2d"/></linearGradient>
+    </defs>
+    <rect width="300" height="160" fill="url(#rbg)"/>
+    <!-- game tile grid background -->
+    <g opacity=".15" stroke="#fff" stroke-width=".5">
+      <line x1="0" y1="40" x2="300" y2="40"/><line x1="0" y1="80" x2="300" y2="80"/>
+      <line x1="0" y1="120" x2="300" y2="120"/>
+      <line x1="75" y1="0" x2="75" y2="160"/><line x1="150" y1="0" x2="150" y2="160"/>
+      <line x1="225" y1="0" x2="225" y2="160"/>
+    </g>
+    <!-- ROBLOX logo area -->
+    <rect x="90" y="12" width="120" height="36" rx="6" fill="#ff0000"/>
+    <text x="150" y="38" text-anchor="middle" font-family="sans-serif" font-size="22" font-weight="900" fill="white" letter-spacing="1">ROBLOX</text>
+    <!-- game tiles -->
+    <!-- adopt me tile -->
+    <rect x="8" y="56" width="68" height="58" rx="8" fill="#ff94c2" stroke="#ff5f9e" stroke-width="2"/>
+    <text x="42" y="78" text-anchor="middle" font-size="22" fill="white">🐣</text>
+    <text x="42" y="96" text-anchor="middle" font-family="sans-serif" font-size="8" font-weight="900" fill="white">Adopt Me!</text>
+    <rect x="10" y="106" width="64" height="5" rx="2" fill="rgba(255,255,255,.3)"/>
+    <!-- blox fruits tile -->
+    <rect x="84" y="56" width="68" height="58" rx="8" fill="#2563eb" stroke="#1d4ed8" stroke-width="2"/>
+    <text x="118" y="78" text-anchor="middle" font-size="22" fill="white">⚔️</text>
+    <text x="118" y="96" text-anchor="middle" font-family="sans-serif" font-size="8" font-weight="900" fill="white">Blox Fruits</text>
+    <rect x="86" y="106" width="64" height="5" rx="2" fill="rgba(255,255,255,.3)"/>
+    <!-- obby tile -->
+    <rect x="160" y="56" width="68" height="58" rx="8" fill="#16a34a" stroke="#15803d" stroke-width="2"/>
+    <text x="194" y="78" text-anchor="middle" font-size="22" fill="white">🏃</text>
+    <text x="194" y="96" text-anchor="middle" font-family="sans-serif" font-size="8" font-weight="900" fill="white">Tower Obby</text>
+    <rect x="162" y="106" width="64" height="5" rx="2" fill="rgba(255,255,255,.3)"/>
+    <!-- avatar tile -->
+    <rect x="236" y="56" width="58" height="58" rx="8" fill="#7c3aed" stroke="#6d28d9" stroke-width="2"/>
+    <text x="265" y="78" text-anchor="middle" font-size="22" fill="white">👾</text>
+    <text x="265" y="96" text-anchor="middle" font-family="sans-serif" font-size="8" font-weight="900" fill="white">My Avatar</text>
+    <rect x="238" y="106" width="54" height="5" rx="2" fill="rgba(255,255,255,.3)"/>
+    <!-- Robux counter -->
+    <rect x="8" y="122" width="284" height="30" rx="8" fill="#1a1a1a" stroke="#444" stroke-width="1.5"/>
+    <text x="150" y="143" text-anchor="middle" font-family="sans-serif" font-size="13" font-weight="900" fill="#00b06f">💎 Robux: 0</text>
+  </svg>`,
+
+  katseye:`<svg viewBox="0 0 300 160" preserveAspectRatio="xMidYMid slice">
+    <defs>
+      <linearGradient id="kbg" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#1a0535"/><stop offset="50%" stop-color="#4a0a80"/><stop offset="100%" stop-color="#2d0070"/></linearGradient>
+      <radialGradient id="spotG" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="rgba(255,255,255,.18)"/><stop offset="100%" stop-color="rgba(255,255,255,0)"/></radialGradient>
+    </defs>
+    <rect width="300" height="160" fill="url(#kbg)"/>
+    <!-- spotlights -->
+    <path d="M60 0 L20 160 L100 160 Z" fill="url(#spotG)"/>
+    <path d="M150 0 L110 160 L190 160 Z" fill="url(#spotG)"/>
+    <path d="M240 0 L200 160 L280 160 Z" fill="url(#spotG)"/>
+    <!-- stage floor -->
+    <rect x="0" y="130" width="300" height="30" fill="#0d001a" opacity=".8"/>
+    <!-- stage floor reflection lines -->
+    <g stroke="rgba(180,100,255,.2)" stroke-width="1">
+      <line x1="0" y1="135" x2="300" y2="135"/>
+      <line x1="0" y1="140" x2="300" y2="140"/>
+      <line x1="0" y1="145" x2="300" y2="145"/>
+    </g>
+    <!-- KATSEYE logo arc -->
+    <path d="M50 40 Q150 10 250 40" stroke="#d4a0ff" stroke-width="3" fill="none" opacity=".8"/>
+    <text x="150" y="38" text-anchor="middle" font-family="sans-serif" font-size="18" font-weight="900" fill="#e879f9" letter-spacing="4">KATSEYE</text>
+    <!-- lightsticks row -->
+    <g>
+      <!-- lightstick 1 -->
+      <rect x="22" y="88" width="10" height="36" rx="4" fill="#d4a0ff"/>
+      <ellipse cx="27" cy="88" rx="6" ry="10" fill="#e879f9"/>
+      <circle cx="27" cy="88" r="5" fill="#f0abfc" opacity=".8"/>
+      <!-- lightstick 2 -->
+      <rect x="52" y="82" width="10" height="42" rx="4" fill="#c084fc"/>
+      <ellipse cx="57" cy="82" rx="6" ry="10" fill="#a855f7"/>
+      <circle cx="57" cy="82" r="5" fill="#d8b4fe" opacity=".8"/>
+      <!-- lightstick 3 -->
+      <rect x="82" y="90" width="10" height="34" rx="4" fill="#e879f9"/>
+      <ellipse cx="87" cy="90" rx="6" ry="10" fill="#d946ef"/>
+      <circle cx="87" cy="90" r="5" fill="#f0abfc" opacity=".8"/>
+      <!-- right side -->
+      <rect x="200" y="86" width="10" height="38" rx="4" fill="#d4a0ff"/>
+      <ellipse cx="205" cy="86" rx="6" ry="10" fill="#e879f9"/>
+      <circle cx="205" cy="86" r="5" fill="#f0abfc" opacity=".8"/>
+      <rect x="228" y="80" width="10" height="44" rx="4" fill="#c084fc"/>
+      <ellipse cx="233" cy="80" rx="6" ry="10" fill="#a855f7"/>
+      <circle cx="233" cy="80" r="5" fill="#d8b4fe" opacity=".8"/>
+      <rect x="258" y="88" width="10" height="36" rx="4" fill="#e879f9"/>
+      <ellipse cx="263" cy="88" rx="6" ry="10" fill="#d946ef"/>
+      <circle cx="263" cy="88" r="5" fill="#f0abfc" opacity=".8"/>
+    </g>
+    <!-- 6 member silhouettes on stage -->
+    <g fill="#2d0060" opacity=".85">
+      <ellipse cx="112" cy="120" rx="7" ry="18"/><rect x="107" y="104" width="10" height="5" rx="5"/>
+      <ellipse cx="130" cy="118" rx="7" ry="18"/><rect x="125" y="102" width="10" height="5" rx="5"/>
+      <ellipse cx="148" cy="122" rx="7" ry="18"/><rect x="143" y="106" width="10" height="5" rx="5"/>
+      <ellipse cx="166" cy="119" rx="7" ry="18"/><rect x="161" y="103" width="10" height="5" rx="5"/>
+      <ellipse cx="184" cy="121" rx="7" ry="18"/><rect x="179" y="105" width="10" height="5" rx="5"/>
+    </g>
+    <!-- stars sparkles -->
+    <g fill="#f0abfc">
+      <text x="130" y="70" font-size="14">✦</text>
+      <text x="158" y="62" font-size="10">✧</text>
+      <text x="170" y="74" font-size="14">✦</text>
+    </g>
+    <!-- STAR fandom text -->
+    <text x="150" y="158" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="700" fill="#d4a0ff" letter-spacing="4">★ STAR FANDOM ★</text>
+  </svg>`
+};
+
+// ═══════════════════════════════════════════════════════
+// HUD ICON SVGs (tiny versions)
+// ═══════════════════════════════════════════════════════
+const HUD_ICONS={
+  candy:`<svg viewBox="0 0 60 60"><rect width="60" height="60" fill="#ffe0f0"/><circle cx="30" cy="30" r="14" fill="#ff6eb4" stroke="#cc0066" stroke-width="2"/><circle cx="30" cy="30" r="7" fill="#ffaacc" opacity=".7"/></svg>`,
+  animals:`<svg viewBox="0 0 60 60"><rect width="60" height="60" fill="#fff3d6"/><ellipse cx="30" cy="35" rx="14" ry="12" fill="#f4a030"/><circle cx="30" cy="20" r="10" fill="#f4a030"/><rect x="26" y="10" width="4" height="8" rx="2" fill="#f4a030"/><rect x="32" y="10" width="4" height="8" rx="2" fill="#f4a030"/></svg>`,
+  space:`<svg viewBox="0 0 60 60"><rect width="60" height="60" fill="#1a1a4e"/><circle cx="30" cy="30" r="16" fill="#e8621a"/><ellipse cx="30" cy="30" rx="24" ry="5" fill="none" stroke="#f0a060" stroke-width="3" opacity=".7"/><g fill="white"><circle cx="10" cy="10" r="1.5"/><circle cx="50" cy="8" r="1"/><circle cx="8" cy="50" r="1"/><circle cx="52" cy="48" r="1.5"/></g></svg>`,
+  zootopia:`<svg viewBox="0 0 60 60"><rect width="60" height="60" fill="#b0d4f0"/><rect x="8" y="20" width="18" height="40" fill="#5b8fd4"/><rect x="28" y="10" width="24" height="50" fill="#9ab8d4"/><polygon points="28,10 40,0 52,10" fill="#7da0bc"/><rect x="0" y="50" width="60" height="10" fill="#555"/><rect x="32" y="42" width="10" height="18" rx="2" fill="#2563eb"/></svg>`,
+  stitch:`<svg viewBox="0 0 60 60"><rect width="60" height="60" fill="#90e0ef"/><circle cx="30" cy="28" r="20" fill="#0077b6"/><ellipse cx="18" cy="15" rx="6" ry="11" fill="#0077b6" transform="rotate(-20 18 15)"/><ellipse cx="42" cy="15" rx="6" ry="11" fill="#0077b6" transform="rotate(20 42 15)"/><circle cx="22" cy="24" r="5" fill="white"/><circle cx="38" cy="24" r="5" fill="white"/><circle cx="23" cy="25" r="3" fill="#111"/><circle cx="39" cy="25" r="3" fill="#111"/></svg>`,
+  roblox:`<svg viewBox="0 0 60 60"><rect width="60" height="60" fill="#1a1a1a" rx="8"/><rect x="10" y="12" width="40" height="18" rx="4" fill="#ff0000"/><text x="30" y="26" text-anchor="middle" font-size="10" font-weight="900" fill="white">ROBLOX</text><rect x="8" y="35" width="20" height="18" rx="4" fill="#ff94c2"/><rect x="32" y="35" width="20" height="18" rx="4" fill="#2563eb"/></svg>`,
+  katseye:`<svg viewBox="0 0 60 60"><rect width="60" height="60" fill="#2d0060"/><text x="30" y="22" text-anchor="middle" font-size="8" font-weight="900" fill="#e879f9" letter-spacing="2">KATSEYE</text><rect x="20" y="28" width="8" height="22" rx="3" fill="#c084fc"/><ellipse cx="24" cy="28" rx="4" ry="7" fill="#e879f9"/><rect x="32" y="30" width="8" height="20" rx="3" fill="#c084fc"/><ellipse cx="36" cy="30" rx="4" ry="7" fill="#e879f9"/></svg>`
+};
+
+// ═══════════════════════════════════════════════════════
+// PORTALS CONFIG
+// ═══════════════════════════════════════════════════════
 const PORTALS=[
-  {id:"candy",name:"Candy Animals",emoji:"🍭",css:"candy",theme:"theme-candy",
-   story:"Gummy creatures guard the sweetest door in the park.",
-   types:["money","fractions","skip","graphs"]},
-  {id:"space",name:"Space Station",emoji:"🚀",css:"space",theme:"theme-space",
-   story:"A glowing elevator launches you into orbit.",
-   types:["time","skip","place","measurement"]},
-  {id:"zoo",name:"Metro Zoo City",emoji:"🐾",css:"zoo",theme:"theme-zoo",
-   story:"Animal citizens need help all across the city.",
-   types:["graphs","ela","sentences","map"]},
-  {id:"island",name:"Stitch Island",emoji:"🛸",css:"island",theme:"theme-island",
-   story:"A wild island portal hums with alien energy.",
-   types:["measurement","time","map","fractions"]},
-  {id:"block",name:"Block World",emoji:"🎮",css:"block",theme:"theme-block",
-   story:"Build, buy, and unlock your way through blocky worlds.",
-   types:["place","money","measurement","skip"]},
-  {id:"pop",name:"Pop Star City",emoji:"🎤",css:"pop",theme:"theme-pop",
-   story:"The stage portal flashes like a concert countdown.",
-   types:["time","graphs","sentences","ela"]}
+  {id:"candy",  name:"Candy Land",   desc:"Sweet treats and sugary challenges.",  types:["add","sub","place"]},
+  {id:"animals",name:"Wild Safari",  desc:"Animals and numbers across the savanna.",types:["skip","measure","graphs"]},
+  {id:"space",  name:"Space Mission",desc:"Numbers in orbit — can you handle zero gravity?",types:["add10","sub10","add100","place"]},
+  {id:"zootopia",name:"Zootopia",    desc:"Cases to crack and counts to make in the city.",types:["money","add","sub","graphs"]},
+  {id:"stitch", name:"Lilo & Stitch",desc:"Ohana means everybody helps with the math.",types:["time","fractions","sub","measure"]},
+  {id:"roblox", name:"Roblox",       desc:"Level up your skills — Robux on the line.",types:["place","add","skip","money"]},
+  {id:"katseye",name:"Katseye",      desc:"Light up the stage with every right answer.",types:["time","graphs","skip","add"]},
 ];
 
 const EVENTS={
-  candy:["A gummy fox opens a secret stand! 🦊","A sprinkle chest sparkles nearby! ✨","A chocolate bridge needs brain power! 🍫","The gummy bears have a quiz! 🐻"],
-  space:["An alien clock is blinking! 👽","Rocket fuel numbers are scrambled! 🚀","A moon chest lands softly! 🌙","Mission control needs answers! 📡"],
-  zoo:["A bunny officer waves you over! 🐰","The city graph board lights up! 📊","A train schedule changes! 🚆","The zookeeper has a question! 🦁"],
-  island:["A blue alien finds a treasure coconut! 🥥","A surfboard needs measuring! 🏄","The beach map blows across the sand! 🗺️","A crab holds a mystery clue! 🦀"],
-  block:["A builder needs the perfect block! 🧱","The item shop opens! 🛒","A mystery block glows! ❓","A crafting recipe appears! ⚒️"],
-  pop:["The stage lights turn on! 🎤","Fans vote for the next song! ⭐","The concert clock starts! ⏰","The crowd holds up score cards! 🃏"]
+  candy:["A gumdrop door appears! 🍬","A candy chest sparkles!","The lollipop path glows!","Sugar rush activated!"],
+  animals:["A lion roars nearby! 🦁","Zebra herd spotted!","An elephant splashes!","Giraffe peers over!"],
+  space:["Mission Control calling! 📡","Asteroid belt ahead!","Rocket fuel check!","Stars aligning!"],
+  zootopia:["Case file opened! 📋","ZPD dispatch!","Judy has a lead!","Nick spots something!"],
+  stitch:["Experiment 626 appears! 👽","Ohana moment!","Hawaii vibes!","Nani needs help!"],
+  roblox:["New game loading! 🎮","Robux incoming!","Obby checkpoint!","Avatar unlocked!"],
+  katseye:["Stage lights on! 🎤","Fan vote time!","STAR fandom rising!","Concert starts now!"]
 };
 
+// ═══════════════════════════════════════════════════════
+// ENGINE
+// ═══════════════════════════════════════════════════════
+const SAVE_KEY="portal_park_v4";
+let state={coins:0,badges:{},rank:1};
+let current=null,deck=[],qIdx=0,hearts=3,correct=0,locked=false;
+
 function rand(a){return a[Math.floor(Math.random()*a.length)]}
-function shuffle(a){let b=[...a];for(let i=b.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]]}return b}
-function save(){localStorage.setItem(SAVE_KEY,JSON.stringify(state))}
-function load(){try{state=JSON.parse(localStorage.getItem(SAVE_KEY))||state}catch(e){}}
+function sh(a){let b=[...a];for(let i=b.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]]}return b}
+function save(){try{localStorage.setItem(SAVE_KEY,JSON.stringify(state))}catch(e){}}
+function load(){try{const d=JSON.parse(localStorage.getItem(SAVE_KEY));if(d)state=d}catch(e){}}
 function show(id){document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));document.getElementById(id).classList.add("active");scrollTo(0,0)}
 function startGame(){load();buildHub();show("hub")}
-function resetAll(){if(confirm("Reset Portal Park progress?")){state={coins:0,badges:{},rank:1};save();buildHub()}}
+function resetAll(){if(confirm("Reset all Portal Park progress?")){state={coins:0,badges:{},rank:1};save();buildHub()}}
+function goHub(){buildHub();show("hub")}
 
 function buildHub(){
   state.rank=1+Math.floor(Object.keys(state.badges).length/2);
@@ -263,353 +765,373 @@ function buildHub(){
   document.getElementById("badgeStat").textContent="🏅 "+Object.keys(state.badges).length+" / "+PORTALS.length;
   const grid=document.getElementById("portalGrid");grid.innerHTML="";
   PORTALS.forEach(p=>{
-    const b=document.createElement("button");
-    b.className=`portal card ${p.css}`;
-    b.innerHTML=`<div class="portal-emoji">${p.emoji}</div><div class="portal-name">${p.name}</div><div class="portal-story">${p.story}</div><div class="portal-status">${state.badges[p.id]?"🏅 Badge found — portal reopens":"Tap to jump through"}</div>`;
-    b.onclick=()=>launch(p.id);
-    grid.appendChild(b);
+    const done=state.badges[p.id];
+    const el=document.createElement("div");
+    el.className="portal card"+(done?" done":"");
+    el.innerHTML=`<div class="portal-art">${PORTAL_ART[p.id]}</div>
+      <div class="portal-info">
+        <div class="portal-name">${p.name}</div>
+        <div class="portal-desc">${p.desc}</div>
+        <div class="portal-status">${done?"🏅 Badge earned — portal open":"Tap to enter"}</div>
+      </div>`;
+    el.onclick=()=>launch(p.id);
+    grid.appendChild(el);
   });
 }
 
 function launch(id){
   current=PORTALS.find(p=>p.id===id);
-  hearts=3;correct=0;index=0;locked=false;
-  deck=shuffle(current.types.flatMap(t=>makeBank(t))).slice(0,8);
-  const game=document.getElementById("game");
-  game.className="screen active "+current.theme;
-  show("game");render();
+  hearts=3;correct=0;qIdx=0;locked=false;
+  deck=sh(current.types.flatMap(t=>makeBank(t))).slice(0,8);
+  document.getElementById("hudIcon").innerHTML=HUD_ICONS[id];
+  document.getElementById("hudName").textContent=current.name;
+  document.getElementById("game").style.background="";
+  show("game");updateHud();renderQ();
 }
 
 function updateHud(){
-  document.getElementById("hudEmoji").textContent=current.emoji;
-  document.getElementById("hudTitle").textContent=current.name;
-  document.getElementById("hudSub").textContent=`Challenge ${index+1} of ${deck.length}`;
-  document.getElementById("hearts").textContent="❤️".repeat(hearts)+"🤍".repeat(3-hearts);
+  document.getElementById("hudQ").textContent=`Challenge ${qIdx+1} of ${deck.length}`;
+  document.getElementById("hearts").textContent="❤️".repeat(hearts)+"🤍".repeat(Math.max(0,3-hearts));
   document.getElementById("hudCoins").textContent="🪙 "+state.coins;
-  document.getElementById("progress").style.width=(index/deck.length*100)+"%";
-  document.getElementById("eventText").textContent=rand(EVENTS[current.id]);
+  document.getElementById("progFill").style.width=(qIdx/deck.length*100)+"%";
+  document.getElementById("eventBar").textContent=rand(EVENTS[current.id]);
 }
 
-function render(){
+function renderQ(){
   locked=false;updateHud();
-  const q=deck[index],area=document.getElementById("gameArea");
-  area.innerHTML=`
-    <section class="question card">
-      <div class="q-text">${q.q}</div>
-      ${q.visual?`<div class="visual">${q.visual}</div>`:""}
-    </section>
-    <section class="answers">
-      ${q.choices.map((c,i)=>`<button class="answer" onclick="answer(${i})">${c}</button>`).join("")}
-    </section>
-    <div id="feedback" class="feedback"></div>`;
+  const q=deck[qIdx],area=document.getElementById("gameArea");area.innerHTML="";
+  const qcard=document.createElement("div");qcard.className="q-card card";
+  qcard.innerHTML=`<div class="q-text">${q.q}</div>`;
+  if(q.visual){const vDiv=document.createElement("div");vDiv.className="q-visual";vDiv.innerHTML=q.visual;qcard.appendChild(vDiv)}
+  area.appendChild(qcard);
+  const grid=document.createElement("div");grid.className="ans-grid";
+  const fb=document.createElement("div");fb.className="feedback";
+  q.choices.forEach((c,i)=>{
+    const btn=document.createElement("button");btn.className="ans-btn";
+    if(c.svg){btn.innerHTML=`${c.svg}<span>${c.label}</span>`}else{btn.textContent=c}
+    btn.onclick=()=>answer(i);grid.appendChild(btn);
+  });
+  area.appendChild(grid);area.appendChild(fb);
 }
 
 function answer(i){
   if(locked)return;locked=true;
-  const q=deck[index],btns=[...document.querySelectorAll(".answer")],fb=document.getElementById("feedback");
+  const q=deck[qIdx];
+  const btns=[...document.querySelectorAll(".ans-btn")];
+  const fb=document.querySelector(".feedback");
   btns.forEach(b=>b.disabled=true);
   if(i===q.ans){
     btns[i].classList.add("correct");correct++;
-    let gain=5+Math.floor(Math.random()*7);state.coins+=gain;save();
-    fb.textContent=rand(["Correct!","Great thinking!","Nice move!","You got it!"]);
-    fb.className="feedback good";updateHud();
-    if(Math.random()<.3)setTimeout(()=>showTreasure(gain),550);else setTimeout(next,950);
+    const gain=5+Math.floor(Math.random()*8);state.coins+=gain;save();
+    fb.textContent="Correct!";fb.className="feedback good";updateHud();
+    if(Math.random()<.28)setTimeout(()=>showTreasure(gain),600);else setTimeout(nextQ,950);
   }else{
-    btns[i].classList.add("wrong");btns[q.ans].classList.add("correct");hearts--;updateHud();
-    fb.textContent="Good try! The answer was: "+q.choices[q.ans]+".";fb.className="feedback bad";
-    if(hearts<=0)setTimeout(()=>document.getElementById("gameover").classList.remove("hidden"),1000);
-    else setTimeout(next,1500);
+    btns[i].classList.add("wrong");btns[q.ans].classList.add("correct");
+    hearts--;updateHud();
+    fb.textContent="Not quite! The answer was: "+(q.choices[q.ans].label||q.choices[q.ans])+".";
+    fb.className="feedback bad";
+    if(hearts<=0)setTimeout(()=>document.getElementById("gameover").classList.remove("hidden"),1100);
+    else setTimeout(nextQ,1600);
   }
 }
 
-function next(){index++;if(index>=deck.length)endRun();else render()}
+function nextQ(){qIdx++;if(qIdx>=deck.length)endRun();else renderQ()}
+
 function showTreasure(gain){
-  document.getElementById("treasureEmoji").textContent=rand(["🎁","💎","🧢","🪄","⭐","🍀","🛸","🧱","🎟️","🐾"]);
+  const icons=["🎁","💎","🌟","🪄","🍀","🎟️","⭐","🏆"];
+  document.getElementById("treasureIcon").textContent=rand(icons);
   document.getElementById("treasureText").textContent=`You found ${gain} coins inside ${current.name}!`;
   document.getElementById("treasure").classList.remove("hidden");
 }
-function closeTreasure(){document.getElementById("treasure").classList.add("hidden");next()}
+function closeTreasure(){document.getElementById("treasure").classList.add("hidden");nextQ()}
 
 function endRun(){
-  document.getElementById("progress").style.width="100%";
+  document.getElementById("progFill").style.width="100%";
   const won=correct>=6;
   if(won){state.badges[current.id]=true;state.coins+=20;save()}
-  document.getElementById("completeEmoji").textContent=won?"🏅":"⭐";
-  document.getElementById("completeTitle").textContent=won?"Portal Badge Found!":"Run Complete!";
+  document.getElementById("completeIcon").textContent=won?"🏅":"⭐";
+  document.getElementById("completeTitle").textContent=won?"Badge Found!":"Run Complete!";
   document.getElementById("completeText").textContent=won
-    ?`You solved ${correct}/8 and found the ${current.name} badge — plus 20 bonus coins!`
-    :`You solved ${correct}/8. Hit 6 or more to find the badge.`;
+    ?`${correct}/8 correct — ${current.name} badge earned! +20 bonus coins!`
+    :`${correct}/8 correct. Need 6 to earn the badge.`;
   document.getElementById("complete").classList.remove("hidden");
 }
 function finishRun(){document.getElementById("complete").classList.add("hidden");buildHub();show("hub")}
-function restartRun(){document.getElementById("complete").classList.add("hidden");document.getElementById("gameover").classList.add("hidden");launch(current.id)}
-function gameOverHub(){document.getElementById("gameover").classList.add("hidden");buildHub();show("hub")}
-
-// ── QUESTION BUILDER ──────────────────────────────────────────
-function q(text,choices,ans,visual=""){
-  const correct=choices[ans];
-  const sh=shuffle([...choices]);
-  return{q:text,choices:sh,ans:sh.indexOf(correct),visual};
+function restartRun(){
+  document.getElementById("complete").classList.add("hidden");
+  document.getElementById("gameover").classList.add("hidden");
+  launch(current.id);
 }
+
+// ═══════════════════════════════════════════════════════
+// QUESTION BANKS
+// ═══════════════════════════════════════════════════════
 function makeBank(type){
-  return({money:moneyBank,time:timeBank,fractions:fractionBank,skip:skipBank,
-          place:placeBank,map:mapBank,graphs:graphBank,ela:elaBank,
-          measurement:measureBank,sentences:sentenceBank}[type]||moneyBank)();
+  const map={add:addBank,sub:subBank,add10:add10Bank,sub10:sub10Bank,
+             add100:add100Bank,place:placeBank,skip:skipBank,money:moneyBank,
+             time:timeBank,fractions:fracBank,measure:measureBank,graphs:graphBank};
+  return(map[type]||addBank)();
 }
 
-// ── MONEY ─────────────────────────────────────────────────────
-function moneyBank(){
-  const coins=[["penny",1,"🟤"],["nickel",5,"⚪"],["dime",10,"🔘"],["quarter",25,"🪙"]];
-  let out=[];
-  for(let i=0;i<50;i++){
-    let a=rand(coins),b=rand(coins),c=Math.random()<.55?rand(coins):null;
-    let total=a[1]+b[1]+(c?c[1]:0);
-    out.push(q(`How much money is shown?`,[total+"¢",(total+5)+"¢",Math.max(1,total-5)+"¢",(total+10)+"¢"],0,a[2]+b[2]+(c?c[2]:"")));
+// shortcut: make a simple MC question
+function mc(q,choices,ans,visual=""){
+  const correct=choices[ans];
+  const sh2=sh([...choices]);
+  return{q,choices:sh2,ans:sh2.indexOf(correct),visual};
+}
+
+// ── ADDITION FACTS ─────────────────────────────────────
+function addBank(){
+  const qs=[];
+  for(let a=1;a<=12;a++)for(let b=1;b<=12;b++){
+    const sum=a+b;
+    const wrongs=sh([...new Set([sum-1,sum+1,sum-2,sum+2,sum+3].filter(x=>x>0&&x!==sum))]).slice(0,3);
+    qs.push(mc(`What is ${a} + ${b}?`,[String(sum),...wrongs.map(String)],0));
   }
-  [[30,35],[40,45],[50,55],[60,65],[75,80],[80,85],[90,95],[100,105]].forEach(([cost,pay])=>{
-    out.push(q(`A snack costs ${cost}¢. You pay ${pay}¢. How much change do you get?`,["5¢","10¢","15¢","20¢"],0,"🛒"));
-  });
-  [["penny","1 cent"],["nickel","5 cents"],["dime","10 cents"],["quarter","25 cents"]].forEach(([coin,val])=>{
-    out.push(q(`How much is a ${coin} worth?`,[val,"2 cents","50 cents","100 cents"],0,"💰"));
-  });
-  out.push(q("Which coins make 30¢?",["1 quarter + 1 nickel","3 dimes","2 dimes + 2 nickels","All of these"],3,"🪙"));
-  out.push(q("How many nickels equal one quarter?",["3","4","5","6"],2,"🪙"));
-  out.push(q("How many dimes equal one dollar?",["5","8","10","20"],2,"💵"));
-  return out;
+  return sh(qs);
 }
 
-// ── TIME ──────────────────────────────────────────────────────
-function timeBank(){
-  let out=[];
-  for(let h=1;h<=12;h++){
-    out.push(q(`The clock shows ${h} o'clock. What time is it?`,[h+":00",h+":30",h+":15",(h%12+1)+":00"],0,"⏰"));
+// ── SUBTRACTION FACTS ──────────────────────────────────
+function subBank(){
+  const qs=[];
+  for(let a=2;a<=12;a++)for(let b=1;b<a;b++){
+    const diff=a-b;
+    const wrongs=sh([...new Set([diff-1,diff+1,diff-2,diff+2,diff+3].filter(x=>x>=0&&x!==diff))]).slice(0,3);
+    qs.push(mc(`What is ${a} − ${b}?`,[String(diff),...wrongs.map(String)],0));
   }
-  for(let h=1;h<=12;h+=2){
-    out.push(q(`What time is half past ${h}?`,[h+":00",h+":30",h+":15",(h%12+1)+":00"],1,"🕰️"));
+  return sh(qs);
+}
+
+// ── ADD TENS ───────────────────────────────────────────
+function add10Bank(){
+  const qs=[];
+  for(let n=10;n<=90;n+=5){
+    qs.push(mc(`What is ${n} + 10?`,[String(n+10),String(n+1),String(n+20),String(n+11)],0));
+    qs.push(mc(`${n} + ___ = ${n+10}`,["10","1","100","11"],0));
   }
-  ["05","10","15","20","25","35","40","45","50","55"].forEach(m=>{
-    let h=rand([2,3,4,5,6,7,8,9]);
-    out.push(q(`What time does the clock show?`,[`${h}:${m}`,`${h}:00`,`${h}:30`,`${h+1}:${m}`],0,`🕐 ${h}:${m}`));
+  [[23,33],[45,55],[67,77],[88,98],[14,24],[56,66],[71,81],[39,49]].forEach(([a,b])=>{
+    qs.push(mc(`What is ${a} + 10?`,[String(b),String(a+1),String(a+20),String(b+1)],0));
   });
-  out.push(q("How many minutes are in an hour?",["30","50","60","100"],2,"⏱️"));
-  out.push(q("How many hours are in a day?",["12","20","24","36"],2,"📅"));
-  out.push(q("School starts at 8:00. It ends 7 hours later. What time does it end?",["2:00","3:00","4:00","15:00"],1,"🏫"));
-  out.push(q("What time is a quarter past 3?",["3:00","3:15","3:25","3:45"],1,"🕒"));
-  out.push(q("A movie starts at 2:00 and lasts 1 hour. When does it end?",["1:00","2:30","3:00","4:00"],2,"🎬"));
-  return out;
+  return sh(qs);
 }
 
-// ── FRACTIONS ────────────────────────────────────────────────
-function fractionBank(){
-  return shuffle([
-    q("Which shows one half?",["1 out of 2 equal parts","1 out of 3 equal parts","2 out of 2 parts","1 whole thing"],0,"🥧"),
-    q("Which shows one fourth?",["1 out of 2 equal parts","1 out of 4 equal parts","4 whole pies","3 out of 3 parts"],1,"🍫"),
-    q("A pizza has 4 equal slices. You eat 1. What fraction?",["1/2","1/3","1/4","4/1"],2,"🍕"),
-    q("Two equal parts of a whole are called…",["halves","thirds","fourths","ones"],0,"🍪"),
-    q("Four equal parts of a whole are called…",["halves","thirds","fourths","tens"],2,"🍰"),
-    q("Which fraction shows the whole thing?",["1/2","1/4","4/4","1/3"],2,"🥧"),
-    q("A sandwich is cut in half. How many pieces?",["1","2","3","4"],1,"🥪"),
-    q("Which is larger — 1/2 or 1/4?",["1/2","1/4","same size","can't tell"],0,"📐"),
-    q("A pie is cut into 4 equal pieces. You eat 2. How much is left?",["2/4","1/4","3/4","0/4"],0,"🥧"),
-    q("What does the bottom number in a fraction tell you?",["how many eaten","how many equal parts in all","the whole number","the size"],1,"🔢"),
-    q("3 out of 3 equal parts is the same as…",["one whole","one third","three thirds are less than a whole","a half"],0,"🍕"),
-    q("If a cookie is cut into 4 equal pieces and you eat 3, what fraction did you eat?",["1/4","2/4","3/4","4/4"],2,"🍪"),
-    q("Which shape is cut into equal halves?",["One big piece and one tiny piece","Two pieces the same size","Three equal pieces","Four unequal parts"],1,"✂️"),
-    q("You share a cake equally between 2 friends. Each friend gets…",["1/4 of the cake","1/2 of the cake","1/3 of the cake","1 whole cake"],1,"🎂"),
-  ]);
-}
-
-// ── SKIP COUNTING ────────────────────────────────────────────
-function skipBank(){
-  let out=[];
-  [2,5,10].forEach(by=>{
-    for(let s=by;s<=90;s+=by*2){
-      const next=s+by*3;
-      const wrongs=[next+1,next-1,s+by*2].map(String);
-      out.push(q(`${s}, ${s+by}, ${s+by*2}, ___`,[String(next),...wrongs],0,"🔢"));
-    }
-    for(let s=by*4;s<=80;s+=by*3){
-      out.push(q(`${s}, ___, ${s+by*2}, ${s+by*3}`,[String(s+by),String(s+by+1),String(s+1),String(s+by-1)],0,"🔢"));
-    }
+// ── SUBTRACT TENS ──────────────────────────────────────
+function sub10Bank(){
+  const qs=[];
+  for(let n=20;n<=99;n+=7){
+    qs.push(mc(`What is ${n} − 10?`,[String(n-10),String(n-1),String(n-20),String(n-11)],0));
+  }
+  [[34,24],[52,42],[78,68],[95,85],[61,51],[43,33],[87,77],[26,16]].forEach(([a,b])=>{
+    qs.push(mc(`What is ${a} − 10?`,[String(b),String(a-1),String(a-20),String(b-1)],0));
   });
-  out.push(q("Skip counting by 2s: 10, 12, 14, ___",["15","16","17","18"],1,"🔢"));
-  out.push(q("Skip counting by 5s: 25, 30, 35, ___",["36","40","38","45"],1,"🔢"));
-  out.push(q("Skip counting by 10s: 50, 60, 70, ___",["72","75","80","90"],2,"🔢"));
-  return out;
+  return sh(qs);
 }
 
-// ── PLACE VALUE ───────────────────────────────────────────────
+// ── ADD HUNDREDS ───────────────────────────────────────
+function add100Bank(){
+  const qs=[];
+  [[143,243],[256,356],[382,482],[417,517],[534,634],[261,361],[348,448],[529,629]].forEach(([a,b])=>{
+    qs.push(mc(`What is ${a} + 100?`,[String(b),String(a+10),String(a+1),String(b+100)],0));
+  });
+  for(let h=1;h<=7;h++){
+    qs.push(mc(`What is ${h*100} + 100?`,[String((h+1)*100),String(h*100+10),String(h*100+1),String((h+2)*100)],0));
+  }
+  return sh(qs);
+}
+
+// ── PLACE VALUE ────────────────────────────────────────
 function placeBank(){
-  let out=[];
-  for(let n=126;n<999;n+=29){
-    let h=Math.floor(n/100),t=Math.floor((n%100)/10),o=n%10;
-    out.push(q(`In ${n}, how many hundreds?`,[String(h),String(t),String(o),String(h*100)],0,"🏦"));
-    out.push(q(`In ${n}, what digit is in the tens place?`,[String(h),String(t),String(o),String(n)],1,"🧱"));
-    out.push(q(`${h} hundreds + ${t} tens + ${o} ones = ?`,[String(n),String(n+10),String(n-1),String(h+t+o)],0,"🔢"));
-    out.push(q(`What is the value of the ${h} in ${n}?`,[String(h*100),String(h*10),String(h),String(h+100)],0,"💡"));
+  const qs=[];
+  for(let i=0;i<40;i++){
+    const n=Math.floor(Math.random()*900)+100;
+    const h=Math.floor(n/100),t=Math.floor((n%100)/10),o=n%10;
+    qs.push(mc(`In ${n}, what is the hundreds digit?`,
+      [String(h),String(t),String(o),String(h*100)],0,
+      `<div style="display:flex;gap:10px;justify-content:center">
+        <div style="background:#ffd6e8;border:3px solid #111;border-radius:12px;padding:10px 18px;font-size:1.8rem;font-weight:900">H<br/><span style="font-size:2.4rem;color:#cc0066">${h}</span></div>
+        <div style="background:#d6e8ff;border:3px solid #111;border-radius:12px;padding:10px 18px;font-size:1.8rem;font-weight:900">T<br/><span style="font-size:2.4rem;color:#0044cc">${t}</span></div>
+        <div style="background:#d6ffe8;border:3px solid #111;border-radius:12px;padding:10px 18px;font-size:1.8rem;font-weight:900">O<br/><span style="font-size:2.4rem;color:#008833">${o}</span></div>
+      </div>`));
+    qs.push(mc(`${h} hundreds + ${t} tens + ${o} ones = ?`,
+      [String(n),String(n+1),String(n-1),String(h+t+o)],0));
   }
-  out.push(q("Which number has a 5 in the hundreds place?",["500","50","510","105"],0,"🔢"));
-  out.push(q("What does the 0 in 304 mean?",["No tens","No ones","No hundreds","It means ten"],0,"🔢"));
-  out.push(q("600 + 40 + 7 = ?",["647","674","467","764"],0,"🔢"));
-  out.push(q("In 832, which digit has the greatest value?",["2","3","8","All equal"],2,"🔢"));
-  return out;
+  return sh(qs);
 }
 
-// ── MAP ───────────────────────────────────────────────────────
-function mapBank(){
-  return shuffle([
-    q("Which arrow points east (right)?",["➡️","⬅️","⬆️","⬇️"],0,"🧭"),
-    q("Which arrow points west (left)?",["➡️","⬅️","⬆️","⬇️"],1,"🧭"),
-    q("Which arrow points north (up)?",["➡️","⬅️","⬆️","⬇️"],2,"🧭"),
-    q("Which arrow points south (down)?",["➡️","⬅️","⬆️","⬇️"],3,"🧭"),
-    q("What does a map key (legend) help you understand?",["What the symbols on the map mean","How fast to drive","The weather today","The name of the ocean"],0,"🗺️"),
-    q("The library is between the park and the store. Where is it?",["Far left","In the middle","Far right","Underground"],1,"🌳 📚 🏪"),
-    q("You go 3 blocks north then 2 blocks east. Which direction did you go first?",["East","North","South","West"],1,"🗺️"),
-    q("A map shows a school at the top. The top of a map usually points…",["South","East","North","West"],2,"🧭"),
-    q("What does a map scale tell you?",["Distances on the map compared to real distances","The colors of the map","Who made the map","How many roads there are"],0,"📏"),
-    q("On a city map, which symbol would most likely show a hospital?",["A red cross","A green tree","A blue wave","A yellow star"],0,"🗺️"),
-    q("Two friends start at the same spot. One goes north, one goes south. Are they going the same direction?",["Yes","No","Only sometimes","Only on maps"],1,"🧭"),
-    q("The park is north of the school. The school is north of the store. Which is furthest north?",["The store","The school","The park","They are all equal"],2,"🗺️"),
-    q("What does a compass rose show?",["Directions like north, south, east, west","The weather","How big the map is","The country name"],0,"🧭"),
-    q("On a treasure map, X marks the spot. What does X usually mean?",["Where to start","The treasure location","A danger zone","A road"],1,"🗺️"),
-    q("You walk east for 4 steps. To get back to the start, which way do you walk?",["North","South","East","West"],3,"🧭"),
-    q("A grid map uses letters and numbers. Where would B3 be?",["Column B, Row 3","Row B, Column 3","Third letter, second row","No such location"],0,"🗺️"),
-    q("Which direction does the sun rise?",["West","North","South","East"],3,"☀️"),
-    q("A map shows 1 inch = 10 miles. Two cities are 3 inches apart. How many miles apart are they?",["10 miles","20 miles","30 miles","13 miles"],2,"📏"),
-  ]);
-}
-
-// ── GRAPHS ────────────────────────────────────────────────────
-function graphBank(){
-  const sets=[
-    {a:"dogs",av:5,aemo:"🐶",b:"cats",bv:3,bemo:"🐱"},
-    {a:"apples",av:7,aemo:"🍎",b:"bananas",bv:4,bemo:"🍌"},
-    {a:"red votes",av:6,aemo:"🔴",b:"blue votes",bv:2,bemo:"🔵"},
-    {a:"cars",av:8,aemo:"🚗",b:"bikes",bv:5,bemo:"🚲"},
-    {a:"sunny days",av:9,aemo:"☀️",b:"rainy days",bv:3,bemo:"🌧️"},
-    {a:"soccer fans",av:7,aemo:"⚽",b:"basketball fans",bv:4,bemo:"🏀"},
-    {a:"boys",av:10,aemo:"👦",b:"girls",bv:6,bemo:"👧"},
-    {a:"pizza slices",av:8,aemo:"🍕",b:"taco bites",bv:5,bemo:"🌮"},
-  ];
-  let out=[];
-  sets.forEach(s=>{
-    const vis=`${s.aemo.repeat(s.av)}\n${s.bemo.repeat(s.bv)}`;
-    const diff=s.av-s.bv;
-    const total=s.av+s.bv;
-    out.push(q(
-      `Look at the data below.\n${s.a}: ${s.av} | ${s.b}: ${s.bv}\n\nWhich group has more?`,
-      [s.a,s.b,"They are the same","Not enough info"],0,
-      `${s.aemo.repeat(s.av)}\n${s.bemo.repeat(s.bv)}`
-    ));
-    out.push(q(
-      `${s.a}: ${s.aemo.repeat(s.av)}\n${s.b}: ${s.bemo.repeat(s.bv)}\n\nHow many more ${s.a} than ${s.b}?`,
-      [String(diff),String(s.av),String(s.bv),String(total)],0,""
-    ));
-    out.push(q(
-      `${s.a}: ${s.aemo.repeat(s.av)}\n${s.b}: ${s.bemo.repeat(s.bv)}\n\nHow many in all?`,
-      [String(total),String(diff),String(s.av),String(s.bv)],0,""
-    ));
+// ── SKIP COUNTING ──────────────────────────────────────
+function skipBank(){
+  const qs=[];
+  [2,5,10].forEach(by=>{
+    for(let s=by;s<=80;s+=by*3){
+      const ans=s+by*3;
+      qs.push(mc(`${s}, ${s+by}, ${s+by*2}, ___`,
+        [String(ans),String(ans+1),String(ans-1),String(ans+by)],0));
+    }
+    for(let s=by*2;s<=70;s+=by*4){
+      qs.push(mc(`${s}, ___, ${s+by*2}, ${s+by*3}`,
+        [String(s+by),String(s+by+1),String(s+1),String(s+by-1)],0));
+    }
   });
-  return shuffle(out);
+  return sh(qs);
 }
 
-// ── ELA ───────────────────────────────────────────────────────
-function elaBank(){
-  return shuffle([
-    // NOUNS
-    q("Which word is a noun?",["jump","happy","dog","quickly"],2,"🐶"),
-    q("Which word is a noun?",["run","table","blue","slowly"],1,"🪑"),
-    q("Which word is a noun?",["bright","under","teacher","skip"],2,"👩‍🏫"),
-    q("Which word names a place?",["park","run","cold","loudly"],0,"🌳"),
-    q("In 'The big cat sat on the mat,' what is the noun?",["big","sat","cat","on"],2,"🐱"),
-    // VERBS
-    q("Which word is a verb (action word)?",["run","happy","table","green"],0,"🏃"),
-    q("Which word is a verb?",["slowly","cat","jump","red"],2,"🦘"),
-    q("In 'The dog barked loudly,' what is the verb?",["dog","barked","loudly","the"],1,"🐕"),
-    q("Which word shows action?",["blue","chair","swim","tiny"],2,"🏊"),
-    q("Which sentence has a verb?",["The big red apple.","She runs every day.","A happy little dog.","Under the tall tree."],1,"✏️"),
-    // ADJECTIVES
-    q("Which word describes a noun (adjective)?",["tiny","teacher","under","skip"],0,"⭐"),
-    q("In 'She has a fluffy cat,' what is the adjective?",["She","has","fluffy","cat"],2,"🐈"),
-    q("Which word describes how something looks?",["sparkling","running","when","table"],0,"✨"),
-    q("Which is an adjective?",["jump","enormous","she","quickly"],1,"📏"),
-    q("In 'The cold, windy day made us shiver,' name one adjective.",["day","shiver","cold","made"],2,"🌬️"),
-    // ADVERBS
-    q("Which word tells how (adverb)?",["slowly","cat","red","chair"],0,"🐢"),
-    q("In 'She sings loudly,' what is the adverb?",["She","sings","loudly","the"],2,"🎵"),
-    q("Which word is an adverb?",["quickly","book","green","table"],0,"⚡"),
-    q("Which word tells when?",["yesterday","table","blue","jump"],0,"📅"),
-    q("Which word tells where?",["outside","red","dog","sing"],0,"🏡"),
-    // SYNONYMS / ANTONYMS
-    q("What is the opposite (antonym) of hot?",["cold","warm","heat","sun"],0,"🔥"),
-    q("What is the opposite of happy?",["joyful","glad","sad","excited"],2,"😢"),
-    q("Which word means almost the same as big (synonym)?",["huge","tiny","cold","slow"],0,"📚"),
-    q("What is the opposite of dark?",["night","shadow","light","dim"],2,"💡"),
-    q("Which means almost the same as fast?",["slow","quick","tired","soft"],1,"⚡"),
-    q("What is the opposite of loud?",["noisy","shout","quiet","boom"],2,"🤫"),
-    // PARTS OF SPEECH MIX
-    q("In 'The tiny bird flew away,' which word is an adjective?",["The","tiny","flew","away"],1,"🐦"),
-    q("In 'He walks slowly to school,' which word is an adverb?",["He","walks","slowly","school"],2,"🚶"),
-    q("Which of these is a proper noun?",["city","Monday","river","school"],1,"📅"),
-    q("Which sentence uses a possessive correctly?",["The dogs tail wagged.","The dog's tail wagged.","The dogs' tail wagged.","The dog tail wagged."],1,"🐕"),
+// ── MONEY (SVG coins) ─────────────────────────────────
+function moneyBank(){
+  const qs=[];
+  // coin identification
+  qs.push({q:"What coin is this?",choices:sh(["Penny – 1¢","Nickel – 5¢","Dime – 10¢","Quarter – 25¢"]),
+    ans:0,visual:svgPenny(90),get ans(){return this.choices.indexOf("Penny – 1¢")}});
+  qs.push({q:"What coin is this?",choices:sh(["Penny – 1¢","Nickel – 5¢","Dime – 10¢","Quarter – 25¢"]),
+    ans:0,visual:svgNickel(90),get ans(){return this.choices.indexOf("Nickel – 5¢")}});
+  qs.push({q:"What coin is this?",choices:sh(["Penny – 1¢","Nickel – 5¢","Dime – 10¢","Quarter – 25¢"]),
+    ans:0,visual:svgDime(80),get ans(){return this.choices.indexOf("Dime – 10¢")}});
+  qs.push({q:"What coin is this?",choices:sh(["Penny – 1¢","Nickel – 5¢","Dime – 10¢","Quarter – 25¢"]),
+    ans:0,visual:svgQuarter(90),get ans(){return this.choices.indexOf("Quarter – 25¢")}});
+
+  // coin combos — show SVG coins
+  const combos=[
+    {coins:[{f:svgQuarter,v:25},{f:svgNickel,v:5}],total:30},
+    {coins:[{f:svgDime,v:10},{f:svgDime,v:10},{f:svgNickel,v:5}],total:25},
+    {coins:[{f:svgQuarter,v:25},{f:svgDime,v:10}],total:35},
+    {coins:[{f:svgNickel,v:5},{f:svgNickel,v:5},{f:svgNickel,v:5}],total:15},
+    {coins:[{f:svgDime,v:10},{f:svgDime,v:10},{f:svgDime,v:10}],total:30},
+    {coins:[{f:svgQuarter,v:25},{f:svgQuarter,v:25}],total:50},
+    {coins:[{f:svgPenny,v:1},{f:svgNickel,v:5},{f:svgDime,v:10}],total:16},
+    {coins:[{f:svgQuarter,v:25},{f:svgDime,v:10},{f:svgNickel,v:5}],total:40},
+  ];
+  combos.forEach(combo=>{
+    const t=combo.total;
+    const visual=combo.coins.map(c=>c.f(60)).join('');
+    const w1=[t+5,t-5,t+10].filter(x=>x>0&&x!==t);
+    qs.push({q:"How much money is shown?",
+      choices:sh([t+"¢",...w1.map(x=>x+"¢")]),
+      ans:0,visual,
+      get ans(){return this.choices.indexOf(t+"¢")}
+    });
+  });
+  // change problems
+  [[25,30],[35,40],[40,50],[60,75],[50,55]].forEach(([cost,pay])=>{
+    const change=pay-cost;
+    qs.push(mc(`A snack costs ${cost}¢. You pay ${pay}¢. How much change do you get?`,
+      [change+"¢",(change+5)+"¢",(change-5)+"¢",(change+10)+"¢"],0,"🛒"));
+  });
+  return sh(qs);
+}
+
+// ── TIME (SVG clocks) ─────────────────────────────────
+function timeBank(){
+  const qs=[];
+  // o'clock times
+  for(let h=1;h<=12;h++){
+    qs.push({
+      q:"What time does this clock show?",
+      visual:svgClock(h,0),
+      choices:sh([`${h}:00`,`${h}:30`,`${h}:15`,`${h===12?1:h+1}:00`]),
+      get ans(){return this.choices.indexOf(`${h}:00`)}
+    });
+  }
+  // half past
+  [1,2,3,4,5,6,7,8,9].forEach(h=>{
+    qs.push({
+      q:"What time does this clock show?",
+      visual:svgClock(h,30),
+      choices:sh([`${h}:30`,`${h}:00`,`${h}:15`,`${h===12?1:h+1}:00`]),
+      get ans(){return this.choices.indexOf(`${h}:30`)}
+    });
+  });
+  // quarter past
+  [2,4,6,8,10].forEach(h=>{
+    qs.push({
+      q:"What time does this clock show?",
+      visual:svgClock(h,15),
+      choices:sh([`${h}:15`,`${h}:00`,`${h}:30`,`${h}:45`]),
+      get ans(){return this.choices.indexOf(`${h}:15`)}
+    });
+  });
+  // elapsed time
+  [[8,0,1,`9:00`],[3,30,1,`4:30`],[11,15,0.5,`11:45`]].forEach(([h,m,addH,ans])=>{
+    qs.push(mc(`A movie starts at ${h}:${m===0?"00":m}. It lasts ${addH===0.5?"30 minutes":"1 hour"}. When does it end?`,
+      [ans,`${h}:00`,`${h+2}:00`,`${h-1}:00`],0,"⏰"));
+  });
+  qs.push(mc("How many minutes are in one hour?",["60","30","100","24"],0,"⏱️"));
+  qs.push(mc("How many hours are in one day?",["24","12","60","48"],0,"📅"));
+  return sh(qs);
+}
+
+// ── FRACTIONS ─────────────────────────────────────────
+function fracBank(){
+  return sh([
+    mc("A pizza has 4 equal slices. You eat 1. What fraction did you eat?",["1/4","1/2","1/3","4/1"],0,"🍕"),
+    mc("Which fraction shows one half?",["1/2","1/4","2/1","2/4"],0,"🥧"),
+    mc("Which fraction shows one fourth?",["1/4","1/2","4/1","2/4"],0,"🍫"),
+    mc("Two equal parts of a whole are called…",["halves","thirds","fourths","fifths"],0,"✂️"),
+    mc("Four equal parts of a whole are called…",["fourths","halves","thirds","sixths"],0,"🍰"),
+    mc("Which is larger — 1/2 or 1/4?",["1/2","1/4","same","can't tell"],0,"📐"),
+    mc("3 out of 4 equal parts = ?",["3/4","1/4","3/3","4/3"],0,"🥧"),
+    mc("Which shows a whole?",["4/4","1/4","2/4","0/4"],0,"🍕"),
+    mc("A sandwich is cut in half. How many pieces?",["2","1","3","4"],0,"🥪"),
+    mc("You share a cake equally with 1 friend. Each gets…",["1/2","1/4","1/3","1 whole"],0,"🎂"),
+    mc("What does the bottom number in a fraction tell you?",["Total equal parts","Parts eaten","The whole number","The color"],0,"🔢"),
+    mc("A pie is cut into 4 equal pieces. 2 are eaten. What fraction is left?",["2/4","1/4","3/4","4/4"],0,"🥧"),
   ]);
 }
 
-// ── MEASUREMENT ───────────────────────────────────────────────
+// ── MEASUREMENT ───────────────────────────────────────
 function measureBank(){
-  let out=[
-    q("Which unit is best for measuring a crayon?",["inch","mile","yard","kilometer"],0,"📏"),
-    q("Which unit is best for measuring a football field?",["inch","centimeter","yard","millimeter"],2,"🏈"),
-    q("Which unit is best for measuring a small bug?",["yard","foot","mile","centimeter"],3,"🐛"),
-    q("Which unit is best for measuring a bedroom rug?",["inch","centimeter","foot","kilometer"],2,"🛋️"),
-    q("A pencil is 7 inches. A marker is 9 inches. Which is longer?",["pencil","marker","same","can't tell"],1,"✏️"),
-    q("How many inches are in 1 foot?",["6","10","12","24"],2,"📏"),
-    q("How many feet are in 1 yard?",["2","3","4","12"],1,"📐"),
-    q("A desk is about 2 _____ wide.",["miles","yards","inches","feet"],3,"🪑"),
-    q("Which is the longest measurement?",["1 inch","1 foot","1 yard","1 centimeter"],2,"📏"),
-    q("A puppy is about 10 inches tall. A table is about 3 feet tall. Which is taller?",["puppy","table","same","can't tell"],1,"🐕"),
-    q("You measure a ribbon. It is 24 inches. How many feet is that?",["1 foot","2 feet","3 feet","4 feet"],1,"🎀"),
-    q("Which tool measures length?",["thermometer","scale","ruler","clock"],2,"📏"),
-    q("Which tool measures weight?",["ruler","thermometer","clock","scale"],3,"⚖️"),
-    q("Which tool measures temperature?",["ruler","thermometer","scale","measuring cup"],1,"🌡️"),
-  ];
-  for(let a=2;a<12;a++){
-    let b=a+Math.ceil(Math.random()*8);
-    out.push(q(`A pencil is ${a} inches. A marker is ${b} inches. How much longer is the marker?`,
+  const qs=[];
+  qs.push(...[
+    mc("Which unit measures a pencil?",["inches","miles","yards","kilometers"],0,"✏️"),
+    mc("Which unit measures a football field?",["yards","inches","centimeters","millimeters"],0,"🏈"),
+    mc("How many inches are in 1 foot?",["12","6","10","24"],0,"📏"),
+    mc("How many feet are in 1 yard?",["3","2","4","12"],0,"📐"),
+    mc("Which is longest?",["1 yard","1 foot","1 inch","1 centimeter"],0,"📏"),
+    mc("Which tool measures length?",["ruler","thermometer","scale","clock"],0,"📏"),
+    mc("Which tool measures weight?",["scale","ruler","thermometer","clock"],0,"⚖️"),
+    mc("Which tool measures temperature?",["thermometer","ruler","scale","clock"],0,"🌡️"),
+    mc("A door is about ___ tall.",["7 feet","7 inches","7 miles","7 yards"],0,"🚪"),
+    mc("A book is about ___ wide.",["8 inches","8 feet","8 yards","8 miles"],0,"📚"),
+  ]);
+  for(let a=4;a<14;a++){
+    const b=a+Math.ceil(Math.random()*7);
+    qs.push(mc(`A pencil is ${a} inches. A marker is ${b} inches. How much longer is the marker?`,
       [String(b-a),String(a),String(b),String(a+b)],0,"✏️"));
   }
-  return out;
+  return sh(qs);
 }
 
-// ── SENTENCES ─────────────────────────────────────────────────
-function sentenceBank(){
-  return shuffle([
-    // CAPITALIZATION
-    q("Which sentence is capitalized correctly?",["i like pizza.","I like pizza.","i Like pizza.","I Like Pizza."],1,"✏️"),
-    q("Which sentence starts correctly?",["the cat sat.","The cat sat.","THE cat sat.","tHE cat sat."],1,"🐱"),
-    q("Which name is written correctly?",["sarah","SARAH","Sarah","sARAH"],2,"👧"),
-    q("Which day of the week is written correctly?",["monday","MONDAY","Monday","monDay"],2,"📅"),
-    // PUNCTUATION
-    q("Which sentence needs a question mark?",["I am happy.","Where is my bag?","The dog ran.","She has a hat."],1,"❓"),
-    q("Which sentence is an exclamation?",["I walk to school.","What time is it.","Watch out!","She has a pet."],2,"❗"),
-    q("Which sentence ends correctly?",["Where are you","Can you help me?","She runs fast","I love dogs"],1,"❓"),
-    q("Which sentence uses a period correctly?",["She runs fast.","She runs fast","she runs fast.","She runs fast!"],0,"📝"),
-    // COMPLETE SENTENCES
-    q("Which is a complete sentence?",["The big dog.","Ran to school.","The cat slept on the mat.","Because it rained."],2,"📚"),
-    q("Which is NOT a complete sentence?",["She jumped over the puddle.","A tiny, happy bird.","The book fell off the shelf.","We ate lunch together."],1,"✂️"),
-    q("Which sentence has both a subject and a verb?",["Happy birds.","Under the tree.","The frog jumped high.","Running fast."],2,"✅"),
-    // CORRECT SENTENCES
-    q("Choose the correct sentence.",["we went to Target.","We went to Target.","We went to target","we went to target."],1,"🛒"),
-    q("Choose the correct sentence.",["Her and me went.","She and I went.","Her and I went.","She and me went."],1,"👭"),
-    q("Choose the correct sentence.",["The two dog run.","The two dogs runs.","The two dogs run.","The two dog runs."],2,"🐕"),
-    q("Which sentence uses the correct verb?",["She don't like snakes.","She doesn't like snakes.","She doesn't likes snakes.","She don't likes snakes."],1,"🐍"),
-    q("Which sentence is written correctly?",["Him and Jake played.","He and Jake played.","He and Jake plays.","Him and Jake plays."],1,"⚽"),
-    // CONJUNCTIONS / STRUCTURE
-    q("Which word connects the two ideas: 'I was tired ___ I finished my homework.'",["but","so","or","because"],3,"📝"),
-    q("Which best completes: 'She likes dogs ___ she is afraid of big ones.'",["so","and","but","because"],2,"🐶"),
-    q("Which is a telling sentence (statement)?",["Is that your dog?","Wow, great catch!","My dog is fluffy.","Come here!"],2,"📖"),
-    q("Which is an asking sentence (question)?",["I eat lunch at noon.","Sit down please.","Did you see that?","What a great day!"],2,"❓"),
-  ]);
+// ── GRAPHS (SVG bar charts) ────────────────────────────
+function graphBank(){
+  const qs=[];
+  const datasets=[
+    {labels:["Dogs","Cats"],values:[7,4],q:"pets",q2:"pet owners"},
+    {labels:["Apples","Bananas"],values:[9,5],q:"fruits",q2:"pieces of fruit"},
+    {labels:["Soccer","Basketball"],values:[8,3],q:"sports",q2:"kids"},
+    {labels:["Pizza","Tacos"],values:[6,4],q:"foods",q2:"votes"},
+    {labels:["Sunny","Rainy"],values:[10,3],q:"weather days",q2:"days"},
+    {labels:["Boys","Girls"],values:[12,9],q:"students",q2:"students"},
+    {labels:["Red","Blue"],values:[5,8],q:"color votes",q2:"votes"},
+    {labels:["Bikes","Cars"],values:[4,9],q:"vehicles",q2:"vehicles"},
+  ];
+  const colors=["#3b82f6","#f59e0b","#10b981","#ef4444","#8b5cf6","#ec4899","#f97316","#06b6d4"];
+  datasets.forEach((d,di)=>{
+    const [la,lb]=[d.labels[0],d.labels[1]];
+    const [va,vb]=[d.values[0],d.values[1]];
+    const diff=Math.abs(va-vb);
+    const total=va+vb;
+    const more=va>vb?la:lb;
+    const moreVal=Math.max(va,vb);
+    const vis=svgBarChart(d.labels,d.values,[colors[di],colors[(di+2)%colors.length]]);
+    qs.push({q:`Look at the graph.\nWhich has more ${d.q}?`,
+      choices:sh([more,la===more?lb:la,"Same amount","Can't tell"]),
+      ans:0,visual:vis,get ans(){return this.choices.indexOf(more)}});
+    qs.push({q:`Look at the graph.\nHow many more ${la} than ${lb}?`,
+      choices:sh([String(diff),String(va),String(vb),String(total)]),
+      ans:0,visual:vis,get ans(){return this.choices.indexOf(String(diff))}});
+    qs.push({q:`Look at the graph.\nHow many ${d.q2} in all?`,
+      choices:sh([String(total),String(diff),String(va),String(vb)]),
+      ans:0,visual:vis,get ans(){return this.choices.indexOf(String(total))}});
+  });
+  return sh(qs);
 }
 </script>
 </body>
