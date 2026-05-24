@@ -1,0 +1,1286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Portal Park — Mrs. Rogers</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&family=Nunito:wght@700;800;900&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.4/howler.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+<style>
+/* ══════════════════════════════════════════════════════
+   BASE
+══════════════════════════════════════════════════════ */
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ink:#1f2937;--white:#fffaf0;--line:#1f2937;
+  --green:#16a34a;--red:#dc2626;--gold:#f59e0b;--blue:#2563eb;
+  --shadow:rgba(31,41,55,.2);
+  --body:'Nunito',sans-serif;--display:'Baloo 2',sans-serif;
+}
+html{font-size:22px}
+body{font-family:var(--body);color:var(--ink);min-height:100vh;overflow-x:hidden;background:#1a0a3d}
+button{font-family:var(--body);font-weight:900;cursor:pointer}
+.screen{display:none;min-height:100vh;flex-direction:column;align-items:center}
+.screen.active{display:flex}
+.hidden{display:none!important}
+
+/* ══════════════════════════════════════════════════════
+   SHARED CARD + BUTTON
+══════════════════════════════════════════════════════ */
+.card{
+  background:rgba(255,255,255,.97);border:4px solid var(--line);
+  border-radius:28px;box-shadow:0 8px 0 var(--line),0 16px 32px var(--shadow);
+}
+.btn{
+  font-family:var(--display);font-size:clamp(1.1rem,2.8vw,1.6rem);
+  padding:14px 28px;border:4px solid var(--line);border-radius:20px;
+  background:var(--gold);box-shadow:0 7px 0 var(--line);
+  transition:.08s;color:var(--ink);line-height:1;
+}
+.btn:hover{transform:translateY(-2px);box-shadow:0 9px 0 var(--line)}
+.btn:active{transform:translateY(4px);box-shadow:0 3px 0 var(--line)}
+.btn.ghost{background:#fff}
+.btn.sm{font-size:clamp(.9rem,2.2vw,1.1rem);padding:9px 16px;border-radius:14px;box-shadow:0 5px 0 var(--line)}
+.btn.danger{background:#fee2e2;border-color:var(--red);color:var(--red)}
+
+/* ══════════════════════════════════════════════════════
+   ANIMATIONS
+══════════════════════════════════════════════════════ */
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-10px)}40%{transform:translateX(10px)}60%{transform:translateX(-8px)}80%{transform:translateX(8px)}}
+@keyframes pop{0%{transform:scale(.6);opacity:0}70%{transform:scale(1.1)}100%{transform:scale(1);opacity:1}}
+@keyframes spinIn{0%{transform:rotate(-180deg) scale(0);opacity:0}100%{transform:rotate(0deg) scale(1);opacity:1}}
+@keyframes slideUp{0%{transform:translateY(40px);opacity:0}100%{transform:translateY(0);opacity:1}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.55}}
+@keyframes coinFly{0%{transform:translateY(0) scale(1);opacity:1}100%{transform:translateY(-80px) scale(.4);opacity:0}}
+
+/* ══════════════════════════════════════════════════════
+   TITLE SCREEN
+══════════════════════════════════════════════════════ */
+#title{
+  background:radial-gradient(ellipse at 30% 20%,#3b1f8c,#1a0a3d 60%);
+  justify-content:center;align-items:center;text-align:center;
+  gap:20px;padding:28px 16px;position:relative;overflow:hidden;
+}
+.title-stars{position:absolute;inset:0;pointer-events:none}
+.title-star{position:absolute;background:white;border-radius:50%;animation:pulse 2s ease-in-out infinite}
+.title-card{padding:30px 28px;max-width:840px;width:100%;background:rgba(255,255,255,.96)}
+.title-icons{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.title-icon-box{
+  width:58px;height:58px;border:3px solid var(--line);border-radius:14px;
+  background:#fff;box-shadow:0 5px 0 var(--line);
+  display:flex;align-items:center;justify-content:center;overflow:hidden;
+  animation:bob 2.8s ease-in-out infinite;
+}
+.title-icon-box img{width:42px;height:42px;object-fit:contain}
+.title-icon-box:nth-child(2){animation-delay:.18s}
+.title-icon-box:nth-child(3){animation-delay:.36s}
+.title-icon-box:nth-child(4){animation-delay:.54s}
+.title-icon-box:nth-child(5){animation-delay:.72s}
+.title-icon-box:nth-child(6){animation-delay:.9s}
+.title-icon-box:nth-child(7){animation-delay:1.08s}
+.game-title{
+  font-family:var(--display);font-size:clamp(3rem,9vw,6rem);
+  line-height:.9;color:#3b1f8c;
+  text-shadow:4px 5px 0 rgba(255,255,255,.9);
+}
+.tagline{
+  font-size:clamp(1.1rem,2.8vw,1.5rem);font-weight:900;
+  line-height:1.4;max-width:680px;margin:12px auto 0;color:#374151;
+}
+
+/* ══════════════════════════════════════════════════════
+   HUB
+══════════════════════════════════════════════════════ */
+#hub{padding:14px;gap:12px;overflow-y:auto;min-height:100vh}
+.hub-bg{
+  position:fixed;inset:0;z-index:0;
+  background:radial-gradient(ellipse at 50% 0%,#1e3a8a,#1a0a3d 70%);
+  pointer-events:none;
+}
+#hub>*{position:relative;z-index:1}
+.topbar{
+  width:100%;position:sticky;top:0;z-index:20;
+  display:flex;gap:8px;align-items:center;justify-content:center;flex-wrap:wrap;
+  padding:10px 12px;background:rgba(255,255,255,.96);border-bottom:4px solid var(--line);
+}
+.stat{
+  font-family:var(--display);font-size:clamp(.9rem,2.2vw,1.15rem);
+  background:#fff;border:3px solid var(--line);border-radius:14px;padding:7px 12px;
+  white-space:nowrap;
+}
+.hub-title{
+  font-family:var(--display);font-size:clamp(2rem,6vw,3.5rem);
+  color:#fff;line-height:1;text-align:center;
+  text-shadow:3px 4px 0 rgba(0,0,0,.4);
+}
+.hub-sub{
+  font-size:clamp(1rem,2.4vw,1.3rem);font-weight:900;
+  text-align:center;max-width:860px;line-height:1.4;
+  color:rgba(255,255,255,.75);
+}
+.portal-grid{
+  width:100%;max-width:1180px;
+  display:grid;grid-template-columns:repeat(4,1fr);
+  gap:16px;padding:6px 0 50px;
+}
+@media(max-width:960px){.portal-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:520px){.portal-grid{grid-template-columns:1fr}}
+
+/* ══════════════════════════════════════════════════════
+   PORTAL CARDS
+══════════════════════════════════════════════════════ */
+.portal{
+  border:4px solid var(--line);border-radius:28px;cursor:pointer;
+  overflow:hidden;box-shadow:0 8px 0 var(--line),0 16px 28px var(--shadow);
+  transition:transform .12s,box-shadow .12s;display:flex;flex-direction:column;
+  background:#fff;
+}
+.portal:hover{transform:translateY(-6px);box-shadow:0 14px 0 var(--line),0 24px 36px var(--shadow)}
+.portal:active{transform:translateY(2px);box-shadow:0 5px 0 var(--line)}
+.portal-scene{
+  width:100%;height:168px;position:relative;overflow:hidden;flex-shrink:0;
+}
+.portal-scene svg{width:100%;height:100%}
+.portal-character{
+  position:absolute;bottom:14px;right:14px;
+  width:72px;height:72px;object-fit:contain;
+  animation:bob 2.8s ease-in-out infinite;
+  filter:drop-shadow(2px 4px 6px rgba(0,0,0,.3));
+}
+.portal-info{padding:14px 14px 16px;flex:1;display:flex;flex-direction:column;gap:6px}
+.portal-name{font-family:var(--display);font-size:clamp(1.2rem,2.8vw,1.6rem);line-height:1;color:#1e3a5f}
+.portal-desc{font-size:clamp(.9rem,2vw,1rem);font-weight:900;color:#374151;line-height:1.3}
+.portal-badge{font-size:.9rem;font-weight:900;margin-top:2px}
+.portal.done .portal-info{background:linear-gradient(180deg,rgba(255,255,255,1),rgba(255,248,195,.7))}
+
+/* ══════════════════════════════════════════════════════
+   GAME SCREEN
+══════════════════════════════════════════════════════ */
+#game{min-height:100vh;overflow-y:auto}
+.hud{
+  width:100%;position:sticky;top:0;z-index:30;
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  padding:12px 14px;background:rgba(255,255,255,.97);border-bottom:4px solid var(--line);
+}
+.hud-char{
+  width:52px;height:52px;object-fit:contain;flex-shrink:0;
+  filter:drop-shadow(2px 3px 4px rgba(0,0,0,.2));
+}
+.hud-info{display:flex;flex-direction:column;gap:2px;flex:1;min-width:0}
+.hud-name{font-family:var(--display);font-size:clamp(1rem,2.5vw,1.4rem);color:#1e3a5f;line-height:1}
+.hud-q{font-size:clamp(.85rem,2vw,1rem);font-weight:900;color:#6b7280}
+.hud-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.hearts{font-size:clamp(1rem,2.5vw,1.3rem);letter-spacing:2px}
+.hud-coins{
+  font-family:var(--display);font-size:clamp(.9rem,2.2vw,1.1rem);
+  background:#fff;border:3px solid var(--line);border-radius:12px;padding:5px 10px;
+}
+.prog-wrap{width:100%;height:16px;background:#f3f4f6;border:3px solid var(--line);border-radius:999px;overflow:hidden}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--green),#84cc16);border-radius:999px;transition:.35s}
+
+/* game area */
+.game-wrap{
+  width:100%;max-width:960px;
+  padding:18px 14px 100px;
+  display:flex;flex-direction:column;gap:14px;align-items:center;
+}
+
+/* world character displayed large */
+.world-char-wrap{
+  display:flex;justify-content:center;align-items:flex-end;
+  width:100%;max-width:500px;
+  background:rgba(255,255,255,.1);border-radius:20px;padding:12px;
+  position:relative;overflow:hidden;
+}
+.world-char-wrap svg{width:100%;height:120px}
+.world-char{
+  width:110px;height:110px;object-fit:contain;
+  position:absolute;right:20px;bottom:10px;
+  filter:drop-shadow(3px 6px 8px rgba(0,0,0,.3));
+  transition:transform .15s;
+  animation:bob 2.5s ease-in-out infinite;
+}
+.world-char.celebrate{animation:none;animation:spinIn .4s ease-out}
+.world-char.hurt{animation:none;animation:shake .4s ease-out}
+
+/* question card */
+.q-card{width:100%;padding:20px 22px}
+.q-card.wide{max-width:100%}
+.q-text{font-size:clamp(1.3rem,3.5vw,2rem);line-height:1.3;font-weight:900;text-align:center;color:#1f2937}
+.q-visual{display:flex;justify-content:center;align-items:center;flex-wrap:wrap;gap:12px;margin-top:14px;overflow:visible}
+.q-visual svg{display:block;max-width:100%;height:auto}
+.q-visual.wide-visual{flex-direction:column;align-items:stretch}
+.q-visual.wide-visual svg{width:100%;height:auto}
+
+/* answer buttons */
+.ans-grid{width:100%;display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+@media(max-width:520px){.ans-grid{grid-template-columns:1fr}}
+.ans-btn{
+  font-size:clamp(1.1rem,3vw,1.5rem);font-weight:900;
+  min-height:72px;padding:16px 14px;
+  border:4px solid var(--line);border-radius:20px;
+  background:#fff;box-shadow:0 6px 0 var(--line);
+  transition:.08s;display:flex;align-items:center;justify-content:center;gap:10px;
+  /* use Kenney button style */
+  background-image:url('/mrsrshb/assets/kenney-ui/PNG/Blue/Default/button_rectangle_depth_gloss.png');
+  background-size:100% 100%;background-repeat:no-repeat;
+  color:var(--ink);
+}
+.ans-btn:hover:not(:disabled){
+  transform:translateY(-3px);box-shadow:0 9px 0 var(--line);
+  background-image:url('/mrsrshb/assets/kenney-ui/PNG/Yellow/Default/button_rectangle_depth_gloss.png');
+}
+.ans-btn:active:not(:disabled){transform:translateY(4px);box-shadow:0 2px 0 var(--line)}
+.ans-btn.correct{
+  background-image:url('/mrsrshb/assets/kenney-ui/PNG/Green/Default/button_rectangle_depth_gloss.png');
+  border-color:var(--green);color:#14532d;animation:pop .25s;
+}
+.ans-btn.wrong{
+  background-image:url('/mrsrshb/assets/kenney-ui/PNG/Red/Default/button_rectangle_depth_gloss.png');
+  border-color:var(--red);color:#7f1d1d;animation:shake .3s;
+}
+.ans-btn:disabled{cursor:default}
+.feedback{
+  min-height:38px;font-family:var(--display);
+  font-size:clamp(1.1rem,2.8vw,1.6rem);text-align:center;
+}
+.good{color:var(--green)}.bad{color:var(--red)}
+
+/* coin animation */
+.coin-fly{
+  position:fixed;z-index:999;font-family:var(--display);
+  font-size:1.4rem;font-weight:900;color:#f59e0b;
+  pointer-events:none;animation:coinFly .8s ease-out forwards;
+}
+
+/* ══════════════════════════════════════════════════════
+   DRAG-DROP (Candy coin drag)
+══════════════════════════════════════════════════════ */
+.coin-bank{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;padding:12px;background:rgba(255,255,255,.08);border-radius:16px;min-height:80px}
+.draggable-coin{cursor:grab;user-select:none;transition:.1s;border-radius:50%}
+.draggable-coin:hover{transform:scale(1.15)}
+.draggable-coin.dragging{opacity:.4;cursor:grabbing}
+.drop-zone{
+  display:flex;flex-wrap:wrap;gap:8px;justify-content:center;align-items:center;
+  min-height:90px;padding:12px;border-radius:16px;
+  border:4px dashed rgba(255,255,255,.4);background:rgba(255,255,255,.07);
+  transition:.2s;font-size:1rem;font-weight:900;color:rgba(255,255,255,.5);
+}
+.drop-zone.drag-over{border-color:var(--gold);background:rgba(251,191,36,.15)}
+.drop-total{font-family:var(--display);font-size:2rem;font-weight:900;color:var(--gold);text-align:center;min-height:2.5rem}
+.check-btn{
+  font-family:var(--display);font-size:clamp(1rem,2.5vw,1.3rem);
+  padding:12px 24px;border:4px solid var(--line);border-radius:18px;
+  background:var(--gold);box-shadow:0 6px 0 var(--line);transition:.08s;
+}
+.check-btn:hover{transform:translateY(-2px)}
+.check-btn:active{transform:translateY(3px)}
+
+/* ══════════════════════════════════════════════════════
+   TAP-WORD (Zootopia / Word tap)
+══════════════════════════════════════════════════════ */
+.sentence-wrap{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;padding:14px}
+.tap-word{
+  font-size:clamp(1.2rem,3vw,1.8rem);font-weight:900;
+  padding:8px 14px;border:3px solid rgba(255,255,255,.3);border-radius:12px;
+  background:rgba(255,255,255,.1);color:#fff;cursor:pointer;transition:.1s;
+}
+.tap-word:hover{background:rgba(255,255,255,.2);transform:scale(1.05)}
+.tap-word.tapped-good{background:rgba(34,197,94,.3);border-color:var(--green);color:#86efac;animation:pop .2s}
+.tap-word.tapped-bad{background:rgba(220,38,38,.3);border-color:var(--red);color:#fca5a5}
+.tap-word.punct{opacity:.3;cursor:default}
+.show-me-btn{
+  font-size:clamp(.85rem,2vw,1rem);font-weight:900;
+  padding:7px 14px;border:2px solid rgba(255,255,255,.25);border-radius:10px;
+  background:rgba(255,255,255,.08);color:rgba(255,255,255,.6);transition:.1s;
+}
+.show-me-btn:hover{background:rgba(255,255,255,.15)}
+
+/* ══════════════════════════════════════════════════════
+   NUMBER PAD (Space / Roblox)
+══════════════════════════════════════════════════════ */
+.numpad-wrap{display:flex;flex-direction:column;align-items:center;gap:10px;width:100%;max-width:400px}
+.answer-display{
+  font-family:var(--body);font-size:clamp(2.2rem,6vw,3.5rem);font-weight:900;
+  min-width:160px;text-align:center;
+  background:#fff;color:#1a1a2e;
+  border:4px solid var(--line);box-shadow:4px 4px 0 var(--line);
+  padding:10px 24px;min-height:76px;
+  display:flex;align-items:center;justify-content:center;letter-spacing:4px;
+}
+.numpad{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;width:100%}
+.npbtn{
+  font-size:clamp(1.1rem,3vw,1.5rem);font-weight:900;
+  padding:14px 8px;border:4px solid var(--line);border-radius:14px;
+  background:#fff;box-shadow:3px 3px 0 var(--line);transition:.08s;text-align:center;
+}
+.npbtn:hover{background:#e0e7ff;transform:translate(-1px,-1px);box-shadow:4px 4px 0 var(--line)}
+.npbtn:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--line)}
+.npbtn.back{background:#fee2e2;border-color:var(--red);color:var(--red)}
+.npbtn.enter{background:#dcfce7;border-color:var(--green);color:var(--green);grid-column:span 2}
+
+/* ══════════════════════════════════════════════════════
+   MODALS
+══════════════════════════════════════════════════════ */
+.modal{
+  position:fixed;inset:0;z-index:90;
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(26,10,61,.88);padding:18px;
+}
+.modal-card{
+  max-width:620px;width:100%;padding:28px;text-align:center;
+  display:flex;flex-direction:column;gap:14px;align-items:center;
+}
+.modal-char{width:120px;height:120px;object-fit:contain;filter:drop-shadow(0 6px 16px rgba(0,0,0,.4))}
+.modal-title{font-family:var(--display);font-size:clamp(2rem,6vw,3.2rem);color:#1e3a5f;line-height:1}
+.modal-text{font-size:clamp(1rem,2.5vw,1.3rem);font-weight:900;line-height:1.5;color:#374151}
+
+/* kenney star rating */
+.star-row{display:flex;gap:6px;justify-content:center}
+.star-row img{width:44px;height:44px;object-fit:contain;animation:pop .3s ease-out both}
+.star-row img:nth-child(2){animation-delay:.15s}
+.star-row img:nth-child(3){animation-delay:.3s}
+</style>
+</head>
+<body>
+
+<!-- TITLE -->
+<section id="title" class="screen active">
+  <div class="title-stars" id="titleStars"></div>
+  <div class="title-card card">
+    <div class="title-icons" id="titleIcons"></div>
+    <h1 class="game-title">Portal Park</h1>
+    <p class="tagline">Seven worlds, seven doors — coins, hearts, and badges waiting inside each one.</p>
+  </div>
+  <button class="btn" onclick="startGame()">Open the Gates ▶</button>
+</section>
+
+<!-- HUB -->
+<section id="hub" class="screen">
+  <div class="hub-bg"></div>
+  <div class="topbar">
+    <div class="stat" id="rankStat">⭐ Rank 1</div>
+    <div class="stat" id="coinStat">🪙 0</div>
+    <div class="stat" id="badgeStat">🏅 0 / 7</div>
+    <button class="btn sm ghost" onclick="resetAll()">↺ Reset</button>
+  </div>
+  <h2 class="hub-title">Pick Your Portal</h2>
+  <p class="hub-sub">Find the badge in each world to unlock the next one.</p>
+  <div class="portal-grid" id="portalGrid"></div>
+</section>
+
+<!-- GAME -->
+<section id="game" class="screen">
+  <div class="hud">
+    <img class="hud-char" id="hudChar" src="" alt=""/>
+    <div class="hud-info">
+      <div class="hud-name" id="hudName">World</div>
+      <div class="hud-q" id="hudQ">Challenge 1 of 8</div>
+    </div>
+    <div class="hud-right">
+      <div class="hearts" id="hearts">❤️❤️❤️</div>
+      <div class="hud-coins" id="hudCoins">🪙 0</div>
+    </div>
+    <div class="prog-wrap" style="flex-basis:100%">
+      <div class="prog-fill" id="progFill" style="width:0%"></div>
+    </div>
+  </div>
+  <main class="game-wrap" id="gameWrap">
+    <div class="world-char-wrap" id="charWrap">
+      <img class="world-char" id="worldChar" src="" alt=""/>
+    </div>
+    <div id="gameArea" style="width:100%;display:flex;flex-direction:column;gap:12px;align-items:center"></div>
+  </main>
+</section>
+
+<!-- BADGE EARNED -->
+<div id="modalBadge" class="modal hidden">
+  <div class="modal-card card">
+    <img class="modal-char" id="mbChar" src="" alt=""/>
+    <div class="star-row" id="mbStars"></div>
+    <div class="modal-title" id="mbTitle">Badge Found!</div>
+    <div class="modal-text" id="mbText">Great work!</div>
+    <button class="btn" onclick="finishRun()">Back to Park ▶</button>
+    <button class="btn ghost" onclick="restartRun()">Play Again ↺</button>
+  </div>
+</div>
+
+<!-- GAME OVER -->
+<div id="modalOver" class="modal hidden">
+  <div class="modal-card card">
+    <img class="modal-char" id="moChar" src="" alt=""/>
+    <div class="modal-title">Portal Closed!</div>
+    <div class="modal-text">You ran out of hearts — try again with new questions!</div>
+    <button class="btn" onclick="restartRun()">Try Again ▶</button>
+    <button class="btn ghost" onclick="goHub()">Back to Park</button>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════
+// ASSET PATHS (relative to /mrsrshb/ base)
+// ═══════════════════════════════════════════════════════
+const BASE = '/mrsrshb/assets/';
+const A = {
+  animals: {
+    elephant: BASE+'kenney-animals/PNG/Round/elephant.png',
+    giraffe:  BASE+'kenney-animals/PNG/Round/giraffe.png',
+    hippo:    BASE+'kenney-animals/PNG/Round/hippo.png',
+    monkey:   BASE+'kenney-animals/PNG/Round/monkey.png',
+    panda:    BASE+'kenney-animals/PNG/Round/panda.png',
+    parrot:   BASE+'kenney-animals/PNG/Round/parrot.png',
+    penguin:  BASE+'kenney-animals/PNG/Round/penguin.png',
+    pig:      BASE+'kenney-animals/PNG/Round/pig.png',
+    rabbit:   BASE+'kenney-animals/PNG/Round/rabbit.png',
+    snake:    BASE+'kenney-animals/PNG/Round/snake.png',
+  },
+  rockets: [
+    BASE+'kenney-space/PNG/Sprites/Rockets/spaceRockets_001.png',
+    BASE+'kenney-space/PNG/Sprites/Rockets/spaceRockets_002.png',
+    BASE+'kenney-space/PNG/Sprites/Rockets/spaceRockets_003.png',
+    BASE+'kenney-space/PNG/Sprites/Rockets/spaceRockets_004.png',
+  ],
+  ui: {
+    starFull:    BASE+'kenney-ui/PNG/Yellow/Default/star.png',
+    starOutline: BASE+'kenney-ui/PNG/Grey/Default/star_outline.png',
+    btnBlue:     BASE+'kenney-ui/PNG/Blue/Default/button_rectangle_depth_gloss.png',
+    btnGreen:    BASE+'kenney-ui/PNG/Green/Default/button_rectangle_depth_gloss.png',
+    btnRed:      BASE+'kenney-ui/PNG/Red/Default/button_rectangle_depth_gloss.png',
+    btnYellow:   BASE+'kenney-ui/PNG/Yellow/Default/button_rectangle_depth_gloss.png',
+    check:       BASE+'kenney-ui/PNG/Green/Default/icon_checkmark.png',
+    cross:       BASE+'kenney-ui/PNG/Red/Default/icon_cross.png',
+  },
+  audio: {
+    correct:  BASE+'audio/correct.mp3',
+    wrong:    BASE+'audio/wrong.mp3',
+    levelup:  BASE+'audio/levelup.mp3',
+    coins:    BASE+'audio/coins.mp3',
+    click:    BASE+'kenney-ui/Sounds/click-a.ogg',
+    tap:      BASE+'kenney-ui/Sounds/tap-b.ogg',
+    switchSnd:BASE+'kenney-ui/Sounds/switch-a.ogg',
+  }
+};
+
+// ═══════════════════════════════════════════════════════
+// SOUNDS
+// ═══════════════════════════════════════════════════════
+const SFX = {
+  correct: new Howl({src:[A.audio.correct], volume:.7}),
+  wrong:   new Howl({src:[A.audio.wrong],   volume:.6}),
+  levelup: new Howl({src:[A.audio.levelup], volume:.7}),
+  coins:   new Howl({src:[A.audio.coins],   volume:.5}),
+  click:   new Howl({src:[A.audio.click],   volume:.4}),
+  tap:     new Howl({src:[A.audio.tap],     volume:.3}),
+  sw:      new Howl({src:[A.audio.switchSnd],volume:.35}),
+};
+
+// ═══════════════════════════════════════════════════════
+// SVG COMPONENTS
+// ═══════════════════════════════════════════════════════
+function svgPenny(sz=64){return`<svg width="${sz}" height="${sz}" viewBox="0 0 60 60"><circle cx="30" cy="30" r="28" fill="#b87333" stroke="#7a4a1e" stroke-width="3"/><circle cx="30" cy="30" r="22" fill="#c97c3a" stroke="#9a5c25" stroke-width="1.5"/><text x="30" y="24" text-anchor="middle" font-family="serif" font-size="7" font-weight="bold" fill="#7a4a1e">LIBERTY</text><text x="30" y="36" text-anchor="middle" font-family="serif" font-size="9" font-weight="bold" fill="#7a4a1e">1¢</text><text x="30" y="46" text-anchor="middle" font-family="serif" font-size="5.5" fill="#7a4a1e">PENNY</text></svg>`}
+function svgNickel(sz=64){return`<svg width="${sz}" height="${sz}" viewBox="0 0 60 60"><circle cx="30" cy="30" r="28" fill="#d0cfc8" stroke="#888" stroke-width="3"/><circle cx="30" cy="30" r="22" fill="#c8c7c0" stroke="#999" stroke-width="1.5"/><text x="30" y="24" text-anchor="middle" font-family="serif" font-size="7" font-weight="bold" fill="#444">LIBERTY</text><text x="30" y="36" text-anchor="middle" font-family="serif" font-size="9" font-weight="bold" fill="#444">5¢</text><text x="30" y="46" text-anchor="middle" font-family="serif" font-size="5.5" fill="#444">NICKEL</text></svg>`}
+function svgDime(sz=52){return`<svg width="${sz}" height="${sz}" viewBox="0 0 60 60"><circle cx="30" cy="30" r="26" fill="#d8d8d8" stroke="#888" stroke-width="3"/><circle cx="30" cy="30" r="20" fill="#ccc" stroke="#999" stroke-width="1.5"/><text x="30" y="24" text-anchor="middle" font-family="serif" font-size="7" font-weight="bold" fill="#333">LIBERTY</text><text x="30" y="36" text-anchor="middle" font-family="serif" font-size="9" font-weight="bold" fill="#333">10¢</text><text x="30" y="46" text-anchor="middle" font-family="serif" font-size="5.5" fill="#333">DIME</text></svg>`}
+function svgQuarter(sz=72){return`<svg width="${sz}" height="${sz}" viewBox="0 0 60 60"><circle cx="30" cy="30" r="28" fill="#c8c8c8" stroke="#777" stroke-width="3"/><circle cx="30" cy="30" r="22" fill="#bdbdbd" stroke="#888" stroke-width="1.5"/><text x="30" y="22" text-anchor="middle" font-family="serif" font-size="6.5" font-weight="bold" fill="#333">LIBERTY</text><text x="30" y="34" text-anchor="middle" font-family="serif" font-size="9" font-weight="bold" fill="#333">25¢</text><text x="30" y="44" text-anchor="middle" font-family="serif" font-size="5.5" fill="#333">QUARTER</text></svg>`}
+
+function svgClock(h,m,sz=140){
+  const hA=(h%12+m/60)*30-90, mA=m*6-90;
+  const hx=(30+22*Math.cos(hA*Math.PI/180)).toFixed(1);
+  const hy=(30+22*Math.sin(hA*Math.PI/180)).toFixed(1);
+  const mx=(30+27*Math.cos(mA*Math.PI/180)).toFixed(1);
+  const my=(30+27*Math.sin(mA*Math.PI/180)).toFixed(1);
+  let ticks='',nums='';
+  for(let i=0;i<12;i++){const a=(i*30-90)*Math.PI/180;const x1=30+24*Math.cos(a),y1=30+24*Math.sin(a),x2=30+28*Math.cos(a),y2=30+28*Math.sin(a);ticks+=`<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="#374151" stroke-width="${i%3===0?2:1}"/>`;}
+  [12,1,2,3,4,5,6,7,8,9,10,11].forEach((n,i)=>{const a=(i*30-90)*Math.PI/180;const nx=30+20*Math.cos(a),ny=30+20*Math.sin(a);nums+=`<text x="${nx.toFixed(1)}" y="${(ny+2.5).toFixed(1)}" text-anchor="middle" font-size="5" font-family="sans-serif" font-weight="bold" fill="#1f2937">${n}</text>`;});
+  return`<svg width="${sz}" height="${sz}" viewBox="0 0 60 60"><circle cx="30" cy="30" r="29" fill="#fff" stroke="#1f2937" stroke-width="2.5"/><circle cx="30" cy="30" r="26" fill="#fffef0" stroke="#d1d5db" stroke-width="1"/>${ticks}${nums}<line x1="30" y1="30" x2="${hx}" y2="${hy}" stroke="#1f2937" stroke-width="3" stroke-linecap="round"/><line x1="30" y1="30" x2="${mx}" y2="${my}" stroke="#374151" stroke-width="2" stroke-linecap="round"/><circle cx="30" cy="30" r="2.5" fill="#1f2937"/></svg>`}
+
+function svgBarChart(labels,values,colors,w=460,h=180){
+  const max=Math.max(...values);
+  const bw=Math.floor((w-70)/(labels.length*1.7));
+  const gap=Math.floor(bw*.65);
+  const cH=h-50;
+  let bars='';
+  labels.forEach((lbl,i)=>{
+    const bh=Math.round((values[i]/max)*cH);
+    const x=50+i*(bw+gap);
+    const y=cH-bh+10;
+    bars+=`<rect x="${x}" y="${y}" width="${bw}" height="${bh}" fill="${colors[i%colors.length]}" rx="4" stroke="#1f2937" stroke-width="1.5"/>`;
+    bars+=`<text x="${x+bw/2}" y="${y-5}" text-anchor="middle" font-size="13" font-weight="900" font-family="sans-serif" fill="#1f2937">${values[i]}</text>`;
+    bars+=`<text x="${x+bw/2}" y="${cH+26}" text-anchor="middle" font-size="11" font-weight="700" font-family="sans-serif" fill="#374151">${lbl.length>8?lbl.slice(0,7)+'…':lbl}</text>`;
+  });
+  return`<svg viewBox="0 0 ${w} ${h}" style="width:100%;max-width:${w}px;height:auto"><rect width="${w}" height="${h}" fill="#fffef0" rx="8" stroke="#d1d5db" stroke-width="1.5"/><line x1="44" y1="10" x2="44" y2="${cH+10}" stroke="#374151" stroke-width="2"/><line x1="44" y1="${cH+10}" x2="${w-10}" y2="${cH+10}" stroke="#374151" stroke-width="2"/>${bars}</svg>`}
+
+function svgFracCircle(s,t,sz=160){
+  const cx=70,cy=70,r=58,sl=(2*Math.PI)/t;
+  let paths='';
+  for(let i=0;i<t;i++){
+    const a1=i*sl-Math.PI/2,a2=(i+1)*sl-Math.PI/2;
+    const x1=(cx+r*Math.cos(a1)).toFixed(2),y1=(cy+r*Math.sin(a1)).toFixed(2);
+    const x2=(cx+r*Math.cos(a2)).toFixed(2),y2=(cy+r*Math.sin(a2)).toFixed(2);
+    paths+=`<path d="M${cx},${cy} L${x1},${y1} A${r},${r} 0 ${sl>Math.PI?1:0} 1 ${x2},${y2} Z" fill="${i<s?"#f97316":"#fff"}" stroke="#1f2937" stroke-width="2"/>`;
+  }
+  return`<svg viewBox="0 0 140 ${sz}" style="width:${sz}px;height:${sz+20}px"><rect width="140" height="${sz+20}" fill="#fffef0" rx="8"/>${paths}<text x="70" y="${sz+16}" text-anchor="middle" font-size="14" font-weight="900" font-family="sans-serif" fill="#1f2937">${s}/${t}</text></svg>`}
+
+function svgRuler(objLen,total=12,label=''){
+  const W=680,H=120,rL=44,rR=640,rT=62,rB=90,rW=rR-rL,px=rW/total;
+  const oPx=objLen*px;
+  let ticks='';
+  for(let i=0;i<=total;i++){const x=rL+i*px;const major=Number.isInteger(i);ticks+=`<line x1="${x.toFixed(1)}" y1="${rT}" x2="${x.toFixed(1)}" y2="${major?rT-13:rT-6}" stroke="#1f2937" stroke-width="${major?2:1}"/>`;if(major)ticks+=`<text x="${x.toFixed(1)}" y="${rT-17}" text-anchor="middle" font-size="13" font-weight="700" font-family="sans-serif" fill="#1f2937">${i}</text>`;}
+  for(let i=0;i<total;i++){const x=rL+(i+.5)*px;ticks+=`<line x1="${x.toFixed(1)}" y1="${rT}" x2="${x.toFixed(1)}" y2="${rT-5}" stroke="#555" stroke-width="1"/>`;}
+  const objSvg=`<rect x="${rL}" y="${rT-54}" width="${oPx.toFixed(1)}" height="34" rx="5" fill="#f97316" stroke="#1f2937" stroke-width="2"/><text x="${(rL+oPx/2).toFixed(1)}" y="${rT-32}" text-anchor="middle" font-size="13" font-weight="900" font-family="sans-serif" fill="white">${label||'?'}</text><line x1="${rL}" y1="${rT-20}" x2="${rL}" y2="${rT}" stroke="#1f2937" stroke-width="1.5" stroke-dasharray="3 2"/><line x1="${(rL+oPx).toFixed(1)}" y1="${rT-20}" x2="${(rL+oPx).toFixed(1)}" y2="${rT}" stroke="#1f2937" stroke-width="1.5" stroke-dasharray="3 2"/>`;
+  return`<svg viewBox="0 0 ${W} ${H}" style="width:100%;max-width:${W}px;height:auto"><rect width="${W}" height="${H}" fill="#fffef0" rx="8" stroke="#d1d5db" stroke-width="1.5"/><rect x="${rL}" y="${rT}" width="${rW}" height="${rB-rT}" fill="#e5e7eb" stroke="#1f2937" stroke-width="2" rx="3"/>${ticks}${objSvg}<text x="${rR}" y="${rB+18}" text-anchor="end" font-size="12" font-family="sans-serif" fill="#555">${total} inches</text></svg>`}
+
+function svgBase10(h,t,o){
+  const W=560,H=160;let shapes='',x=20;
+  for(let i=0;i<Math.min(h,4);i++){for(let r=0;r<10;r++)for(let c=0;c<10;c++)shapes+=`<rect x="${(x+c*8).toFixed(0)}" y="${(16+r*8).toFixed(0)}" width="7" height="7" fill="#3b82f6" stroke="#1e40af" stroke-width=".5"/>`;shapes+=`<text x="${(x+40).toFixed(0)}" y="110" text-anchor="middle" font-size="11" font-weight="900" font-family="sans-serif" fill="#1e40af">100</text>`;x+=98;}
+  if(h>0)x+=10;
+  for(let i=0;i<Math.min(t,9);i++){for(let r=0;r<10;r++)shapes+=`<rect x="${x.toFixed(0)}" y="${(16+r*8).toFixed(0)}" width="14" height="7" fill="#10b981" stroke="#065f46" stroke-width=".5"/>`;shapes+=`<text x="${(x+7).toFixed(0)}" y="110" text-anchor="middle" font-size="11" font-weight="900" font-family="sans-serif" fill="#065f46">10</text>`;x+=22;}
+  if(t>0)x+=10;
+  for(let i=0;i<Math.min(o,9);i++){shapes+=`<rect x="${x.toFixed(0)}" y="24" width="18" height="18" fill="#f97316" stroke="#9a3412" stroke-width="1"/>`;shapes+=`<text x="${(x+9).toFixed(0)}" y="110" text-anchor="middle" font-size="11" font-weight="900" font-family="sans-serif" fill="#9a3412">1</text>`;x+=24;}
+  return`<svg viewBox="0 0 ${W} ${H}" style="width:100%;max-width:${W}px;height:auto"><rect width="${W}" height="${H}" fill="#fffef0" rx="8" stroke="#d1d5db" stroke-width="1.5"/>${shapes}<text x="${W/2}" y="${H-8}" text-anchor="middle" font-size="13" font-weight="900" font-family="sans-serif" fill="#1f2937">${h} hundreds + ${t} tens + ${o} ones</text></svg>`}
+
+// ═══════════════════════════════════════════════════════
+// PORTAL SCENE SVGs
+// ═══════════════════════════════════════════════════════
+const SCENES={
+  candy:`<svg viewBox="0 0 300 168" preserveAspectRatio="xMidYMid slice"><defs><linearGradient id="csk" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#ffd6e8"/><stop offset="100%" stop-color="#fff0f8"/></linearGradient></defs><rect width="300" height="168" fill="url(#csk)"/><ellipse cx="80" cy="148" rx="90" ry="40" fill="#ffb3d1"/><ellipse cx="220" cy="152" rx="100" ry="38" fill="#ff80b0"/><path d="M30 168 Q50 108 70 128 Q90 148 110 108 Q130 68 150 98 Q170 128 190 88 Q210 48 230 78 Q250 108 270 68" stroke="#ff3399" stroke-width="8" fill="none" stroke-linecap="round"/><path d="M30 168 Q50 108 70 128 Q90 148 110 108 Q130 68 150 98 Q170 128 190 88 Q210 48 230 78 Q250 108 270 68" stroke="white" stroke-width="4" fill="none" stroke-linecap="round" stroke-dasharray="12 12"/><circle cx="60" cy="108" r="14" fill="#ff6eb4" stroke="#cc0066" stroke-width="2"/><circle cx="140" cy="85" r="14" fill="#ff9f1c" stroke="#cc6600" stroke-width="2"/><circle cx="220" cy="65" r="14" fill="#9b5de5" stroke="#6600cc" stroke-width="2"/><line x1="258" y1="168" x2="258" y2="92" stroke="#cc44aa" stroke-width="3"/><circle cx="258" cy="82" r="18" fill="#ff6eb4" stroke="#cc0066" stroke-width="2"/></svg>`,
+  animals:`<svg viewBox="0 0 300 168" preserveAspectRatio="xMidYMid slice"><defs><linearGradient id="ask" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#ff9f1c"/><stop offset="40%" stop-color="#ffbf69"/><stop offset="100%" stop-color="#e07b39"/></linearGradient></defs><rect width="300" height="168" fill="url(#ask)"/><circle cx="240" cy="34" r="22" fill="#ffd166" opacity=".9"/><ellipse cx="150" cy="185" rx="180" ry="55" fill="#c8843a"/><ellipse cx="150" cy="172" rx="180" ry="42" fill="#d4924a"/><rect x="118" y="82" width="10" height="60" rx="3" fill="#8b4513"/><ellipse cx="123" cy="70" rx="32" ry="18" fill="#5a8a1a"/><ellipse cx="105" cy="74" rx="20" ry="12" fill="#4a7a14"/><ellipse cx="142" cy="74" rx="20" ry="12" fill="#4a7a14"/><g fill="#7cb518"><path d="M20 138 Q22 118 24 138"/><path d="M23 138 Q26 112 29 138"/><path d="M200 132 Q202 114 204 132"/><path d="M203 132 Q206 110 209 132"/></g></svg>`,
+  space:`<svg viewBox="0 0 300 168" preserveAspectRatio="xMidYMid slice"><defs><radialGradient id="spbg" cx="50%" cy="50%" r="70%"><stop offset="0%" stop-color="#1a1a4e"/><stop offset="100%" stop-color="#050520"/></radialGradient></defs><rect width="300" height="168" fill="url(#spbg)"/><g fill="white"><circle cx="15" cy="12" r="1.5"/><circle cx="40" cy="28" r="1"/><circle cx="75" cy="8" r="2"/><circle cx="110" cy="18" r="1.5"/><circle cx="155" cy="5" r="1"/><circle cx="190" cy="22" r="2"/><circle cx="225" cy="10" r="1.5"/><circle cx="265" cy="18" r="1"/><circle cx="285" cy="8" r="2"/><circle cx="30" cy="50" r="1"/><circle cx="95" cy="40" r="1.5"/><circle cx="248" cy="45" r="1.5"/></g><circle cx="72" cy="90" r="38" fill="#e8621a"/><path d="M34 82 Q72 76 110 82" stroke="#c84a08" stroke-width="7" fill="none" opacity=".6"/><ellipse cx="72" cy="90" rx="56" ry="12" fill="none" stroke="#f0a060" stroke-width="5" opacity=".7"/><circle cx="258" cy="48" r="20" fill="#f0e8c8" stroke="#d4c090" stroke-width="1.5"/><circle cx="251" cy="41" r="5" fill="#e0d4aa" opacity=".6"/></svg>`,
+  zootopia:`<svg viewBox="0 0 300 168" preserveAspectRatio="xMidYMid slice"><defs><linearGradient id="zsk" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#87ceeb"/><stop offset="100%" stop-color="#b0e0ff"/></linearGradient></defs><rect width="300" height="168" fill="url(#zsk)"/><rect x="0" y="55" width="40" height="113" fill="#5b8fd4"/><g fill="#ffd166" opacity=".8"><rect x="8" y="58" width="7" height="7" rx="1"/><rect x="20" y="58" width="7" height="7" rx="1"/><rect x="8" y="72" width="7" height="7" rx="1"/><rect x="20" y="72" width="7" height="7" rx="1"/></g><rect x="44" y="35" width="50" height="133" fill="#7d9ec0"/><rect x="48" y="25" width="42" height="16" fill="#6888aa"/><g fill="#fef3c7" opacity=".85"><rect x="50" y="40" width="10" height="10" rx="1"/><rect x="66" y="40" width="10" height="10" rx="1"/><rect x="50" y="57" width="10" height="10" rx="1"/><rect x="66" y="57" width="10" height="10" rx="1"/></g><rect x="105" y="20" width="65" height="148" fill="#9ab8d4"/><polygon points="105,20 137,0 170,20" fill="#7da0bc"/><rect x="128" y="25" width="18" height="18" rx="2" fill="#ffd166" opacity=".9"/><rect x="178" y="45" width="45" height="123" fill="#6888b8"/><rect x="228" y="60" width="38" height="108" fill="#8aaac8"/><rect x="0" y="145" width="300" height="23" fill="#555"/><g fill="#ffd166"><rect x="30" y="150" width="20" height="2" rx="1"/><rect x="80" y="150" width="20" height="2" rx="1"/><rect x="130" y="150" width="20" height="2" rx="1"/><rect x="180" y="150" width="20" height="2" rx="1"/></g><rect x="192" y="112" width="60" height="26" rx="6" fill="#2563eb" stroke="#1e40af" stroke-width="2"/><text x="222" y="130" text-anchor="middle" font-family="sans-serif" font-size="13" font-weight="900" fill="white">ZPD</text></svg>`,
+  stitch:`<svg viewBox="0 0 300 168" preserveAspectRatio="xMidYMid slice"><defs><linearGradient id="ssk" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#0096c7"/><stop offset="60%" stop-color="#48cae4"/><stop offset="100%" stop-color="#90e0ef"/></linearGradient></defs><rect width="300" height="168" fill="url(#ssk)"/><circle cx="255" cy="30" r="18" fill="#ffd166"/><path d="M0 122 Q50 112 100 122 Q150 132 200 122 Q250 112 300 122 L300 168 L0 168 Z" fill="#0077b6"/><rect x="30" y="75" width="8" height="60" rx="3" fill="#8b6343"/><ellipse cx="34" cy="68" rx="28" ry="14" fill="#52b788" transform="rotate(-15 34 68)"/><ellipse cx="34" cy="68" rx="25" ry="12" fill="#74c69d" transform="rotate(10 34 68)"/><rect x="245" y="85" width="7" height="50" rx="3" fill="#8b6343"/><ellipse cx="248" cy="78" rx="24" ry="12" fill="#52b788" transform="rotate(-10 248 78)"/><circle cx="52" cy="110" r="8" fill="#ff6eb4"/><circle cx="52" cy="110" r="4" fill="#ffd166"/><rect x="168" y="58" width="34" height="18" rx="5" fill="#e63946" stroke="#9b1c1c" stroke-width="1.5"/><text x="185" y="71" text-anchor="middle" font-family="sans-serif" font-size="10" font-weight="900" fill="white">626</text></svg>`,
+  roblox:`<svg viewBox="0 0 300 168" preserveAspectRatio="xMidYMid slice"><defs><linearGradient id="rbg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1a1a1a"/><stop offset="100%" stop-color="#2d2d2d"/></linearGradient></defs><rect width="300" height="168" fill="url(#rbg)"/><g opacity=".15" stroke="#fff" stroke-width=".5"><line x1="0" y1="42" x2="300" y2="42"/><line x1="0" y1="84" x2="300" y2="84"/><line x1="0" y1="126" x2="300" y2="126"/><line x1="75" y1="0" x2="75" y2="168"/><line x1="150" y1="0" x2="150" y2="168"/><line x1="225" y1="0" x2="225" y2="168"/></g><rect x="90" y="12" width="120" height="36" rx="6" fill="#ff0000"/><text x="150" y="38" text-anchor="middle" font-family="sans-serif" font-size="22" font-weight="900" fill="white">ROBLOX</text><rect x="8" y="56" width="68" height="58" rx="8" fill="#ff94c2" stroke="#ff5f9e" stroke-width="2"/><text x="42" y="82" text-anchor="middle" font-size="22" fill="white">🐣</text><text x="42" y="100" text-anchor="middle" font-family="sans-serif" font-size="8" font-weight="900" fill="white">Adopt Me!</text><rect x="84" y="56" width="68" height="58" rx="8" fill="#2563eb" stroke="#1d4ed8" stroke-width="2"/><text x="118" y="82" text-anchor="middle" font-size="22" fill="white">⚔️</text><text x="118" y="100" text-anchor="middle" font-family="sans-serif" font-size="8" font-weight="900" fill="white">Blox Fruits</text><rect x="160" y="56" width="68" height="58" rx="8" fill="#16a34a" stroke="#15803d" stroke-width="2"/><text x="194" y="82" text-anchor="middle" font-size="22" fill="white">🏃</text><text x="194" y="100" text-anchor="middle" font-family="sans-serif" font-size="8" font-weight="900" fill="white">Tower Obby</text><rect x="8" y="122" width="284" height="38" rx="8" fill="#111" stroke="#444" stroke-width="1.5"/><text x="150" y="148" text-anchor="middle" font-family="sans-serif" font-size="14" font-weight="900" fill="#00b06f">💎 Robux: Ready</text></svg>`,
+  katseye:`<svg viewBox="0 0 300 168" preserveAspectRatio="xMidYMid slice"><defs><linearGradient id="kbg" x1="0" y1="1" x2="1" y2="0"><stop offset="0%" stop-color="#1a0535"/><stop offset="50%" stop-color="#4a0a80"/><stop offset="100%" stop-color="#2d0070"/></linearGradient><radialGradient id="spG" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="rgba(255,255,255,.18)"/><stop offset="100%" stop-color="rgba(255,255,255,0)"/></radialGradient></defs><rect width="300" height="168" fill="url(#kbg)"/><path d="M60 0 L20 168 L100 168 Z" fill="url(#spG)"/><path d="M150 0 L110 168 L190 168 Z" fill="url(#spG)"/><path d="M240 0 L200 168 L280 168 Z" fill="url(#spG)"/><rect x="0" y="136" width="300" height="32" fill="#0d001a" opacity=".8"/><path d="M50 42 Q150 12 250 42" stroke="#d4a0ff" stroke-width="3" fill="none" opacity=".8"/><text x="150" y="40" text-anchor="middle" font-family="sans-serif" font-size="18" font-weight="900" fill="#e879f9" letter-spacing="4">KATSEYE</text><g><rect x="22" y="90" width="10" height="36" rx="4" fill="#d4a0ff"/><ellipse cx="27" cy="90" rx="6" ry="10" fill="#e879f9"/><rect x="52" y="84" width="10" height="42" rx="4" fill="#c084fc"/><ellipse cx="57" cy="84" rx="6" ry="10" fill="#a855f7"/><rect x="82" y="92" width="10" height="34" rx="4" fill="#e879f9"/><ellipse cx="87" cy="92" rx="6" ry="10" fill="#d946ef"/><rect x="200" y="88" width="10" height="38" rx="4" fill="#d4a0ff"/><ellipse cx="205" cy="88" rx="6" ry="10" fill="#e879f9"/><rect x="228" y="82" width="10" height="44" rx="4" fill="#c084fc"/><ellipse cx="233" cy="82" rx="6" ry="10" fill="#a855f7"/><rect x="258" y="90" width="10" height="36" rx="4" fill="#e879f9"/><ellipse cx="263" cy="92" rx="6" ry="10" fill="#d946ef"/></g><g fill="#2d0060" opacity=".85"><ellipse cx="112" cy="126" rx="7" ry="18"/><rect x="107" y="108" width="10" height="5" rx="5"/><ellipse cx="130" cy="124" rx="7" ry="18"/><rect x="125" y="106" width="10" height="5" rx="5"/><ellipse cx="148" cy="128" rx="7" ry="18"/><rect x="143" y="112" width="10" height="5" rx="5"/><ellipse cx="166" cy="125" rx="7" ry="18"/><rect x="161" y="107" width="10" height="5" rx="5"/><ellipse cx="184" cy="127" rx="7" ry="18"/><rect x="179" y="111" width="10" height="5" rx="5"/></g><g fill="#f0abfc"><text x="130" y="72" font-size="14">✦</text><text x="158" y="64" font-size="10">✧</text><text x="170" y="76" font-size="14">✦</text></g></svg>`
+};
+
+// Character images per world
+const WORLD_CHARS={
+  candy: A.animals.pig,
+  animals: A.animals.giraffe,
+  space: A.rockets[0],
+  zootopia: A.animals.rabbit,
+  stitch: A.animals.penguin,
+  roblox: A.animals.monkey,
+  katseye: A.animals.parrot,
+};
+
+// ═══════════════════════════════════════════════════════
+// PORTALS CONFIG
+// ═══════════════════════════════════════════════════════
+const PORTALS=[
+  {id:'candy',   name:'Candy Land',    desc:'Sweet adding, subtracting, and nouns.',   types:['add','sub','ela_nouns'],       bg:'#1a0535'},
+  {id:'animals', name:'Wild Safari',   desc:'Skip counting, measuring, and describing.',types:['skip','measure','ela_adj'],    bg:'#1a2e0a'},
+  {id:'space',   name:'Space Mission', desc:'Blast off with tens, hundreds, and blocks.',types:['add10','sub10','add100','base10'],bg:'#050520'},
+  {id:'zootopia',name:'Zootopia',      desc:'Money, graphs, and sharp sentences.',      types:['money','graphs','ela_sent'],   bg:'#0a1628'},
+  {id:'stitch',  name:'Lilo & Stitch', desc:'Time, fractions, and synonyms.',           types:['time','fractions','ela_syn'],  bg:'#003344'},
+  {id:'roblox',  name:'Roblox',        desc:'Place value and opposites to level up.',   types:['place','ela_ant'],             bg:'#111'},
+  {id:'katseye', name:'Katseye',       desc:'Charts, verbs, and the big stage.',        types:['graphs','ela_verbs'],          bg:'#1a0535'},
+];
+
+// ═══════════════════════════════════════════════════════
+// ENGINE
+// ═══════════════════════════════════════════════════════
+const SAVE='portal_park_v4';
+let state={coins:0,badges:{},rank:1};
+let current=null,deck=[],qIdx=0,hearts=3,correct=0,locked=false;
+
+function rand(a){return a[Math.floor(Math.random()*a.length)]}
+function sh(a){let b=[...a];for(let i=b.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]]}return b}
+function save(){try{localStorage.setItem(SAVE,JSON.stringify(state))}catch(e){}}
+function load(){try{const d=JSON.parse(localStorage.getItem(SAVE));if(d)state=d}catch(e){}}
+function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');window.scrollTo(0,0)}
+function startGame(){load();buildHub();showScreen('hub')}
+function resetAll(){if(confirm('Reset all Portal Park progress?')){state={coins:0,badges:{},rank:1};save();buildHub()}}
+function goHub(){document.getElementById('modalBadge').classList.add('hidden');document.getElementById('modalOver').classList.add('hidden');buildHub();showScreen('hub')}
+
+// animated coin counter
+function addCoins(amount, fromEl){
+  state.coins+=amount;save();
+  SFX.coins.play();
+  const el=document.createElement('div');
+  el.className='coin-fly';
+  el.textContent='+'+amount+'🪙';
+  el.style.cssText=`left:${window.innerWidth/2-40}px;top:${window.innerHeight/2-60}px`;
+  document.body.appendChild(el);
+  setTimeout(()=>el.remove(),900);
+  updateHud();
+}
+
+function buildHub(){
+  state.rank=1+Math.floor(Object.keys(state.badges).length/2);
+  document.getElementById('rankStat').textContent='⭐ Rank '+state.rank;
+  document.getElementById('coinStat').textContent='🪙 '+state.coins;
+  document.getElementById('badgeStat').textContent='🏅 '+Object.keys(state.badges).length+' / '+PORTALS.length;
+  const grid=document.getElementById('portalGrid');grid.innerHTML='';
+  PORTALS.forEach((p,i)=>{
+    const done=state.badges[p.id];
+    const el=document.createElement('div');
+    el.className='portal'+(done?' done':'');
+    el.innerHTML=`<div class="portal-scene">${SCENES[p.id]}<img class="portal-character" src="${WORLD_CHARS[p.id]}" alt="${p.name}" style="animation-delay:${i*.2}s"/></div>
+    <div class="portal-info">
+      <div class="portal-name">${p.name}</div>
+      <div class="portal-desc">${p.desc}</div>
+      <div class="portal-badge">${done?'🏅 Badge earned':'Tap to enter'}</div>
+    </div>`;
+    el.onclick=()=>{SFX.click.play();launch(p.id)};
+    grid.appendChild(el);
+    gsap.from(el,{y:40,opacity:0,duration:.5,ease:'back.out(1.4)',delay:i*.08});
+  });
+}
+
+function launch(id){
+  current=PORTALS.find(p=>p.id===id);
+  hearts=3;correct=0;qIdx=0;locked=false;
+  deck=sh(current.types.flatMap(t=>makeBank(t))).slice(0,8);
+  document.getElementById('game').style.background=current.bg;
+  document.getElementById('hudChar').src=WORLD_CHARS[id];
+  document.getElementById('worldChar').src=WORLD_CHARS[id];
+  document.getElementById('hudName').textContent=current.name;
+  document.getElementById('modalBadge').classList.add('hidden');
+  document.getElementById('modalOver').classList.add('hidden');
+  showScreen('game');
+  updateHud();renderQ();
+}
+
+function updateHud(){
+  document.getElementById('hudQ').textContent=`Challenge ${qIdx+1} of ${deck.length}`;
+  document.getElementById('hearts').textContent='❤️'.repeat(hearts)+'🤍'.repeat(Math.max(0,3-hearts));
+  document.getElementById('hudCoins').textContent='🪙 '+state.coins;
+  document.getElementById('progFill').style.width=(qIdx/deck.length*100)+'%';
+}
+
+function celebrateChar(){
+  const ch=document.getElementById('worldChar');
+  ch.className='world-char celebrate';
+  gsap.from(ch,{scale:.7,duration:.35,ease:'back.out(2)'});
+  setTimeout(()=>{ch.className='world-char';},600);
+}
+function hurtChar(){
+  const ch=document.getElementById('worldChar');
+  ch.className='world-char hurt';
+  gsap.to(ch,{x:-12,duration:.06,repeat:5,yoyo:true,onComplete:()=>{ch.style.transform='';ch.className='world-char';}});
+}
+
+function onCorrect(btn){
+  SFX.correct.play();
+  correct++;
+  celebrateChar();
+  const gain=5+Math.floor(Math.random()*8);
+  setTimeout(()=>addCoins(gain),300);
+  if(correct===8||correct===6){
+    confetti({particleCount:80,spread:70,origin:{y:.65},colors:['#fbbf24','#a78bfa','#34d399','#f472b6']});
+  }
+  gsap.from(btn,{scale:.8,duration:.25,ease:'back.out(2)'});
+}
+
+function onWrong(btn){
+  SFX.wrong.play();
+  hurtChar();
+  hearts--;
+  updateHud();
+  gsap.to(btn,{x:-8,duration:.05,repeat:5,yoyo:true});
+  if(hearts<=0)setTimeout(showGameOver,1000);
+}
+
+function nextQ(){qIdx++;if(qIdx>=deck.length)endRun();else{locked=false;renderQ()}}
+
+function endRun(){
+  document.getElementById('progFill').style.width='100%';
+  const won=correct>=6;
+  if(won){state.badges[current.id]=true;state.coins+=20;save();SFX.levelup.play();confetti({particleCount:160,spread:90,origin:{y:.5}});}
+  const mb=document.getElementById('modalBadge');
+  document.getElementById('mbChar').src=WORLD_CHARS[current.id];
+  document.getElementById('mbTitle').textContent=won?'Badge Found!':'Run Complete!';
+  document.getElementById('mbText').textContent=won
+    ?`${correct}/8 correct — ${current.name} badge earned! +20 bonus coins!`
+    :`${correct}/8 correct. Need 6 to earn the badge. Try again!`;
+  // star rating
+  const stars=document.getElementById('mbStars');stars.innerHTML='';
+  const numStars=correct>=7?3:correct>=6?2:correct>=4?1:0;
+  for(let i=0;i<3;i++){const img=document.createElement('img');img.src=i<numStars?A.ui.starFull:A.ui.starOutline;img.style.animationDelay=(i*.15)+'s';stars.appendChild(img);}
+  mb.classList.remove('hidden');
+}
+
+function showGameOver(){
+  const mo=document.getElementById('modalOver');
+  document.getElementById('moChar').src=WORLD_CHARS[current.id];
+  mo.classList.remove('hidden');
+}
+function finishRun(){goHub()}
+function restartRun(){launch(current.id)}
+
+// ═══════════════════════════════════════════════════════
+// RENDER DISPATCHER
+// ═══════════════════════════════════════════════════════
+function renderQ(){
+  locked=false;updateHud();
+  const q=deck[qIdx];
+  const area=document.getElementById('gameArea');area.innerHTML='';
+  // world color for game bg
+  document.getElementById('game').style.background=current.bg;
+
+  if(q.type==='tap')       renderTap(q,area);
+  else if(q.type==='drag') renderDrag(q,area);
+  else if(q.type==='pad')  renderPad(q,area);
+  else                     renderMC(q,area);
+}
+
+// ── MC ────────────────────────────────────────────────
+function renderMC(q,area){
+  const qc=document.createElement('div');
+  qc.className='q-card card'+(q.wide?' wide':'');
+  qc.innerHTML=`<div class="q-text">${q.q}</div>`;
+  if(q.visual){const vd=document.createElement('div');vd.className='q-visual'+(q.wide?' wide-visual':'');vd.innerHTML=q.visual;qc.appendChild(vd)}
+  area.appendChild(qc);
+  gsap.from(qc,{y:24,opacity:0,duration:.35,ease:'power2.out'});
+
+  const grid=document.createElement('div');grid.className='ans-grid';
+  const fb=document.createElement('div');fb.className='feedback';
+
+  q.choices.forEach((c,i)=>{
+    const btn=document.createElement('button');btn.className='ans-btn';
+    if(c&&c.svg){btn.innerHTML=`${c.svg}<span>${c.label}</span>`}else{btn.textContent=c}
+    btn.onclick=()=>{
+      if(locked)return;locked=true;
+      grid.querySelectorAll('.ans-btn').forEach(b=>b.disabled=true);
+      if(i===q.ans){
+        btn.classList.add('correct');onCorrect(btn);
+        fb.textContent='Correct!';fb.className='feedback good';
+        setTimeout(nextQ,1100);
+      }else{
+        btn.classList.add('wrong');
+        grid.querySelectorAll('.ans-btn')[q.ans].classList.add('correct');
+        onWrong(btn);
+        fb.textContent='The answer was: '+(q.choices[q.ans].label||q.choices[q.ans]);
+        fb.className='feedback bad';
+        if(hearts>0)setTimeout(nextQ,1600);
+      }
+    };
+    gsap.from(btn,{y:20,opacity:0,duration:.3,ease:'power2.out',delay:.08+i*.06});
+    grid.appendChild(btn);
+  });
+  area.appendChild(grid);area.appendChild(fb);
+}
+
+// ── TAP WORD ──────────────────────────────────────────
+function renderTap(q,area){
+  const qc=document.createElement('div');qc.className='q-card card';
+  qc.innerHTML=`<div class="q-text">${q.q}</div>`;
+  area.appendChild(qc);
+  gsap.from(qc,{y:24,opacity:0,duration:.35,ease:'power2.out'});
+
+  const sentDiv=document.createElement('div');sentDiv.className='sentence-wrap';
+  const fb=document.createElement('div');fb.className='feedback';
+  let tapped=new Set(),correct_count=0;
+
+  q.sentence.forEach((word,wi)=>{
+    const span=document.createElement('button');
+    span.className='tap-word'+(word.match(/^[.,!?]$/)?'  punct':'');
+    span.textContent=word;span.dataset.idx=wi;
+    if(word.match(/^[.,!?]$/)){span.disabled=true;span.style.cursor='default'}
+    else{
+      span.onclick=()=>{
+        if(locked||tapped.has(wi))return;
+        SFX.tap.play();
+        tapped.add(wi);
+        const isTarget=q.targets.includes(wi);
+        if(isTarget){
+          span.classList.add('tapped-good');correct_count++;
+          gsap.from(span,{scale:.8,duration:.2,ease:'back.out(2)'});
+          if(correct_count===q.targets.length){
+            locked=true;
+            SFX.correct.play();celebrateChar();
+            const gain=5+Math.floor(Math.random()*8);
+            setTimeout(()=>addCoins(gain),300);
+            correct++;fb.textContent='All found!';fb.className='feedback good';
+            setTimeout(nextQ,1000);
+          }
+        }else{
+          span.classList.add('tapped-bad');
+          onWrong(span);
+          fb.textContent='Not a target word — try again!';fb.className='feedback bad';
+        }
+      };
+    }
+    sentDiv.appendChild(span);
+  });
+
+  const showMe=document.createElement('button');showMe.className='show-me-btn';showMe.textContent='💡 Show Me';
+  showMe.onclick=()=>{
+    if(locked)return;locked=true;
+    q.sentence.forEach((_,wi)=>{
+      if(q.targets.includes(wi)){
+        sentDiv.querySelectorAll('.tap-word')[wi]&&sentDiv.querySelectorAll('.tap-word')[wi].classList.add('tapped-good');
+      }
+    });
+    hearts=Math.max(0,hearts-1);updateHud();
+    SFX.wrong.play();
+    fb.textContent='Here are the answers!';fb.className='feedback bad';
+    if(hearts<=0)setTimeout(showGameOver,900);
+    else setTimeout(nextQ,1400);
+  };
+
+  area.appendChild(qc);area.appendChild(sentDiv);area.appendChild(showMe);area.appendChild(fb);
+}
+
+// ── DRAG COINS ────────────────────────────────────────
+function renderDrag(q,area){
+  const qc=document.createElement('div');qc.className='q-card card';
+  qc.innerHTML=`<div class="q-text">${q.q}</div>`;
+  area.appendChild(qc);
+
+  const bank=document.createElement('div');bank.className='coin-bank';
+  bank.innerHTML='<div style="font-size:.85rem;font-weight:900;color:rgba(255,255,255,.5);width:100%;text-align:center;margin-bottom:4px">Drag coins below</div>';
+
+  const drop=document.createElement('div');drop.className='drop-zone';
+  drop.textContent='Drop coins here';
+  const total=document.createElement('div');total.className='drop-total';total.textContent='0¢';
+  const checkBtn=document.createElement('button');checkBtn.className='check-btn';checkBtn.textContent='Check ✓';
+
+  let droppedCoins=[],currentTotal=0;
+
+  q.coinOptions.forEach(coin=>{
+    for(let i=0;i<coin.count;i++){
+      const wrapper=document.createElement('div');wrapper.className='draggable-coin';
+      wrapper.innerHTML=coin.svg;wrapper.dataset.value=coin.value;
+      wrapper.draggable=true;
+      wrapper.addEventListener('dragstart',e=>{e.dataTransfer.setData('value',coin.value);e.dataTransfer.setData('svg',coin.svg);wrapper.classList.add('dragging')});
+      wrapper.addEventListener('dragend',()=>wrapper.classList.remove('dragging'));
+      // touch support
+      wrapper.addEventListener('click',()=>{
+        SFX.tap.play();
+        currentTotal+=coin.value;droppedCoins.push(coin.value);
+        const c=document.createElement('div');c.innerHTML=coin.svg;drop.appendChild(c);
+        total.textContent=currentTotal+'¢';
+        if(drop.querySelector('div:first-child')&&drop.querySelector('div:first-child').textContent==='Drop coins here')drop.querySelector('div:first-child').remove();
+      });
+      bank.appendChild(wrapper);
+    }
+  });
+
+  drop.addEventListener('dragover',e=>{e.preventDefault();drop.classList.add('drag-over')});
+  drop.addEventListener('dragleave',()=>drop.classList.remove('drag-over'));
+  drop.addEventListener('drop',e=>{
+    e.preventDefault();drop.classList.remove('drag-over');SFX.tap.play();
+    const val=parseInt(e.dataTransfer.getData('value'));
+    const svg=e.dataTransfer.getData('svg');
+    currentTotal+=val;droppedCoins.push(val);
+    const c=document.createElement('div');c.innerHTML=svg;drop.appendChild(c);
+    total.textContent=currentTotal+'¢';
+  });
+
+  const fb=document.createElement('div');fb.className='feedback';
+  checkBtn.onclick=()=>{
+    if(locked)return;
+    if(currentTotal===q.target){
+      locked=true;checkBtn.classList.add('correct');onCorrect(checkBtn);
+      fb.textContent='Correct! '+q.target+'¢';fb.className='feedback good';
+      setTimeout(nextQ,1100);
+    }else if(currentTotal>q.target){
+      fb.textContent='Too much! The total is '+currentTotal+'¢. Try removing some.';fb.className='feedback bad';
+    }else if(droppedCoins.length>0){
+      fb.textContent='Not enough yet — keep adding!';fb.className='feedback bad';
+    }else{
+      fb.textContent='Drag some coins into the box first!';fb.className='feedback bad';
+    }
+  };
+  // skip/reveal after wrong attempts
+  let attempts=0;
+  checkBtn.addEventListener('click',()=>{attempts++;if(attempts>=3&&currentTotal!==q.target){locked=true;onWrong(checkBtn);fb.textContent='The answer was '+q.target+'¢';fb.className='feedback bad';if(hearts>0)setTimeout(nextQ,1600);}},true);
+
+  area.appendChild(bank);area.appendChild(drop);area.appendChild(total);area.appendChild(checkBtn);area.appendChild(fb);
+}
+
+// ── NUMBER PAD ────────────────────────────────────────
+function renderPad(q,area){
+  const qc=document.createElement('div');qc.className='q-card card'+(q.wide?' wide':'');
+  qc.innerHTML=`<div class="q-text">${q.q}</div>`;
+  if(q.visual){const vd=document.createElement('div');vd.className='q-visual'+(q.wide?' wide-visual':'');vd.innerHTML=q.visual;qc.appendChild(vd)}
+  area.appendChild(qc);
+  gsap.from(qc,{y:24,opacity:0,duration:.35,ease:'power2.out'});
+
+  const wrap=document.createElement('div');wrap.className='numpad-wrap';
+  const disp=document.createElement('div');disp.className='answer-display';disp.textContent='?';
+  let entered='';
+
+  const pad=document.createElement('div');pad.className='numpad';
+  const fb=document.createElement('div');fb.className='feedback';
+
+  function check(){
+    if(locked||!entered)return;locked=true;
+    if(entered===String(q.ans)){
+      disp.style.background='#dcfce7';disp.style.borderColor='var(--green)';
+      onCorrect(disp);fb.textContent='Correct!';fb.className='feedback good';
+      setTimeout(nextQ,1100);
+    }else{
+      disp.style.background='#fee2e2';disp.style.borderColor='var(--red)';
+      onWrong(disp);fb.textContent='The answer was '+q.ans;fb.className='feedback bad';
+      if(hearts>0)setTimeout(()=>{locked=false;disp.style.background='';disp.style.borderColor='';entered='';disp.textContent='?';},1600);
+    }
+  }
+
+  [1,2,3,4,5,6,7,8,9,'⌫','0','✓'].forEach(k=>{
+    const b=document.createElement('button');b.className='npbtn';b.textContent=k;
+    if(k==='⌫')b.classList.add('back');
+    if(k==='✓'){b.classList.add('enter');b.style.gridColumn='span 2'}
+    b.onclick=()=>{
+      SFX.tap.play();
+      if(locked)return;
+      if(k==='⌫'){entered=entered.slice(0,-1)||'';disp.textContent=entered||'?';}
+      else if(k==='✓'){check();}
+      else if(entered.length<5){entered+=k;disp.textContent=entered;}
+    };
+    pad.appendChild(b);
+  });
+
+  wrap.appendChild(disp);wrap.appendChild(pad);
+  area.appendChild(wrap);area.appendChild(fb);
+}
+
+// ═══════════════════════════════════════════════════════
+// MC BUILDER — guaranteed shuffled choices, no duplicates
+// ═══════════════════════════════════════════════════════
+function mc(q,choices,ansIdx,visual='',wide=false,type='mc'){
+  const correct=choices[ansIdx];
+  const deduped=[...new Set(choices.map(String))];
+  if(!deduped.includes(String(correct)))deduped.unshift(String(correct));
+  const shuffled=sh(deduped).slice(0,4);
+  while(shuffled.length<4){
+    const n=Number(correct);
+    const filler=Number.isFinite(n)?String(n+shuffled.length+10):correct+'?';
+    if(!shuffled.includes(filler))shuffled.push(filler);
+  }
+  return{q,choices:shuffled,ans:shuffled.indexOf(String(correct)),visual,wide,type};
+}
+
+function makeBank(t){
+  const m={
+    add:addBank,sub:subBank,add10:add10Bank,sub10:sub10Bank,add100:add100Bank,
+    place:placeBank,skip:skipBank,money:moneyBank,time:timeBank,
+    fractions:fracBank,measure:measureBank,graphs:graphBank,base10:base10Bank,
+    ela_nouns:elaNouns,ela_verbs:elaVerbs,ela_adj:elaAdj,
+    ela_syn:elaSyn,ela_ant:elaAnt,ela_sent:elaSent,
+  };
+  return(m[t]||addBank)();
+}
+
+// ── ADDITION ─────────────────────────────────────────
+function addBank(){
+  const qs=[];
+  for(let a=1;a<=12;a++)for(let b=1;b<=12;b++){
+    const s=a+b;
+    const w=sh([...new Set([s-1,s+1,s-2,s+2].filter(x=>x>0&&x!==s))]).slice(0,3);
+    qs.push(mc(`What is ${a} + ${b}?`,[String(s),...w.map(String)],0));
+  }
+  return sh(qs);
+}
+
+// ── SUBTRACTION ───────────────────────────────────────
+function subBank(){
+  const qs=[];
+  for(let a=2;a<=12;a++)for(let b=1;b<a;b++){
+    const d=a-b;
+    const w=sh([...new Set([d-1,d+1,d-2,d+2].filter(x=>x>=0&&x!==d))]).slice(0,3);
+    qs.push(mc(`What is ${a} − ${b}?`,[String(d),...w.map(String)],0));
+  }
+  return sh(qs);
+}
+
+// ── ADD TENS ──────────────────────────────────────────
+function add10Bank(){
+  const qs=[];
+  [[23,33],[45,55],[67,77],[88,98],[14,24],[56,66],[71,81],[39,49],[52,62],[18,28],[34,44],[76,86]].forEach(([a,b])=>{
+    qs.push(mc(`What is ${a} + 10?`,[String(b),String(a+1),String(a+20),String(b+1)],0));
+    qs.push(mc(`${a} + ___ = ${b}`,['10','1','100','20'],0));
+  });
+  return sh(qs);
+}
+
+// ── SUBTRACT TENS ─────────────────────────────────────
+function sub10Bank(){
+  const qs=[];
+  [[34,24],[52,42],[78,68],[95,85],[61,51],[43,33],[87,77],[26,16],[70,60],[48,38]].forEach(([a,b])=>{
+    qs.push(mc(`What is ${a} − 10?`,[String(b),String(a-1),String(a-20),String(b-1)],0));
+  });
+  return sh(qs);
+}
+
+// ── ADD HUNDREDS ──────────────────────────────────────
+function add100Bank(){
+  const qs=[];
+  [[143,243],[256,356],[382,482],[417,517],[534,634],[261,361],[348,448],[529,629],[173,273],[485,585]].forEach(([a,b])=>{
+    qs.push(mc(`What is ${a} + 100?`,[String(b),String(a+10),String(a+1),String(b+100)],0));
+  });
+  return sh(qs);
+}
+
+// ── PLACE VALUE ───────────────────────────────────────
+function placeBank(){
+  const qs=[];
+  const nums=[123,145,267,318,432,516,624,738,841,952,174,285,396,417,528,639,741,852,963,137,248,359,461,572,683,794,815,926];
+  nums.forEach(n=>{
+    const h=Math.floor(n/100),t=Math.floor((n%100)/10),o=n%10;
+    const vis=`<div style="display:flex;gap:10px;justify-content:center;margin-top:10px">
+      <div style="background:#ffd6e8;border:3px solid #111;border-radius:12px;padding:10px 18px;font-size:1.6rem;font-weight:900;text-align:center">H<br/><span style="font-size:2rem;color:#cc0066">${h}</span></div>
+      <div style="background:#d6e8ff;border:3px solid #111;border-radius:12px;padding:10px 18px;font-size:1.6rem;font-weight:900;text-align:center">T<br/><span style="font-size:2rem;color:#0044cc">${t}</span></div>
+      <div style="background:#d6ffe8;border:3px solid #111;border-radius:12px;padding:10px 18px;font-size:1.6rem;font-weight:900;text-align:center">O<br/><span style="font-size:2rem;color:#008833">${o}</span></div>
+    </div>`;
+    const hChoices=[...new Set([String(h),String(t),String(o),String(h*100)])];
+    while(hChoices.length<4)hChoices.push(String(h*100+hChoices.length));
+    qs.push(mc(`In ${n}, what is the HUNDREDS digit?`,hChoices,hChoices.indexOf(String(h)),vis));
+    qs.push(mc(`${h} hundreds + ${t} tens + ${o} ones = ?`,[String(n),String(n+1),String(n-1),String(n+10)],0));
+    qs.push(mc(`What is the VALUE of the hundreds in ${n}?`,[String(h*100),String(h*10),String(h),String(h*100+10)],0));
+  });
+  return sh(qs);
+}
+
+// ── SKIP COUNTING ─────────────────────────────────────
+function skipBank(){
+  const qs=[];
+  [2,5,10].forEach(by=>{
+    for(let s=by;s<=80;s+=by*3){
+      const ans=s+by*3;
+      qs.push(mc(`${s}, ${s+by}, ${s+by*2}, ___`,[String(ans),String(ans+1),String(ans-1),String(ans+by)],0));
+    }
+    for(let s=by*2;s<=70;s+=by*4){
+      qs.push(mc(`${s}, ___, ${s+by*2}, ${s+by*3}`,[String(s+by),String(s+by+1),String(s+1),String(s+by-1)],0));
+    }
+  });
+  return sh(qs);
+}
+
+// ── MONEY (drag interaction for some, MC for rest) ────
+function moneyBank(){
+  const qs=[];
+  // coin ID - MC with SVG visual
+  [{svg:svgPenny(90),ans:'Penny – 1¢'},{svg:svgNickel(90),ans:'Nickel – 5¢'},{svg:svgDime(80),ans:'Dime – 10¢'},{svg:svgQuarter(90),ans:'Quarter – 25¢'}].forEach(c=>{
+    const opts=sh(['Penny – 1¢','Nickel – 5¢','Dime – 10¢','Quarter – 25¢']);
+    qs.push({q:'What coin is this?',choices:opts,ans:opts.indexOf(c.ans),visual:c.svg,type:'mc'});
+  });
+  // drag coin combos
+  const combos=[
+    {target:30,coinOptions:[{svg:svgQuarter(52),value:25,count:2},{svg:svgNickel(52),value:5,count:3},{svg:svgDime(44),value:10,count:3}]},
+    {target:25,coinOptions:[{svg:svgDime(44),value:10,count:3},{svg:svgNickel(52),value:5,count:5}]},
+    {target:35,coinOptions:[{svg:svgQuarter(52),value:25,count:2},{svg:svgDime(44),value:10,count:3}]},
+    {target:15,coinOptions:[{svg:svgNickel(52),value:5,count:4},{svg:svgDime(44),value:10,count:2}]},
+    {target:40,coinOptions:[{svg:svgQuarter(52),value:25,count:2},{svg:svgDime(44),value:10,count:3},{svg:svgNickel(52),value:5,count:3}]},
+  ];
+  combos.forEach(c=>qs.push({q:`Make exactly ${c.target}¢ by dragging coins!`,type:'drag',target:c.target,coinOptions:c.coinOptions}));
+  // MC change questions
+  [[25,30],[35,40],[40,50],[60,75],[50,55]].forEach(([cost,pay])=>{
+    const change=pay-cost;
+    qs.push(mc(`A snack costs ${cost}¢. You pay ${pay}¢. How much change do you get?`,[change+'¢',(change+5)+'¢',(change-5>0?change-5:change+10)+'¢',(change+10)+'¢'],0));
+  });
+  return sh(qs);
+}
+
+// ── TIME (SVG clock MC) ───────────────────────────────
+function timeBank(){
+  const qs=[];
+  for(let h=1;h<=12;h++){
+    const opts=sh([`${h}:00`,`${h}:30`,`${h}:15`,`${h===12?1:h+1}:00`]);
+    qs.push({q:'What time does this clock show?',visual:svgClock(h,0),choices:opts,ans:opts.indexOf(`${h}:00`),type:'mc'});
+  }
+  [1,2,3,4,5,6,7,8,9].forEach(h=>{
+    const opts=sh([`${h}:30`,`${h}:00`,`${h}:15`,`${h===12?1:h+1}:00`]);
+    qs.push({q:'What time does this clock show?',visual:svgClock(h,30),choices:opts,ans:opts.indexOf(`${h}:30`),type:'mc'});
+  });
+  [2,4,6,8,10].forEach(h=>{
+    const opts=sh([`${h}:15`,`${h}:00`,`${h}:30`,`${h}:45`]);
+    qs.push({q:'What time does this clock show?',visual:svgClock(h,15),choices:opts,ans:opts.indexOf(`${h}:15`),type:'mc'});
+  });
+  qs.push(mc('How many minutes are in one hour?',['60','30','100','24'],0,svgClock(1,0)));
+  qs.push(mc('How many hours are in one day?',['24','12','60','48'],0,svgClock(12,0)));
+  return sh(qs);
+}
+
+// ── FRACTIONS ─────────────────────────────────────────
+function fracBank(){
+  const qs=[];
+  [{s:1,t:2},{s:1,t:4},{s:3,t:4},{s:1,t:3},{s:2,t:3},{s:2,t:4}].forEach(f=>{
+    const opts=sh([`${f.s}/${f.t}`,`${f.t-f.s}/${f.t}`,`${f.s}/${f.t+1}`,`${f.s+1}/${f.t}`]);
+    qs.push({q:'What fraction of the circle is shaded?',choices:opts,ans:opts.indexOf(`${f.s}/${f.t}`),visual:svgFracCircle(f.s,f.t),type:'mc'});
+  });
+  qs.push(...sh([
+    mc('A pizza has 4 equal slices. You eat 1. What fraction?',['1/4','1/2','1/3','4/1'],0,'🍕'),
+    mc('Which is larger — 1/2 or 1/4?',['1/2','1/4','same','can\'t tell'],0),
+    mc('Two equal parts of a whole are called…',['halves','thirds','fourths','fifths'],0),
+    mc('Four equal parts of a whole are called…',['fourths','halves','thirds','sixths'],0),
+    mc('3 out of 4 equal parts = ?',['3/4','1/4','3/3','4/3'],0),
+  ]));
+  return sh(qs);
+}
+
+// ── MEASUREMENT ───────────────────────────────────────
+function measureBank(){
+  const qs=[];
+  [{name:'crayon',len:6,total:12},{name:'pencil',len:7,total:12},{name:'eraser',len:3,total:8},{name:'marker',len:5,total:10},{name:'stick',len:4,total:8},{name:'ribbon',len:9,total:12}].forEach(item=>{
+    const w=sh([item.len-1,item.len+1,item.len+2,item.len-2].filter(x=>x>0&&x!==item.len)).slice(0,3);
+    const opts=sh([`${item.len} inches`,...w.map(x=>`${x} inch${x===1?'':'es'}`)]);
+    qs.push({q:`How long is the ${item.name}?`,choices:opts,ans:opts.indexOf(`${item.len} inches`),wide:true,visual:svgRuler(item.len,item.total,item.name),type:'mc'});
+  });
+  qs.push(...sh([
+    mc('Which unit is best for measuring a pencil?',['inches','miles','yards','kilometers'],0),
+    mc('How many inches are in 1 foot?',['12','6','10','24'],0),
+    mc('How many feet are in 1 yard?',['3','2','4','12'],0),
+    mc('Which is longest?',['1 yard','1 foot','1 inch','1 centimeter'],0),
+    mc('Which tool measures length?',['ruler','thermometer','scale','clock'],0),
+  ]));
+  return sh(qs);
+}
+
+// ── GRAPHS ────────────────────────────────────────────
+function graphBank(){
+  const qs=[];
+  const sets=[
+    {labels:['Dogs','Cats'],values:[7,4]},{labels:['Apples','Bananas'],values:[9,5]},
+    {labels:['Soccer','Basketball'],values:[8,3]},{labels:['Pizza','Tacos'],values:[6,4]},
+    {labels:['Sunny','Rainy'],values:[10,3]},{labels:['Boys','Girls'],values:[12,9]},
+    {labels:['Red','Blue'],values:[5,8]},{labels:['Bikes','Cars'],values:[4,9]},
+  ];
+  const colors=['#3b82f6','#f59e0b','#10b981','#ef4444','#8b5cf6','#ec4899'];
+  sets.forEach((d,di)=>{
+    const [la,lb]=[d.labels[0],d.labels[1]];
+    const [va,vb]=[d.values[0],d.values[1]];
+    const diff=Math.abs(va-vb),total=va+vb,more=va>vb?la:lb;
+    const vis=svgBarChart(d.labels,d.values,[colors[di%colors.length],colors[(di+2)%colors.length]],460,180);
+    // ensure unique choices for diff question
+    const diffChoices=[...new Set([String(diff),String(va),String(vb),String(total)])];
+    while(diffChoices.length<4)diffChoices.push(String(diff+diffChoices.length));
+    qs.push({q:`Look at the graph.\nWhich has MORE?`,choices:sh([more,la===more?lb:la,'Same','Can\'t tell']),wide:true,type:'mc',get ans(){return this.choices.indexOf(more)}});
+    qs.push({q:`Look at the graph.\nHow many more ${la} than ${lb}?`,choices:sh(diffChoices),wide:true,visual:vis,type:'mc',get ans(){return this.choices.indexOf(String(diff))}});
+    qs.push({q:`Look at the graph.\nHow many in all?`,choices:sh([...new Set([String(total),String(diff),String(va),String(vb)])]),wide:true,visual:vis,type:'mc',get ans(){return this.choices.indexOf(String(total))}});
+  });
+  return sh(qs);
+}
+
+// ── BASE-10 BLOCKS ────────────────────────────────────
+function base10Bank(){
+  const qs=[];
+  [[2,3,5],[1,4,7],[3,0,2],[2,5,0],[1,8,3],[4,2,6],[3,6,1],[2,0,8]].forEach(([h,t,o])=>{
+    const n=h*100+t*10+o;
+    const opts=sh([...new Set([String(n),String(n+1),String(n-1),String(n+10)])]).slice(0,4);
+    while(opts.length<4)opts.push(String(n+opts.length));
+    qs.push({q:'What number do the blocks show?',choices:opts,ans:opts.indexOf(String(n)),wide:true,visual:svgBase10(h,t,o),type:'mc'});
+  });
+  return sh(qs);
+}
+
+// ── ELA BANKS ─────────────────────────────────────────
+function elaNouns(){return sh([
+  mc('Which word is a NOUN?',['jump','happy','dog','quickly'],2),
+  mc('Which word is a NOUN?',['run','table','blue','slowly'],1),
+  mc('Which word names a PLACE?',['park','run','cold','loudly'],0),
+  mc('Which word is a NOUN?',['bright','under','teacher','skip'],2),
+  mc("In 'The big cat sat on the mat,' what is the noun?",['big','sat','cat','on'],2),
+  mc('Which is a PROPER noun?',['dog','Monday','river','school'],1),
+  mc('Which word names a THING?',['pencil','jump','happy','quickly'],0),
+  mc("In 'The teacher read a book,' which is a noun?",['read','teacher','The','a'],1),
+  mc('Which is a PLURAL noun (more than one)?',['child','cat','books','run'],2),
+  mc("Which sentence has TWO nouns?",["The dog ran fast.","She jumped high.","The cat chased a bird.","He ran outside."],2),
+  mc("A noun names a person, place, or ___.",["action","thing","color","verb"],1),
+  mc("Which is a POSSESSIVE noun?",["dogs","dog's","the dog","dogged"],1),
+])}
+
+function elaVerbs(){return sh([
+  mc('Which word is a VERB?',['run','happy','table','green'],0),
+  mc('Which word shows ACTION?',['blue','chair','swim','tiny'],2),
+  mc("In 'The dog barked loudly,' what is the verb?",['dog','barked','loudly','the'],1),
+  mc("Which sentence uses the correct verb?",["She don't like it.","She doesn't like it.","She doesn't likes it.","She don't likes it."],1),
+  mc("In 'She sings every morning,' what is the verb?",['She','sings','every','morning'],1),
+  mc("Which is a past-tense verb?",['run','runs','ran','running'],2),
+  mc("Which word is a verb?",['purple','sing','chair','quickly'],1),
+  mc("A verb tells us what something ___ or is.",['looks','does','smells','sounds'],1),
+  mc("'The bird ___ south for winter.' Which verb fits?",['fluffy','flew','nest','warm'],1),
+  mc("In 'We cooked dinner together,' what is the verb?",['We','cooked','dinner','together'],1),
+  mc("Which sentence has a verb?",["The big red apple.","She runs every day.","A happy little dog.","Under the tall tree."],1),
+])}
+
+function elaAdj(){return sh([
+  mc('Which word DESCRIBES a noun?',['tiny','teacher','under','skip'],0),
+  mc("In 'She has a fluffy cat,' what is the adjective?",['She','has','fluffy','cat'],2),
+  mc('Which is an adjective?',['jump','enormous','she','quickly'],1),
+  mc("In 'The cold day made us shiver,' name an adjective.",['day','shiver','cold','made'],2),
+  mc("Adjectives describe ___.",['verbs','nouns','adverbs','sentences'],1),
+  mc("In 'The tiny bird flew away,' which word is the adjective?",['The','tiny','flew','away'],1),
+  mc("Which pair are BOTH adjectives?",['run and jump','hot and cold','fast and slowly','table and chair'],1),
+  mc("An adjective answers 'what kind?' or ___.",['where?','when?','how many?','why?'],2),
+  mc("Which word is an adjective?",['shout','purple','ran','him'],1),
+])}
+
+function elaSyn(){return sh([
+  mc('Which word means almost the same as HAPPY?',['sad','joyful','angry','tired'],1),
+  mc('Which means almost the same as BIG?',['tiny','fast','huge','soft'],2),
+  mc('Which means almost the same as RUN?',['sleep','jog','swim','sit'],1),
+  mc('Which means almost the same as COLD?',['warm','chilly','bright','loud'],1),
+  mc('Which means almost the same as FAST?',['slow','loud','quick','tired'],2),
+  mc('Which means almost the same as TALK?',['listen','run','jump','speak'],3),
+  mc('Which means almost the same as PRETTY?',['ugly','beautiful','boring','loud'],1),
+  mc('Which means almost the same as LITTLE?',['huge','tiny','loud','soft'],1),
+  mc('Which means almost the same as START?',['end','stop','begin','finish'],2),
+  mc('Which means almost the same as GLAD?',['mad','sad','happy','scared'],2),
+  mc('Which means almost the same as YELL?',['whisper','shout','sing','listen'],1),
+  mc('Which means almost the same as SLEEPY?',['awake','tired','fast','loud'],1),
+])}
+
+function elaAnt(){return sh([
+  mc('What is the OPPOSITE of HOT?',['warm','cold','heat','cook'],1),
+  mc('What is the OPPOSITE of HAPPY?',['joyful','glad','sad','excited'],2),
+  mc('What is the OPPOSITE of FAST?',['quick','slow','zoom','speedy'],1),
+  mc('What is the OPPOSITE of TALL?',['big','large','short','huge'],2),
+  mc('What is the OPPOSITE of NIGHT?',['dark','stars','day','moon'],2),
+  mc('What is the OPPOSITE of PUSH?',['shove','carry','lift','pull'],3),
+  mc('What is the OPPOSITE of LOUD?',['noisy','quiet','shout','boom'],1),
+  mc('What is the OPPOSITE of EMPTY?',['hollow','bare','full','open'],2),
+  mc('What is the OPPOSITE of CLEAN?',['fresh','bright','dirty','new'],2),
+  mc('What is the OPPOSITE of OPEN?',['shut','wide','big','jar'],0),
+  mc('What is the OPPOSITE of HARD?',['rough','tough','soft','strong'],2),
+  mc('What is the OPPOSITE of DARK?',['night','shadow','light','dim'],2),
+])}
+
+function elaSent(){return sh([
+  mc("Which sentence is written CORRECTLY?",["i like pizza.","I like pizza.","i Like pizza.","I Like Pizza."],1),
+  mc("Which needs a QUESTION MARK?",["I like dogs.","Where is my bag?","The dog ran.","She has a hat."],1),
+  mc("Which is a COMPLETE sentence?",["The big dog.","Ran to school.","The cat slept on the mat.","Because it rained."],2),
+  mc("Which sentence is CORRECT?",["The dogs is barking.","The dog are barking.","The dogs are barking.","Dogs barking is."],2),
+  mc("Which uses the correct verb?",["She don't like snakes.","She doesn't like snakes.","She doesn't likes.","She don't likes."],1),
+  mc("Which is NOT a complete sentence?",["She jumped high.","A tiny happy bird.","The book fell.","We ate lunch."],1),
+  mc("Which sentence starts correctly?",["the cat sat.","The cat sat.","THE cat sat.","tHE cat sat."],1),
+  mc("Choose the CORRECT sentence.",["We went to Target.","we went to Target.","We went to target.","we went to target."],0),
+  mc("Which uses THEY'RE correctly?",["Their going to the park.","There going.","They're going to the park.","Theyre going."],2),
+  mc("Which is a TELLING sentence?",["Is that your dog?","Watch out!","My dog is fluffy.","Come here!"],2),
+  mc("Which is an ASKING sentence?",["I eat at noon.","Sit down.","Did you see that?","What a great day!"],2),
+])}
+
+// ═══════════════════════════════════════════════════════
+// TITLE SCREEN SETUP
+// ═══════════════════════════════════════════════════════
+function buildTitleStars(){
+  const c=document.getElementById('titleStars');
+  for(let i=0;i<50;i++){
+    const s=document.createElement('div');s.className='title-star';
+    const sz=Math.random()*2+.5;
+    s.style.cssText=`width:${sz}px;height:${sz}px;left:${Math.random()*100}%;top:${Math.random()*100}%;opacity:${Math.random()*.5+.1};animation-delay:${Math.random()*3}s;animation-duration:${Math.random()*2+1.5}s`;
+    c.appendChild(s);
+  }
+}
+
+function buildTitleIcons(){
+  const icons=document.getElementById('titleIcons');
+  const chars=Object.values(WORLD_CHARS);
+  chars.forEach((src,i)=>{
+    const box=document.createElement('div');box.className='title-icon-box';
+    const img=document.createElement('img');img.src=src;img.alt='';
+    box.appendChild(img);icons.appendChild(box);
+  });
+}
+
+// init
+buildTitleStars();
+buildTitleIcons();
+gsap.from('.title-card',{y:40,opacity:0,duration:.7,ease:'back.out(1.4)',delay:.2});
+gsap.from('.title-icon-box',{scale:0,opacity:0,duration:.4,ease:'back.out(2)',stagger:.07,delay:.4});
+</script>
+</body>
+</html>

@@ -1,0 +1,1796 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Word Quest — Mrs. Rogers’ Class</title>
+<style>
+/* ─── RESET & ROOT ──────────────────────────────────────────── */
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --black:#0f0f23;--white:#f8f8f8;--gold:#ffd700;--red:#ff4757;
+  --green:#2ed573;--blue:#1e90ff;--purple:#a29bfe;--orange:#fd9644;
+  --pink:#fd79a8;--teal:#2dd4bf;--yellow:#fdcb6e;--sky:#74b9ff;
+  --body-font:'Nunito',sans-serif;
+  --quest-font:'Bree Serif',serif;
+  --button-font:'Fredoka',sans-serif;
+  --min-readable:22px;
+}
+html{font-size:22px}
+body{font-family:var(--body-font);background:var(--black);color:var(--white);min-height:100vh;overflow-x:hidden;font-size:var(--min-readable);line-height:1.45}
+.screen{display:none;min-height:100vh;flex-direction:column;align-items:center}
+.screen.active{display:flex}
+button{cursor:pointer}
+
+/* ─── ANIMATIONS ────────────────────────────────────────────── */
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-14px)}}
+@keyframes starPop{0%{transform:scale(0) rotate(-180deg);opacity:0}60%{transform:scale(1.5) rotate(15deg)}100%{transform:scale(1) rotate(0);opacity:1}}
+@keyframes twinkle{0%,100%{opacity:.4;transform:scale(1)}50%{opacity:1;transform:scale(1.4)}}
+@keyframes scanline{0%{top:-10%}100%{top:110%}}
+@keyframes glow{0%,100%{box-shadow:4px 4px 0 #000}50%{box-shadow:4px 4px 0 #000,0 0 22px var(--gold)}}
+@keyframes slideUp{0%{transform:translateY(40px);opacity:0}100%{transform:translateY(0);opacity:1}}
+@keyframes rainbowBg{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+@keyframes cardFlip{0%{transform:rotateY(0)}50%{transform:rotateY(90deg)}100%{transform:rotateY(0)}}
+@keyframes pop{0%{transform:scale(.8);opacity:0}100%{transform:scale(1);opacity:1}}
+@keyframes waveAnim{0%,100%{transform:translateY(0)}33%{transform:translateY(-6px)}66%{transform:translateY(4px)}}
+@keyframes march{0%{transform:translateX(0)}100%{transform:translateX(8px)}}
+@keyframes dimple{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
+
+/* ─── PIXEL COMPONENTS ──────────────────────────────────────── */
+.pb{border:4px solid var(--white);box-shadow:4px 4px 0 #000}
+.pb-gold{border:4px solid var(--gold);box-shadow:4px 4px 0 #000,0 0 18px rgba(255,215,0,.3)}
+.pxbtn{
+  font-family:var(--button-font);
+  font-size:clamp(.5rem,1.4vw,.72rem);
+  padding:12px 22px;border:4px solid #000;
+  box-shadow:4px 4px 0 #000;letter-spacing:1px;
+  transition:transform .08s,box-shadow .08s;line-height:1.6;
+}
+.pxbtn:hover{transform:translate(-2px,-2px);box-shadow:6px 6px 0 #000}
+.pxbtn:active{transform:translate(2px,2px);box-shadow:1px 1px 0 #000}
+.hidden{display:none!important}
+
+/* ─── TITLE ─────────────────────────────────────────────────── */
+#title{
+  background:linear-gradient(180deg,#0f0f23 0%,#1a1a4e 40%,#2d1b69 100%);
+  background-image:linear-gradient(180deg,#0f0f23 0%,#1a1a4e 40%,#2d1b69 100%),
+  repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(255,255,255,.02) 39px,rgba(255,255,255,.02) 40px),
+  repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(255,255,255,.02) 39px,rgba(255,255,255,.02) 40px);
+  justify-content:center;align-items:center;text-align:center;
+  padding:2rem 1rem;gap:1.4rem;position:relative;overflow:hidden
+}
+.scan-line{position:absolute;left:0;right:0;height:3px;background:rgba(255,255,255,.04);animation:scanline 7s linear infinite}
+.title-logo{
+  font-size:clamp(2.5rem,9vw,5rem);color:var(--gold);letter-spacing:6px;line-height:1.2;
+  text-shadow:6px 6px 0 #8b6914,0 0 50px rgba(255,215,0,.4);
+  animation:float 3s ease-in-out infinite
+}
+.title-hero{font-size:5rem;animation:bounce 1.8s ease-in-out infinite;filter:drop-shadow(0 6px 12px rgba(255,215,0,.4))}
+.blink-txt{animation:blink 1.2s step-end infinite;font-size:clamp(.5rem,1.4vw,.68rem);letter-spacing:2px}
+
+/* ─── WORLD MAP ─────────────────────────────────────────────── */
+#worldmap{
+  background:linear-gradient(135deg,#0d3b3b,#1a5c3a 30%,#2d4a00 60%,#1a2a5c);
+  padding:1rem;overflow-y:auto;align-items:center
+}
+.map-title{font-size:clamp(.8rem,2.5vw,1.3rem);color:var(--gold);text-shadow:3px 3px 0 #000;text-align:center;padding:1rem 0 .4rem;letter-spacing:3px}
+.map-sub{font-size:clamp(.42rem,1.2vw,.6rem);color:var(--yellow);text-align:center;margin-bottom:1rem;letter-spacing:1px}
+.map-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;max-width:880px;width:100%;padding-bottom:2rem}
+@media(max-width:620px){.map-grid{grid-template-columns:repeat(2,1fr)}}
+.zone-tile{
+  background:#1a1a4e;border:4px solid #333;
+  padding:14px 8px;text-align:center;
+  display:flex;flex-direction:column;align-items:center;gap:6px;
+  box-shadow:4px 4px 0 #000;
+  min-height:115px;justify-content:center;
+  position:relative;transition:transform .1s,box-shadow .1s
+}
+.zone-tile.unlocked{cursor:pointer}
+.zone-tile.unlocked:hover{transform:translate(-2px,-2px);box-shadow:6px 6px 0 #000}
+.zone-tile.locked{opacity:.45;cursor:not-allowed;filter:grayscale(.8)}
+.zone-tile.done{border-color:var(--gold);animation:glow 2.5s ease-in-out infinite}
+.zt-num{position:absolute;top:4px;left:6px;font-size:.38rem;color:rgba(255,255,255,.4)}
+.zt-emo{font-size:2.2rem}
+.zt-name{font-size:clamp(.38rem,.9vw,.5rem);color:var(--white);letter-spacing:.5px;line-height:1.5}
+.zt-star{font-size:.95rem;min-height:1.1rem}
+
+/* ─── HUD ───────────────────────────────────────────────────── */
+.hud{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:8px 14px;background:rgba(0,0,0,.65);
+  border-bottom:4px solid rgba(255,255,255,.12);
+  gap:8px;flex-wrap:wrap;position:sticky;top:0;z-index:100
+}
+.hud-zone{font-size:clamp(.38rem,1.1vw,.58rem);color:var(--gold);letter-spacing:1px;flex:1}
+.hud-q{font-size:clamp(.38rem,1.1vw,.52rem);color:var(--sky)}
+.hud-hp{font-size:1rem;letter-spacing:2px}
+.hud-pts{font-size:clamp(.38rem,1.1vw,.52rem);color:var(--green)}
+.hud-mapbtn{
+  font-family:var(--button-font);font-size:.4rem;
+  background:rgba(255,255,255,.1);border:2px solid rgba(255,255,255,.3);
+  color:#fff;padding:5px 9px;letter-spacing:1px
+}
+
+/* ─── GAME BG ───────────────────────────────────────────────── */
+#game{min-height:100vh;position:relative}
+.gbg{flex:1;display:flex;flex-direction:column;align-items:center;padding:14px;gap:12px;width:100%}
+
+/* ─── PROGRESS BAR ──────────────────────────────────────────── */
+.prog-wrap{width:100%;max-width:700px;background:rgba(255,255,255,.1);border:3px solid rgba(255,255,255,.25);height:16px}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--green),var(--gold));transition:width .4s}
+
+/* ─── QUESTION BOX ──────────────────────────────────────────── */
+.q-box{
+  max-width:700px;width:100%;background:rgba(0,0,0,.72);
+  border:4px solid var(--white);box-shadow:6px 6px 0 #000;
+  padding:20px;text-align:center;
+  font-size:clamp(.62rem,1.8vw,.88rem);line-height:2.1;color:var(--white)
+}
+.q-highlight{color:var(--gold)}
+.q-label{font-size:clamp(.42rem,1.1vw,.55rem);color:var(--purple);letter-spacing:2px;margin-bottom:8px}
+
+/* ─── ANSWER GRID ───────────────────────────────────────────── */
+.ans-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;max-width:700px;width:100%}
+@media(max-width:480px){.ans-grid{grid-template-columns:1fr}}
+.ans-btn{
+  font-family:var(--button-font);
+  font-size:clamp(.52rem,1.5vw,.72rem);
+  padding:14px 12px;background:#1a1a4e;
+  border:4px solid #4a4a8a;color:var(--white);
+  box-shadow:4px 4px 0 #000;text-align:center;
+  line-height:1.7;letter-spacing:1px;transition:all .1s
+}
+.ans-btn:hover:not(:disabled){background:#2a2a7e;border-color:var(--sky);transform:translate(-2px,-2px);box-shadow:6px 6px 0 #000}
+.ans-btn.correct{background:#0d4f1c;border-color:var(--green);color:var(--green);animation:bounce .4s}
+.ans-btn.wrong{background:#4f0d0d;border-color:var(--red);color:var(--red);animation:shake .3s}
+.ans-btn:disabled{cursor:default}
+.feedback{font-size:clamp(.6rem,1.8vw,.9rem);text-align:center;letter-spacing:2px;min-height:1.4rem}
+.feedback.good{color:var(--green)}.feedback.bad{color:var(--red)}
+
+/* ─── SORT GAME ─────────────────────────────────────────────── */
+.sort-wrap{width:100%;max-width:700px;display:flex;flex-direction:column;gap:12px}
+.sort-pool{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;min-height:48px;padding:10px;background:rgba(0,0,0,.3);border:3px solid rgba(255,255,255,.15)}
+.sort-chip{
+  font-family:var(--button-font);font-size:clamp(.48rem,1.3vw,.62rem);
+  background:#2a1a6e;border:3px solid var(--purple);color:var(--white);
+  padding:8px 13px;box-shadow:3px 3px 0 #000;transition:all .1s;letter-spacing:1px;line-height:1.6
+}
+.sort-chip:hover{background:#3a2a8e;transform:translate(-2px,-2px);box-shadow:5px 5px 0 #000}
+.sort-chip.selected{background:var(--gold);color:#000;border-color:#c89600}
+.sort-chip.placed{opacity:.35;cursor:default}
+.sort-bins{display:grid;grid-template-columns:1fr 1fr;gap:10px}@media(max-width:780px){.sort-bins{grid-template-columns:1fr;}}
+.sort-bin{
+  background:rgba(0,0,0,.45);border:4px dashed rgba(255,255,255,.28);
+  min-height:90px;padding:10px;display:flex;flex-direction:column;gap:5px;
+  cursor:pointer;transition:border-color .2s
+}
+.sort-bin:hover{border-color:var(--gold)}
+.bin-label{font-size:clamp(.44rem,1.1vw,.58rem);color:var(--sky);letter-spacing:1px;text-align:center;padding-bottom:6px;border-bottom:2px solid rgba(255,255,255,.18)}
+.bin-chip{font-family:var(--button-font);font-size:clamp(.4rem,1vw,.5rem);background:rgba(255,255,255,.1);border:2px solid rgba(255,255,255,.2);padding:4px 7px;color:var(--white);margin-top:3px}
+.bin-chip.correct-chip{border-color:var(--green);color:var(--green)}
+.bin-chip.wrong-chip{border-color:var(--red);color:var(--red)}
+
+/* ─── MATCH GAME ────────────────────────────────────────────── */
+.match-wrap{width:100%;max-width:700px;display:flex;flex-direction:column;gap:12px}
+.match-instr{font-size:clamp(.44rem,1.1vw,.56rem);color:var(--yellow);text-align:center;letter-spacing:1px;line-height:2}
+.match-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+@media(max-width:500px){.match-grid{grid-template-columns:repeat(2,1fr)}}
+.m-card{
+  font-family:var(--button-font);font-size:clamp(.52rem,1.4vw,.68rem);
+  padding:13px 8px;background:#0d1a3d;border:4px solid #2a3a6e;
+  color:var(--white);text-align:center;box-shadow:4px 4px 0 #000;
+  min-height:58px;display:flex;align-items:center;justify-content:center;
+  line-height:1.6;letter-spacing:1px;transition:all .15s
+}
+.m-card:hover:not(.matched):not(.bad-match){background:#1a2a5e;border-color:var(--sky);transform:translate(-2px,-2px);box-shadow:6px 6px 0 #000}
+.m-card.selected{background:#2a1a6e;border-color:var(--purple);color:var(--purple)}
+.m-card.matched{background:#0d3d1a;border-color:var(--green);color:var(--green);animation:bounce .35s;cursor:default}
+.m-card.bad-match{background:#3d0d0d;border-color:var(--red);animation:shake .3s;cursor:default}
+
+/* ─── SENTENCE FIX ──────────────────────────────────────────── */
+.fix-wrap{width:100%;max-width:700px;display:flex;flex-direction:column;gap:12px;align-items:center}
+.broken-box{
+  font-size:clamp(.68rem,2vw,.95rem);color:var(--red);text-align:center;
+  line-height:2.1;padding:16px;background:rgba(255,0,0,.1);
+  border:3px solid rgba(255,0,0,.35);width:100%;max-width:640px
+}
+.fix-opts{display:flex;flex-direction:column;gap:8px;width:100%;max-width:640px}
+.fix-opt{
+  font-family:var(--button-font);font-size:clamp(.48rem,1.3vw,.65rem);
+  background:#0d1a2d;border:3px solid #2a3a5a;color:var(--sky);
+  padding:12px 15px;box-shadow:3px 3px 0 #000;line-height:1.9;
+  text-align:left;transition:all .1s;letter-spacing:.8px
+}
+.fix-opt:hover:not(:disabled){background:#1a2a4a;border-color:var(--sky);transform:translate(-2px,-2px);box-shadow:5px 5px 0 #000}
+.fix-opt.correct{background:#0d3d1a;border-color:var(--green);color:var(--green)}
+.fix-opt.wrong{background:#3d0d0d;border-color:var(--red);color:var(--red)}
+
+/* ─── HIGHLIGHT TAP GAME ────────────────────────────────────── */
+.tap-wrap{width:100%;max-width:700px;display:flex;flex-direction:column;gap:12px;align-items:center}
+.tap-instr{font-size:clamp(.46rem,1.2vw,.6rem);color:var(--yellow);text-align:center;letter-spacing:1px;line-height:2}
+.tap-sentence{
+  font-size:clamp(.72rem,2vw,1rem);line-height:2.5;text-align:center;
+  padding:16px;background:rgba(0,0,0,.5);border:4px solid rgba(255,255,255,.2);
+  max-width:660px;width:100%
+}
+.tap-word{
+  display:inline-block;padding:2px 5px;cursor:pointer;transition:all .15s;
+  border-radius:0;border:2px solid transparent;margin:0 3px;
+  font-size:inherit;font-family:inherit;background:transparent;color:var(--white)
+}
+.tap-word:hover{background:rgba(255,215,0,.2);border-color:var(--gold)}
+.tap-word.tapped-good{background:rgba(46,213,115,.25);border-color:var(--green);color:var(--green)}
+.tap-word.tapped-bad{background:rgba(255,71,87,.25);border-color:var(--red);color:var(--red);animation:shake .25s}
+.tap-word.should-be{animation:blink .5s step-end 4}
+
+/* ─── ZONE COMPLETE ─────────────────────────────────────────── */
+#zoneOver{
+  position:fixed;inset:0;background:rgba(0,0,0,.88);
+  display:flex;flex-direction:column;align-items:center;
+  justify-content:center;gap:1.5rem;z-index:600;
+  text-align:center;padding:2rem
+}
+.zc-star{font-size:5rem;animation:starPop .7s cubic-bezier(.34,1.56,.64,1)}
+.zc-title{font-size:clamp(1rem,3.5vw,2rem);color:var(--gold);text-shadow:4px 4px 0 #8b6914;letter-spacing:3px}
+.zc-score{font-size:clamp(.55rem,1.5vw,.85rem);color:var(--white);letter-spacing:2px}
+
+/* ─── BG THEMES ─────────────────────────────────────────────── */
+.bg-castle{background:linear-gradient(180deg,#1a1a4e,#2d1b69 40%,#4a2040 70%,#3d1010)}
+.bg-volcano{background:linear-gradient(180deg,#1a0000,#3d0a00 30%,#8b1a00 60%,#cc3300 80%,#ff6600)}
+.bg-village{background:linear-gradient(180deg,#0a2e0a,#1a5c1a 30%,#2d8a2d 60%,#5aaa5a 85%)}
+.bg-dungeon{background:linear-gradient(180deg,#080808,#1a0a2d 40%,#2d0a4a 70%,#180d30)}
+.bg-art{background:linear-gradient(160deg,#1a0535,#2d0d5c 40%,#1a2060 80%,#0d0d2e);}
+.bg-battle{background:linear-gradient(180deg,#3a0000,#6e0000 30%,#aa1a00 55%,#6e3300 75%,#3a1a00)}
+.bg-ocean{background:linear-gradient(180deg,#001833,#003366 30%,#0055aa 60%,#0077cc 80%,#009999)}
+.bg-map{background:linear-gradient(135deg,#2d1b00,#5a3a00 30%,#8b6914 60%,#d4a017 80%,#f5d060)}
+.bg-lab{background:linear-gradient(180deg,#001a1a,#003333 30%,#004d4d 60%,#2d6e6e)}
+.bg-fix{background:linear-gradient(135deg,#1a1a3d,#2d2d6e 50%,#1a3d1a)}
+.bg-garden{background:linear-gradient(180deg,#0d1f0d,#1a4d1a 30%,#2d802d 60%,#4aad4a 80%)}
+.bg-shadow{background:linear-gradient(135deg,#000,#0d0d0d 30%,#1a0d00 60%,#0d0d1a)}
+
+/* ─── CHAIN MATCH (synonyms/antonyms) ───────────────────────── */
+.chain-wrap{width:100%;max-width:700px;display:flex;flex-direction:column;gap:12px;align-items:center}
+.chain-q{
+  font-size:clamp(.7rem,2vw,.95rem);color:var(--gold);text-align:center;
+  line-height:2;padding:16px;background:rgba(0,0,0,.5);border:3px solid var(--gold);width:100%;max-width:660px
+}
+.chain-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;width:100%;max-width:660px}
+
+/* ─── WORD BANK FILL ────────────────────────────────────────── */
+.fill-wrap{width:100%;max-width:700px;display:flex;flex-direction:column;gap:12px;align-items:center}
+.fill-sent{
+  font-size:clamp(.7rem,2vw,1rem);line-height:2.4;text-align:center;
+  padding:18px;background:rgba(0,0,0,.55);border:4px solid rgba(255,255,255,.25);
+  max-width:660px;width:100%
+}
+.blank{
+  display:inline-block;min-width:90px;border-bottom:4px solid var(--gold);
+  background:rgba(255,215,0,.1);color:var(--gold);padding:0 6px;text-align:center
+}
+.word-bank{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;max-width:660px}
+.wb-chip{
+  font-family:var(--button-font);font-size:clamp(.48rem,1.2vw,.62rem);
+  background:#1a0d3d;border:3px solid #4a3a8e;color:var(--purple);
+  padding:8px 12px;box-shadow:3px 3px 0 #000;transition:all .1s;letter-spacing:1px
+}
+.wb-chip:hover:not(.wb-used){background:#2a1a5e;border-color:var(--purple);transform:translate(-2px,-2px)}
+.wb-chip.wb-used{opacity:.3;cursor:not-allowed}
+
+/* ─── SCROLL FIX ────────────────────────────────────────────── */
+#game.active,.gbg{min-height:0}
+#game.active{overflow-y:auto}
+
+/* ─── ZONE COLOR ACCENTS ──────────────────────────────────── */
+.bg-castle .q-box{border-color:#a29bfe}
+.bg-castle .ans-btn{border-color:#4a3a8a}
+.bg-volcano .q-box{border-color:#ff6600}
+.bg-volcano .ans-btn{border-color:#8b1a00}
+.bg-village .q-box{border-color:#55efc4}
+.bg-village .ans-btn{border-color:#2d8a2d}
+.bg-dungeon .q-box{border-color:#a29bfe;background:rgba(0,0,0,.85)}
+.bg-art .q-box{border-color:#a29bfe;}
+.bg-battle .q-box{border-color:#ff4757}
+.bg-battle .ans-btn{border-color:#8b0000}
+.bg-ocean .q-box{border-color:#74b9ff}
+.bg-ocean .ans-btn{border-color:#003366}
+.bg-map .q-box{border-color:#d4a017;background:rgba(20,14,0,.8)}
+.bg-map .q-box,.bg-map .q-label{color:#f5d060}
+.bg-lab .q-box{border-color:#2dd4bf}
+.bg-fix .q-box{border-color:#74b9ff}
+.bg-garden .q-box{border-color:#55efc4}
+.bg-garden .ans-btn{border-color:#2d802d}
+.bg-shadow .q-box{border-color:rgba(255,255,255,.2);background:rgba(0,0,0,.95)}
+
+/* ─── FLOATING ZONE DECO ──────────────────────────────────── */
+.zone-deco{position:absolute;font-size:2.8rem;opacity:.1;pointer-events:none;animation:float 4s ease-in-out infinite;z-index:0}
+.gbg>*{position:relative;z-index:1}
+
+/* ─── MATCH SECTION DIVIDER ───────────────────────────────── */
+.match-divider{width:100%;max-width:700px;height:2px;background:rgba(255,255,255,.15);margin:4px 0}
+
+/* ─── PIXEL ART HEART ─────────────────────────────────────── */
+.hud-hp{letter-spacing:3px;font-size:1.1rem}
+
+/* ─── SCROLLABLE GAME ─────────────────────────────────────── */
+#game.active{overflow-y:auto;overflow-x:hidden}
+.gbg{padding-bottom:60px}
+
+/* ─── WORD HIGHLIGHT IN TAP ───────────────────────────────── */
+.tap-sentence{font-size:clamp(.78rem,2.2vw,1.05rem)}
+
+/* ─── MAP DECO PATHS ──────────────────────────────────────── */
+.map-path{
+  grid-column: span 1;
+  display:flex;align-items:center;justify-content:center;
+  color:rgba(255,255,255,.25);font-size:1.5rem;
+  background:none;border:none;pointer-events:none
+}
+
+/* ─── ZONE EMOJI BOUNCE ON MAP ────────────────────────────── */
+.zone-tile.unlocked .zt-emo{animation:dimple 2s ease-in-out infinite}
+@keyframes dimple{0%,100%{transform:scale(1)}50%{transform:scale(1.1)}}
+.zone-tile.done .zt-emo{animation:bounce 1.5s ease-in-out infinite}
+
+/* ─── SPECIAL ART ZONE TITLE SCREEN ──────────────────────── */
+.bg-art .q-label{color:#c4b0ff;}
+
+/* ─── ZONE COMPLETE CELEBRATION ──────────────────────────── */
+#zoneOver{background:radial-gradient(ellipse at center,#1a1a4e 0%,#0f0f23 100%)}
+#zoneOver::before{
+  content:'⭐ ✨ 🌟 ⭐ ✨ 🌟 ⭐ ✨ 🌟';
+  display:block;text-align:center;font-size:1.5rem;opacity:.3;
+  letter-spacing:8px;margin-bottom:.5rem
+}
+
+/* ─── ANSWER SHIMMER ON CORRECT ───────────────────────────── */
+.ans-btn.correct{
+  background:linear-gradient(135deg,#0d4f1c,#1a7a2e);
+  box-shadow:4px 4px 0 #000,0 0 15px rgba(46,213,115,.4)
+}
+
+
+/* ─── GAME OVER ────────────────────────────────────────────── */
+#gameOver {
+  position:fixed;inset:0;
+  background:radial-gradient(ellipse at center, #1a0000 0%, #000 100%);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:1.4rem;z-index:700;text-align:center;padding:2rem;
+}
+#gameOver::before {
+  content:'💀 💀 💀';
+  font-size:2rem;letter-spacing:12px;opacity:0.3;display:block;margin-bottom:.5rem;
+}
+.go-skull {
+  font-size:5rem;
+  animation:shake .5s ease-in-out 3;
+  filter:drop-shadow(0 0 20px rgba(255,50,50,.6));
+}
+.go-title {
+  font-size:clamp(1.2rem,4vw,2.2rem);
+  color:var(--red);
+  text-shadow:4px 4px 0 #8b0000, 0 0 30px rgba(255,50,50,.5);
+  letter-spacing:3px;
+  animation:blink .8s step-end 4;
+}
+.go-sub {
+  font-size:clamp(.48rem,1.3vw,.68rem);
+  color:rgba(255,255,255,.6);
+  letter-spacing:2px;
+  line-height:2.2;
+}
+.go-zone {
+  font-size:clamp(.52rem,1.4vw,.7rem);
+  color:var(--yellow);
+  letter-spacing:1px;
+}
+@keyframes goFlash {
+  0%{background:rgba(255,0,0,.4)} 100%{background:transparent}
+}
+.game-flash {
+  position:fixed;inset:0;pointer-events:none;z-index:800;
+  background:rgba(255,0,0,.5);
+  animation:goFlash .35s ease-out forwards;
+}
+
+
+/* ─── LIFE LOST FLASH ──────────────────────────────────────── */
+@keyframes lifeLost {
+  0%{transform:scale(1.5);color:var(--red)}
+  50%{transform:scale(1.2)}
+  100%{transform:scale(1)}
+}
+.hud-hp.lost {
+  animation:lifeLost .4s ease-out;
+}
+
+
+
+/* ─── READABLE RPG REBUILD OVERRIDES ─────────────────────────
+   Baseline rule: no functional text below 22px for 2nd graders.
+   Decorative headings can be bigger; tiny UI is intentionally removed.
+────────────────────────────────────────────────────────────── */
+body, button, input, select, textarea { font-family:var(--body-font) !important; }
+.title-logo, .map-title, .zc-title, .go-title, .pcbox-title, .quest-heading { font-family:var(--quest-font) !important; }
+.pxbtn, .ans-btn, .sort-chip, .m-card, .fix-opt, .wb-chip, .hud-mapbtn, .zone-tile, .tap-word { font-family:var(--button-font) !important; }
+
+.screen { font-size:1rem; }
+.pxbtn,
+.ans-btn,
+.sort-chip,
+.m-card,
+.fix-opt,
+.wb-chip,
+.tap-word,
+.hud-mapbtn {
+  font-size:clamp(1rem,2.4vw,1.35rem) !important;
+  line-height:1.35 !important;
+  letter-spacing:.5px !important;
+}
+
+.hud{
+  display:grid !important;
+  grid-template-columns:1fr 1fr 1fr !important;
+  align-items:center !important;
+  gap:10px !important;
+  padding:14px 16px !important;
+  background:rgba(0,0,0,.82) !important;
+}
+.hud-hero,.hud-zone,.hud-q,.hud-hp,.hud-pts,.hud-coins,.hud-mapbtn{
+  font-size:clamp(1rem,2.3vw,1.35rem) !important;
+  line-height:1.25 !important;
+  letter-spacing:.5px !important;
+  color:var(--white);
+  text-align:center;
+  font-weight:900;
+}
+.hud-zone{color:var(--gold) !important; grid-column:span 2; text-align:left !important;}
+.hud-hp{font-size:clamp(1.2rem,3vw,1.6rem) !important;}
+.hud-mapbtn{padding:10px 14px !important;border:3px solid rgba(255,255,255,.35) !important;}
+
+.map-title{font-size:clamp(2rem,5vw,3rem) !important;letter-spacing:2px !important;}
+.map-sub{font-size:clamp(1.1rem,2.5vw,1.5rem) !important;line-height:1.4 !important;color:var(--yellow) !important;}
+.map-grid{grid-template-columns:repeat(2,1fr) !important;gap:18px !important;max-width:1000px !important;}
+.zone-tile{min-height:180px !important;padding:22px 14px !important;gap:12px !important;}
+.zt-num{font-size:1rem !important;}
+.zt-emo{font-size:4rem !important;}
+.zt-name{font-size:clamp(1.15rem,2.4vw,1.5rem) !important;line-height:1.25 !important;}
+.zt-star{font-size:1.7rem !important;}
+
+.gbg{gap:18px !important;padding:18px !important;padding-bottom:90px !important;}
+#gameArea{max-width:920px !important;gap:18px !important;}
+.prog-wrap{max-width:920px !important;height:24px !important;border-width:4px !important;}
+.q-box,
+.broken-box,
+.tap-sentence,
+.fill-sent,
+.chain-q{
+  max-width:920px !important;
+  font-size:clamp(1.25rem,2.8vw,1.8rem) !important;
+  line-height:1.55 !important;
+  padding:26px !important;
+}
+.q-label,
+.tap-instr,
+.match-instr,
+.bin-label{
+  font-size:clamp(1rem,2vw,1.3rem) !important;
+  line-height:1.35 !important;
+  letter-spacing:.5px !important;
+}
+.ans-grid,.fix-opts,.word-bank,.match-wrap,.sort-wrap,.tap-wrap,.fill-wrap{max-width:920px !important;}
+.ans-grid{gap:16px !important;}
+.ans-btn{padding:22px 18px !important;min-height:92px !important;}
+.feedback{font-size:clamp(1.15rem,2.5vw,1.6rem) !important;line-height:1.4 !important;min-height:2rem !important;}
+
+.sort-pool{gap:14px !important;min-height:80px !important;padding:16px !important;}
+.sort-chip{padding:14px 18px !important;}
+.sort-bins{gap:16px !important;}
+.sort-bin{min-height:150px !important;padding:16px !important;}
+.bin-chip{font-size:1rem !important;padding:10px 12px !important;line-height:1.3 !important;}
+.match-grid{gap:14px !important;}
+.m-card{min-height:96px !important;padding:20px 14px !important;}
+.fix-opt{padding:20px 18px !important;text-align:left !important;}
+.tap-word{padding:8px 10px !important;margin:4px !important;border-width:3px !important;}
+.blank{min-width:130px !important;}
+
+.zc-score,.go-sub,.go-zone,#zcSubMsg,.blink-txt{
+  font-size:clamp(1rem,2.5vw,1.35rem) !important;
+  line-height:1.5 !important;
+}
+.go-title,.zc-title{font-size:clamp(2rem,5vw,3rem) !important;}
+
+.quest-banner{
+  width:100%;max-width:920px;
+  background:rgba(0,0,0,.62);
+  border:4px solid var(--gold);
+  box-shadow:5px 5px 0 #000;
+  padding:18px 22px;
+  text-align:center;
+}
+.enemy-line{
+  font-family:var(--quest-font) !important;
+  color:var(--gold);
+  font-size:clamp(1.35rem,3vw,2rem);
+  line-height:1.2;
+}
+.quest-instruction{
+  margin-top:8px;
+  color:rgba(255,255,255,.92);
+  font-size:clamp(1.05rem,2.2vw,1.35rem);
+  line-height:1.35;
+  font-weight:900;
+}
+.treasure-pop,.enemy-hit-pop{
+  position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);
+  z-index:9999;text-align:center;
+  border:5px solid #000;box-shadow:7px 7px 0 #000;
+  border-radius:18px;padding:24px 34px;
+  font-family:var(--button-font) !important;
+  animation:pop .2s ease-out;
+}
+.treasure-pop{background:linear-gradient(135deg,#fff4b0,#ffd700);color:#1a1a1a;}
+.enemy-hit-pop{background:#3d0d0d;color:#fff;border-color:var(--red);font-size:clamp(1.1rem,3vw,1.6rem);}
+.treasure-icon{font-size:3rem}.treasure-title{font-size:clamp(1.4rem,3vw,2rem);font-weight:900}.treasure-item{font-size:clamp(1.05rem,2.4vw,1.4rem);margin-top:6px}.treasure-reward{font-size:clamp(1.1rem,2.5vw,1.5rem);color:#5a3a00;margin-top:6px;font-weight:900}
+
+@media(max-width:700px){
+  .hud{grid-template-columns:1fr 1fr !important;}
+  .hud-zone{grid-column:span 2;text-align:center !important;}
+  .map-grid{grid-template-columns:1fr !important;}
+  .ans-grid,.sort-bins,.chain-grid{grid-template-columns:1fr !important;}
+}
+
+
+/* Offline Chromebook readability overrides */
+html{font-size:22px}
+body{font-size:22px}
+p, div, span, label, main, section{font-size:inherit}
+.battle-question,.q-text,.q-box,.tap-sentence,.broken-box,.fill-sent,.chain-q,.card-desc,.hero-line{font-size:clamp(1.1rem,2.8vw,1.5rem)}
+.battle-btn,.ans-btn,.btn,.play-btn,.tap-word,.sort-chip,.m-card,.fix-opt,.wb-chip,.pxbtn{font-size:clamp(1.1rem,3vw,1.6rem)}
+svg{max-width:100%;height:auto}
+
+.tap-sentence{font-size:clamp(1.35rem,3.6vw,2.1rem)!important;line-height:1.7!important;background:rgba(0,0,0,.82)!important}
+.tap-word{font-size:clamp(1.25rem,3.4vw,1.9rem)!important;min-height:64px!important;margin:5px!important;border-radius:14px!important;border:3px solid var(--sky)!important;background:#102a4d!important;color:#fff!important}
+.sort-bins{grid-template-columns:1fr!important}
+.bg-art::before{content:"";position:absolute;inset:0;background:rgba(0,0,0,.42);pointer-events:none;z-index:0}.bg-art>*{position:relative;z-index:1}
+.fix-opt{font-size:clamp(1.1rem,2.8vw,1.45rem)!important;line-height:1.45!important}
+</style>
+
+<!-- Shared offline arcade polish layer -->
+  <link rel="stylesheet" crossorigin href="/mrsrshb/assets/arcade-hY7JvN-a.css">
+</head>
+<body>
+
+<!-- TITLE -->
+<div id="title" class="screen active">
+  <div class="scan-line"></div>
+  <div style="display:flex;gap:6px;justify-content:center;margin-top:1rem;font-size:1.4rem">
+    <span style="animation:twinkle 2s ease-in-out infinite">⭐</span>
+    <span style="animation:twinkle 2s ease-in-out infinite .3s">✨</span>
+    <span style="animation:twinkle 2s ease-in-out infinite .6s">⭐</span>
+  </div>
+  <div class="title-logo" style="margin-top:.5rem">WORD<br>QUEST</div>
+  <div style="font-size:clamp(.44rem,1.3vw,.62rem);color:var(--purple);letter-spacing:4px;margin-top:-.3rem">AN ELA ADVENTURE</div>
+  <div class="title-hero">🧙</div>
+  <div style="font-size:clamp(.44rem,1.3vw,.6rem);color:rgba(255,255,255,.5);letter-spacing:1px;text-align:center;max-width:400px;line-height:2.2">COLLECT ALL 12 STARS<br>TO SAVE WORD KINGDOM!</div>
+  <button class="pxbtn" style="background:var(--gold);color:#000;font-size:clamp(.58rem,1.8vw,.78rem);margin-top:.5rem" onclick="startGame()">▶ START QUEST</button>
+  <div class="blink-txt" style="color:var(--white);margin-top:.3rem">PRESS START!</div>
+  <div style="font-size:.38rem;color:rgba(255,255,255,.25);letter-spacing:1px;margin-top:.5rem">© WORD QUEST 2025 — GRADE 2 ELA</div>
+</div>
+
+<!-- WORLD MAP -->
+<div id="worldmap" class="screen">
+  <div class="map-title">🗺️ WORD KINGDOM MAP</div>
+  <div class="map-sub" id="mapSub">STARS: 0 / 12 — CHOOSE YOUR NEXT ZONE!</div>
+  <div class="map-grid" id="mapGrid"></div>
+</div>
+
+<!-- GAME -->
+<div id="game" class="screen">
+  <div class="hud">
+    <div class="hud-hero">🧙 LVL <span id="hudLevel">1</span></div>
+    <div class="hud-zone" id="hudZone">ZONE 1</div>
+    <div class="hud-q" id="hudQ">Q: 1/8</div>
+    <div class="hud-hp" id="hudHP">❤️❤️❤️</div>
+    <div class="hud-pts" id="hudPts">⭐ 0</div>
+    <div class="hud-coins" id="hudCoins">🪙 0</div>
+    
+  </div>
+  <div class="gbg" id="gbg">
+    <div class="prog-wrap"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
+    <div id="gameArea" style="width:100%;max-width:700px;display:flex;flex-direction:column;align-items:center;gap:12px"></div>
+  </div>
+</div>
+
+
+<!-- GAME OVER -->
+<div id="gameOver" class="hidden">
+  <div class="go-skull" id="goSkull">💀</div>
+  <div class="go-title">GAME OVER!</div>
+  <div class="go-zone" id="goZoneName">ZONE 1</div>
+  <div class="go-sub">YOU RAN OUT OF LIVES!<br>TIME TO TRY AGAIN!</div>
+  <button class="pxbtn" style="background:var(--red);color:#fff;font-size:clamp(.55rem,1.5vw,.72rem)" onclick="restartZone()">▶ TRY AGAIN!</button>
+  <button class="pxbtn" style="background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.3);color:#fff;font-size:clamp(.45rem,1.2vw,.58rem)" onclick="gameOverToMap()">MAP ▶</button>
+</div>
+
+<!-- ZONE COMPLETE -->
+<div id="zoneOver" class="hidden">
+  <div class="zc-star" id="zcStar">⭐</div>
+  <div class="zc-title" id="zcTitle">ZONE CLEAR!</div>
+  <div class="zc-score" id="zcScore">YOU GOT 8/8!</div>
+  <div id="zcSubMsg" style="font-size:clamp(.38rem,1vw,.52rem);color:rgba(255,255,255,.5);letter-spacing:1px;text-align:center">A NEW STAR HAS BEEN ADDED TO YOUR MAP!</div>
+  <button class="pxbtn" style="background:var(--gold);color:#000" onclick="afterZone()">BACK TO MAP ▶</button>
+  <button class="pxbtn" style="background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.3);color:#fff;font-size:clamp(.42rem,1.1vw,.58rem)" onclick="retryFromComplete()">↺ TRY AGAIN</button>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// ZONE DATA — 12 zones, 8 questions each
+// ═══════════════════════════════════════════════════════════════
+const ZONES = [
+// ── ZONE 1: NOUNS (tap the noun) ────────────────────────────
+{
+  id:1, name:"NOUN\nCASTLE", emoji:"🏰", bg:"bg-castle",
+  type:"tap",
+  intro:"TAP every NOUN in each sentence!",
+  label:"TAP ALL THE NOUNS",
+  qs:[
+    {sentence:["The","dog","ran","to","the","park","."], targets:[1,5]},
+    {sentence:["My","sister","has","a","book","and","a","cat","."], targets:[1,4,7]},
+    {sentence:["The","teacher","wrote","on","the","board","."], targets:[1,5]},
+    {sentence:["A","bird","sat","on","the","fence","."], targets:[1,5]},
+    {sentence:["The","boy","dropped","his","pencil","on","the","floor","."], targets:[1,4,7]},
+    {sentence:["Her","grandmother","baked","a","cake","for","the","party","."], targets:[1,4,7]},
+    {sentence:["The","frog","jumped","over","the","rock","."], targets:[1,5]},
+    {sentence:["My","friend","has","a","dog","and","a","fish","."], targets:[1,4,7]},
+  ]
+},
+// ── ZONE 2: PROPER NOUNS (sort proper vs common) ─────────────
+{
+  id:2, name:"PROPER NOUN\nVOLCANO", emoji:"🌋", bg:"bg-volcano",
+  type:"sort",
+  intro:"SORT the words! Which are PROPER NOUNS?",
+  binLabels:["PROPER NOUN\n(special name!)","COMMON NOUN\n(any person/place/thing)"],
+  qs:[
+    {chips:["Monday","day","Amazon","river","Spain","country"],
+     bins:[[0,2,4],[1,3,5]]},
+    {chips:["Fido","dog","Disney","movie","Texas","state"],
+     bins:[[0,2,4],[1,3,5]]},
+    {chips:["pizza","Domino's","July","month","Rover","pet"],
+     bins:[[1,2,4],[0,3,5]]},
+    {chips:["Christmas","holiday","Nike","brand","Paris","city"],
+     bins:[[0,2,4],[1,3,5]]},
+    {chips:["teacher","Ms. Smith","ocean","Pacific","sandwich","Subway"],
+     bins:[[1,3,5],[0,2,4]]},
+    {chips:["Jupiter","planet","Simba","cat","Apple","phone"],
+     bins:[[0,2,4],[1,3,5]]},
+    {chips:["school","Lincoln School","store","Target","holiday","Thanksgiving"],
+     bins:[[1,3,5],[0,2,4]]},
+    {chips:["girl","Sofia","city","Chicago","team","Lakers"],
+     bins:[[1,3,5],[0,2,4]]},
+  ]
+},
+// ── ZONE 3: COMMON NOUNS (pick the common noun from 4) ───────
+{
+  id:3, name:"COMMON NOUN\nVILLAGE", emoji:"🏡", bg:"bg-village",
+  type:"mc",
+  intro:"PICK the COMMON NOUN — a general name for any person, place, or thing!",
+  qs:[
+    {q:"Which word is a COMMON noun?", choices:["London","Emma","city","Tuesday"], answer:2},
+    {q:"Which word is a COMMON noun?", choices:["Nemo","fish","Dory","Netflix"], answer:1},
+    {q:"Pick the common noun!", choices:["Google","Amazon","store","Nike"], answer:2},
+    {q:"Which is a common noun?", choices:["March","Friday","month","Easter"], answer:2},
+    {q:"Pick the common noun!", choices:["Fluffy","cat","Whiskers","Persian"], answer:1},
+    {q:"Which word is a common noun?", choices:["Mrs. Brown","teacher","Sarah","Emma"], answer:1},
+    {q:"Pick the common noun!", choices:["Hawaii","island","Maui","Oahu"], answer:1},
+    {q:"Which is a common noun?", choices:["Batman","Superman","hero","Spiderman"], answer:2},
+  ]
+},
+// ── ZONE 4: POSSESSIVE NOUNS (fix it) ────────────────────────
+{
+  id:4, name:"POSSESSIVE\nDUNGEON", emoji:"💎", bg:"bg-dungeon",
+  type:"fix",
+  intro:"Find the CORRECT possessive noun!",
+  qs:[
+    {broken:"The ___ ball is red. (dog)",
+     opts:["The dogs ball is red.","The dog's ball is red.","The dogs' ball is red.","The dog ball is red."],
+     answer:1},
+    {broken:"___ backpack is blue. (Sara)",
+     opts:["Saras backpack is blue.","Sara backpack is blue.","Sara's backpack is blue.","Saras' backpack is blue."],
+     answer:2},
+    {broken:"I found the ___ toy. (cat)",
+     opts:["I found the cat's toy.","I found the cats toy.","I found the cats' toy.","I found the cat toy."],
+     answer:0},
+    {broken:"The ___ wings are bright. (butterfly)",
+     opts:["The butterflys wings are bright.","The butterfly's wings are bright.","The butterflies wings are bright.","The butterfly wings are bright."],
+     answer:1},
+    {broken:"We sat in ___ car. (Mom)",
+     opts:["We sat in Mom car.","We sat in Moms car.","We sat in Mom's car.","We sat in Moms' car."],
+     answer:2},
+    {broken:"The ___ hat blew away. (teacher)",
+     opts:["The teachers hat blew away.","The teacher hat blew away.","The teacher's hat blew away.","The teachers' hat blew away."],
+     answer:2},
+    {broken:"I love my ___ face. (brother)",
+     opts:["I love my brothers face.","I love my brother's face.","I love my brother face.","I love my brothers' face."],
+     answer:1},
+    {broken:"She found the ___ collar. (puppy)",
+     opts:["She found the puppys collar.","She found the puppy collar.","She found the puppy's collar.","She found the puppies collar."],
+     answer:2},
+  ]
+},
+// ── ZONE 5: ADJECTIVES (choose the adjective) ────────────────
+{
+  id:5, name:"ADJECTIVE\nART STUDIO", emoji:"🎨", bg:"bg-art",
+  type:"mc",
+  intro:"ADJECTIVES describe nouns! Pick the adjective in each sentence!",
+  qs:[
+    {q:"The BIG, RED apple fell from the tree.", choices:["apple","fell","big","tree"], answer:2},
+    {q:"She wore a SPARKLY dress to the party.", choices:["wore","dress","party","sparkly"], answer:3},
+    {q:"The TINY frog sat on a leaf.", choices:["tiny","frog","sat","leaf"], answer:0},
+    {q:"He had a LOUD, SCARY dog.", choices:["had","dog","loud","ran"], answer:2},
+    {q:"The princess lived in a TALL tower.", choices:["princess","lived","tall","tower"], answer:2},
+    {q:"We found a SHINY rock by the river.", choices:["found","shiny","rock","river"], answer:1},
+    {q:"My FLUFFY cat sleeps all day.", choices:["fluffy","cat","sleeps","day"], answer:0},
+    {q:"She ate the COLD, SWEET ice cream.", choices:["ate","cold","ice cream","fast"], answer:1},
+  ]
+},
+// ── ZONE 6: VERBS (tap all verbs) ────────────────────────────
+{
+  id:6, name:"VERB\nBATTLEFIELD", emoji:"⚔️", bg:"bg-battle",
+  type:"tap",
+  intro:"VERBS are action words! TAP every VERB!",
+  label:"TAP ALL THE VERBS",
+  qs:[
+    {sentence:["The","rabbit","hopped","over","the","log","."], targets:[2]},
+    {sentence:["She","sings","and","dances","at","school","."], targets:[1,3]},
+    {sentence:["The","kids","ran","and","played","in","the","yard","."], targets:[2,4]},
+    {sentence:["He","reads","books","every","night","."], targets:[1]},
+    {sentence:["The","dog","barked","and","jumped","at","the","door","."], targets:[2,4]},
+    {sentence:["We","cooked","dinner","and","ate","together","."], targets:[1,4]},
+    {sentence:["The","bird","flew","and","landed","on","a","branch","."], targets:[2,4]},
+    {sentence:["I","write","draw","and","paint","in","art","class","."], targets:[1,2,4]},
+  ]
+},
+// ── ZONE 7: ADVERBS (pick the adverb) ────────────────────────
+{
+  id:7, name:"ADVERB\nOCEAN", emoji:"🌊", bg:"bg-ocean",
+  type:"mc",
+  intro:"ADVERBS describe verbs — HOW, WHEN, or WHERE! Pick the adverb!",
+  qs:[
+    {q:"She ran QUICKLY to catch the bus.", choices:["ran","quickly","bus","catch"], answer:1},
+    {q:"The dog barked LOUDLY outside.", choices:["dog","barked","loudly","outside"], answer:2},
+    {q:"He ALWAYS forgets his homework.", choices:["always","forgets","homework","he"], answer:0},
+    {q:"The cat walked SOFTLY across the floor.", choices:["cat","walked","floor","softly"], answer:3},
+    {q:"They NEVER eat broccoli.", choices:["they","never","eat","broccoli"], answer:1},
+    {q:"She smiled HAPPILY at her friend.", choices:["smiled","friend","happily","she"], answer:2},
+    {q:"He went UPSTAIRS to get his coat.", choices:["went","upstairs","coat","get"], answer:1},
+    {q:"The baby FINALLY fell asleep.", choices:["baby","finally","fell","asleep"], answer:1},
+  ]
+},
+// ── ZONE 8: PREPOSITIONS ─────────────────────────────────────
+{
+  id:8, name:"PREPOSITION\nMAP ROOM", emoji:"🗺️", bg:"bg-map",
+  type:"fill",
+  intro:"Fill in the PREPOSITION that makes sense!",
+  qs:[
+    {sentence:"The cat is sitting ___ the chair.",
+     blank:"___",
+     choices:["on","run","blue","slowly"], answer:0,
+     bank:["on","run","blue","slowly"]},
+    {sentence:"She hid the gift ___ the bed.",
+     blank:"___",
+     choices:["under","loud","happy","jump"], answer:0,
+     bank:["under","loud","happy","jump"]},
+    {sentence:"The bird flew ___ the clouds.",
+     blank:"___",
+     choices:["eat","above","quickly","red"], answer:1,
+     bank:["eat","above","quickly","red"]},
+    {sentence:"Put the book ___ the shelf.",
+     blank:"___",
+     choices:["happy","purple","on","shout"], answer:2,
+     bank:["happy","purple","on","shout"]},
+    {sentence:"The fish swam ___ the tank.",
+     blank:"___",
+     choices:["around","slowly","soft","sunny"], answer:0,
+     bank:["around","slowly","soft","sunny"]},
+    {sentence:"She sat ___ her two best friends.",
+     blank:"___",
+     choices:["loud","between","happy","ran"], answer:1,
+     bank:["loud","between","happy","ran"]},
+    {sentence:"The key is ___ the table.",
+     blank:"___",
+     choices:["behind","quickly","yellow","shout"], answer:0,
+     bank:["behind","quickly","yellow","shout"]},
+    {sentence:"We walked ___ the park to get home.",
+     blank:"___",
+     choices:["happy","through","bright","bark"], answer:1,
+     bank:["happy","through","bright","bark"]},
+  ]
+},
+// ── ZONE 9: CONTRACTIONS (match pairs) ──────────────────────
+{
+  id:9, name:"CONTRACTION\nLIGHTNING LAB", emoji:"⚡", bg:"bg-lab",
+  type:"match",
+  intro:"Match the two words to their CONTRACTION! Tap a pair!",
+  qs:[
+    {pairs:[["do not","don't"],["I am","I'm"],["we are","we're"],["it is","it's"],["cannot","can't"],["they are","they're"]]},
+    {pairs:[["I will","I'll"],["you are","you're"],["is not","isn't"],["she is","she's"],["we will","we'll"],["did not","didn't"]]},
+    {pairs:[["I have","I've"],["he is","he's"],["are not","aren't"],["they will","they'll"],["would not","wouldn't"],["has not","hasn't"]]},
+    {pairs:[["should not","shouldn't"],["could not","couldn't"],["was not","wasn't"],["will not","won't"],["there is","there's"],["what is","what's"]]},
+    {pairs:[["let us","let's"],["that is","that's"],["who is","who's"],["were not","weren't"],["I would","I'd"],["he will","he'll"]]},
+    {pairs:[["she will","she'll"],["you will","you'll"],["are not","aren't"],["have not","haven't"],["I am","I'm"],["they have","they've"]]},
+    {pairs:[["we have","we've"],["could not","couldn't"],["it will","it'll"],["she has","she's"],["do not","don't"],["might not","mightn't"]]},
+    {pairs:[["you have","you've"],["he has","he's"],["I would","I'd"],["will not","won't"],["who would","who'd"],["are not","aren't"]]},
+  ]
+},
+// ── ZONE 10: SENTENCE CORRECTIONS ───────────────────────────
+{
+  id:10, name:"SENTENCE\nFIX-IT SHOP", emoji:"🔧", bg:"bg-fix",
+  type:"fix",
+  intro:"Pick the sentence that is written CORRECTLY!",
+  qs:[
+    {broken:"One of these sentences is correct. Which one?",
+     opts:["Me went store Jake.","Jake went store I.","Jake and me store went.","Jake and I went to the store."],
+     answer:3},
+    {broken:"Find the correctly written sentence:",
+     opts:["She no like snakes.","She doesn't like snakes.","She like not snakes.","She snakes doesn't like."],
+     answer:1},
+    {broken:"Find the correctly written sentence:",
+     opts:["Dogs barking the are.","The dog are barking.","The dogs are barking.","The dogs barking was."],
+     answer:2},
+    {broken:"Find the correctly written sentence:",
+     opts:["He and me played outside.","He played outside and me.","Him played outside.","He and I played outside."],
+     answer:3},
+    {broken:"Find the correctly written sentence:",
+     opts:["we went to school on monday.","We went to school on Monday.","We Went to School on Monday.","we went to School on monday."],
+     answer:1},
+    {broken:"Find the correctly written sentence:",
+     opts:["Their going to the park.","There going to the park.","They're going to the park.","Theyre going to the park."],
+     answer:2},
+    {broken:"Find the correctly written sentence:",
+     opts:["She runned fast in the race.","She run fast in the race.","She running fast in the race.","She ran fast in the race."],
+     answer:3},
+    {broken:"Find the correctly written sentence:",
+     opts:["The two cat sat on the mat.","The two cats sat on the mat.","Two cat sitted on mat.","Two cats sitted on the mat."],
+     answer:1},
+  ]
+},
+// ── ZONE 11: SYNONYMS ────────────────────────────────────────
+{
+  id:11, name:"SYNONYM\nGARDEN", emoji:"🌸", bg:"bg-garden",
+  type:"mc",
+  intro:"SYNONYMS mean almost the SAME thing! Pick the synonym for the bold word!",
+  qs:[
+    {q:"Find a synonym for HAPPY!", choices:["sad","joyful","angry","tired"], answer:1},
+    {q:"Find a synonym for BIG!", choices:["tiny","fast","huge","soft"], answer:2},
+    {q:"Find a synonym for RUN!", choices:["sleep","jog","swim","sit"], answer:1},
+    {q:"Find a synonym for COLD!", choices:["warm","chilly","bright","loud"], answer:1},
+    {q:"Find a synonym for SCARY!", choices:["funny","cute","spooky","pretty"], answer:2},
+    {q:"Find a synonym for FAST!", choices:["slow","loud","quick","tired"], answer:2},
+    {q:"Find a synonym for TALK!", choices:["listen","run","jump","speak"], answer:3},
+    {q:"Find a synonym for PRETTY!", choices:["ugly","beautiful","boring","loud"], answer:1},
+  ]
+},
+// ── ZONE 12: ANTONYMS ────────────────────────────────────────
+{
+  id:12, name:"ANTONYM\nSHADOW WORLD", emoji:"🌑", bg:"bg-shadow",
+  type:"mc",
+  intro:"ANTONYMS are OPPOSITES! Find the antonym of the bold word!",
+  qs:[
+    {q:"Find the OPPOSITE of HOT!", choices:["warm","cold","heat","cook"], answer:1},
+    {q:"Find the OPPOSITE of HAPPY!", choices:["joyful","glad","sad","excited"], answer:2},
+    {q:"Find the OPPOSITE of FAST!", choices:["quick","slow","zoom","speedy"], answer:1},
+    {q:"Find the OPPOSITE of TALL!", choices:["big","large","short","huge"], answer:2},
+    {q:"Find the OPPOSITE of NIGHT!", choices:["dark","stars","day","moon"], answer:2},
+    {q:"Find the OPPOSITE of PUSH!", choices:["shove","carry","lift","pull"], answer:3},
+    {q:"Find the OPPOSITE of LOUD!", choices:["noisy","quiet","shout","boom"], answer:1},
+    {q:"Find the OPPOSITE of EMPTY!", choices:["hollow","bare","full","open"], answer:2},
+  ]
+},
+];
+
+// ── EXPANDED 2ND GRADE REVIEW BANK ───────────────────────────
+// Adds more second-grade ELA practice while each quest stays 8 random questions.
+function enrichWordQuestQuestions(){
+  const z = id => ZONES.find(zone => zone.id === id);
+
+  z(1).qs.push(
+    {sentence:["The","doctor","helped","the","child","at","school","."], targets:[1,4,6]},
+    {sentence:["A","family","ate","dinner","at","home","."], targets:[1,3,5]},
+    {sentence:["The","class","visited","the","museum","on","Friday","."], targets:[1,4,6]},
+    {sentence:["My","uncle","drove","the","truck","to","work","."], targets:[1,4,6]},
+    {sentence:["The","team","won","the","game","after","lunch","."], targets:[1,4,6]},
+    {sentence:["A","rabbit","hid","behind","the","basket","."], targets:[1,5]},
+    {sentence:["The","artist","painted","a","picture","of","a","horse","."], targets:[1,4,7]},
+    {sentence:["The","children","played","music","in","the","room","."], targets:[1,3,6]}
+  );
+
+  z(2).qs.push(
+    {chips:["California","state","Ava","girl","Target","store"], bins:[[0,2,4],[1,3,5]]},
+    {chips:["Dr. Lee","doctor","San Diego","city","Friday","day"], bins:[[0,2,4],[1,3,5]]},
+    {chips:["January","month","Minecraft","game","Snoopy","dog"], bins:[[0,2,4],[1,3,5]]},
+    {chips:["school","Roosevelt School","park","Balboa Park","restaurant","In-N-Out"], bins:[[1,3,5],[0,2,4]]},
+    {chips:["Elsa","queen","Earth","planet","Nike","shoe"], bins:[[0,2,4],[1,3,5]]},
+    {chips:["book","Charlotte's Web","boy","Mateo","ocean","Pacific"], bins:[[1,3,5],[0,2,4]]}
+  );
+
+  z(3).qs.push(
+    {q:"Which word is a COMMON noun?", choices:["Miguel","restaurant","Saturday","Lego"], answer:1},
+    {q:"Which word is a COMMON noun?", choices:["Disneyland","park","June","Sofia"], answer:1},
+    {q:"Pick the common noun!", choices:["Dr. King","leader","Mexico","Target"], answer:1},
+    {q:"Which is a common noun?", choices:["teacher","Mrs. Garcia","Monday","California"], answer:0},
+    {q:"Which is a common noun?", choices:["city","Chicago","Earth","Christmas"], answer:0},
+    {q:"Pick the common noun!", choices:["phone","Apple","Rover","Friday"], answer:0},
+    {q:"Which word names any thing, not a special name?", choices:["Oreo","cookie","July","Aiden"], answer:1},
+    {q:"Which is a common noun?", choices:["team","Lakers","Padres","Dodgers"], answer:0}
+  );
+
+  z(4).qs.push(
+    {broken:"The ___ desk is messy. (student)", opts:["The students desk is messy.","The student's desk is messy.","The student desk is messy.","The students' desk is messy."], answer:1},
+    {broken:"The ___ lunch is in the bag. (girl)", opts:["The girls lunch is in the bag.","The girl lunch is in the bag.","The girl's lunch is in the bag.","The girls' lunch is in the bag."], answer:2},
+    {broken:"The ___ bikes are outside. (boys)", opts:["The boys bikes are outside.","The boy's bikes are outside.","The boys' bikes are outside.","The boy bikes are outside."], answer:2},
+    {broken:"The ___ room was clean. (children)", opts:["The childrens room was clean.","The children's room was clean.","The children room was clean.","The childrens' room was clean."], answer:1},
+    {broken:"___ shoes are by the door. (Dad)", opts:["Dads shoes are by the door.","Dad shoes are by the door.","Dad's shoes are by the door.","Dads' shoes are by the door."], answer:2},
+    {broken:"The ___ nest is in the tree. (bird)", opts:["The bird's nest is in the tree.","The birds nest is in the tree.","The bird nest is in the tree.","The birds' nest is in the tree."], answer:0}
+  );
+
+  z(5).qs.push(
+    {q:"The BRAVE firefighter rescued the kitten.", choices:["brave","firefighter","rescued","kitten"], answer:0},
+    {q:"We walked down the LONG hallway.", choices:["walked","down","long","hallway"], answer:2},
+    {q:"The BUMPY road made us laugh.", choices:["road","bumpy","made","laugh"], answer:1},
+    {q:"She opened the HEAVY door.", choices:["opened","heavy","door","she"], answer:1},
+    {q:"The SLEEPY puppy curled up.", choices:["sleepy","puppy","curled","up"], answer:0},
+    {q:"They found a ROUND shell.", choices:["they","found","round","shell"], answer:2},
+    {q:"The SOUR lemon made me blink.", choices:["lemon","made","sour","blink"], answer:2},
+    {q:"A GENTLE rain fell all morning.", choices:["gentle","rain","fell","morning"], answer:0}
+  );
+
+  z(6).qs.push(
+    {sentence:["The","students","whispered","and","listened","during","the","story","."], targets:[2,4]},
+    {sentence:["Mom","packed","lunch","and","drove","to","school","."], targets:[1,4]},
+    {sentence:["The","fish","swam","under","the","bridge","."], targets:[2]},
+    {sentence:["We","cleaned","our","desks","and","lined","up","."], targets:[1,5]},
+    {sentence:["The","baby","laughed","and","clapped","."], targets:[2,4]},
+    {sentence:["They","built","a","tower","and","shared","blocks","."], targets:[1,5]},
+    {sentence:["I","opened","the","box","and","found","a","map","."], targets:[1,5]},
+    {sentence:["The","horse","trotted","across","the","field","."], targets:[2]}
+  );
+
+  z(7).qs.push(
+    {q:"The turtle moved SLOWLY across the path.", choices:["turtle","moved","slowly","path"], answer:2},
+    {q:"We will leave SOON after lunch.", choices:["we","leave","soon","lunch"], answer:2},
+    {q:"The kite flew HIGH above the trees.", choices:["kite","flew","high","trees"], answer:2},
+    {q:"She carefully carried the glass.", choices:["she","carefully","carried","glass"], answer:1},
+    {q:"The class worked quietly during reading.", choices:["class","worked","quietly","reading"], answer:2},
+    {q:"He looked everywhere for his pencil.", choices:["looked","everywhere","pencil","his"], answer:1},
+    {q:"The dog waited patiently by the door.", choices:["dog","waited","patiently","door"], answer:2},
+    {q:"I sometimes eat cereal for dinner.", choices:["I","sometimes","eat","cereal"], answer:1}
+  );
+
+  z(8).qs.push(
+    {sentence:"The backpack is ___ the desk.", blank:"___", choices:["under","happy","quick","jump"], answer:0, bank:["under","happy","quick","jump"]},
+    {sentence:"The plane flew ___ the city.", blank:"___", choices:["above","green","laugh","soft"], answer:0, bank:["above","green","laugh","soft"]},
+    {sentence:"The dog ran ___ the fence.", blank:"___", choices:["along","sleepy","bright","sing"], answer:0, bank:["along","sleepy","bright","sing"]},
+    {sentence:"The pencil rolled ___ the table.", blank:"___", choices:["off","blue","slowly","eat"], answer:0, bank:["off","blue","slowly","eat"]},
+    {sentence:"We stood ___ the classroom door.", blank:"___", choices:["near","loud","purple","read"], answer:0, bank:["near","loud","purple","read"]},
+    {sentence:"The rabbit hopped ___ the log.", blank:"___", choices:["over","tiny","write","careful"], answer:0, bank:["over","tiny","write","careful"]},
+    {sentence:"She walked ___ the stairs.", blank:"___", choices:["down","yellow","talk","kind"], answer:0, bank:["down","yellow","talk","kind"]},
+    {sentence:"The picture hangs ___ the couch.", blank:"___", choices:["above","funny","sleep","fast"], answer:0, bank:["above","funny","sleep","fast"]}
+  );
+
+  z(9).qs.push(
+    {pairs:[["I am","I'm"],["you are","you're"],["they are","they're"],["we are","we're"],["do not","don't"],["cannot","can't"]]},
+    {pairs:[["she will","she'll"],["he will","he'll"],["we will","we'll"],["they will","they'll"],["I will","I'll"],["you will","you'll"]]},
+    {pairs:[["is not","isn't"],["are not","aren't"],["was not","wasn't"],["were not","weren't"],["has not","hasn't"],["have not","haven't"]]},
+    {pairs:[["could not","couldn't"],["should not","shouldn't"],["would not","wouldn't"],["did not","didn't"],["does not","doesn't"],["will not","won't"]]},
+    {pairs:[["that is","that's"],["there is","there's"],["what is","what's"],["who is","who's"],["it is","it's"],["let us","let's"]]}
+  );
+
+  z(10).qs.push(
+    {broken:"Something is WRONG with this sentence:", opts:["my dog likes to run.","My dog likes to run.","My Dog likes to run.","my Dog likes to run."], answer:1},
+    {broken:"Something is WRONG with this sentence:", opts:["Where is my pencil.","Where is my pencil?","where is my pencil?","Where is my pencil"], answer:1},
+    {broken:"Something is WRONG with this sentence:", opts:["I saw three mouses.","I saw three mouse.","I saw three mice.","I seen three mice."], answer:2},
+    {broken:"Something is WRONG with this sentence:", opts:["The child are happy.","The children is happy.","The children are happy.","The childs are happy."], answer:2},
+    {broken:"Something is WRONG with this sentence:", opts:["She gave the book to I.","She gave the book to me.","Her gave the book to me.","She gave book to me."], answer:1},
+    {broken:"Something is WRONG with this sentence:", opts:["We ate lunch at noon.","we ate lunch at noon.","We ate lunch at noon","We ate Lunch at noon."], answer:0},
+    {broken:"Something is WRONG with this sentence:", opts:["The baby cried loudly.","The baby cry loudly.","The baby cried loud.","The baby cries loudly yesterday."], answer:0},
+    {broken:"Something is WRONG with this sentence:", opts:["I have two foot.","I have two feet.","I has two feet.","Me have two feet."], answer:1}
+  );
+
+  z(11).qs.push(
+    {q:"Find a synonym for SMALL!", choices:["tiny","huge","loud","late"], answer:0},
+    {q:"Find a synonym for SMART!", choices:["clever","sleepy","empty","cold"], answer:0},
+    {q:"Find a synonym for BEGIN!", choices:["start","finish","drop","hide"], answer:0},
+    {q:"Find a synonym for SAD!", choices:["unhappy","excited","brave","bright"], answer:0},
+    {q:"Find a synonym for EASY!", choices:["simple","difficult","heavy","wild"], answer:0},
+    {q:"Find a synonym for CLEAN!", choices:["neat","dirty","broken","slow"], answer:0},
+    {q:"Find a synonym for HELP!", choices:["assist","ignore","break","forget"], answer:0},
+    {q:"Find a synonym for QUIET!", choices:["silent","noisy","angry","round"], answer:0},
+    {q:"Find a synonym for LOOK!", choices:["see","sleep","carry","melt"], answer:0},
+    {q:"Find a synonym for END!", choices:["finish","begin","open","mix"], answer:0}
+  );
+
+  z(12).qs.push(
+    {q:"Find the OPPOSITE of OPEN!", choices:["closed","wide","door","start"], answer:0},
+    {q:"Find the OPPOSITE of CLEAN!", choices:["dirty","neat","shiny","clear"], answer:0},
+    {q:"Find the OPPOSITE of BEGIN!", choices:["end","start","go","try"], answer:0},
+    {q:"Find the OPPOSITE of HEAVY!", choices:["light","large","hard","strong"], answer:0},
+    {q:"Find the OPPOSITE of ABOVE!", choices:["below","over","high","top"], answer:0},
+    {q:"Find the OPPOSITE of BEFORE!", choices:["after","early","first","past"], answer:0},
+    {q:"Find the OPPOSITE of REMEMBER!", choices:["forget","think","know","learn"], answer:0},
+    {q:"Find the OPPOSITE of STRONG!", choices:["weak","brave","tall","fast"], answer:0},
+    {q:"Find the OPPOSITE of ARRIVE!", choices:["leave","come","enter","visit"], answer:0},
+    {q:"Find the OPPOSITE of KIND!", choices:["mean","nice","helpful","sweet"], answer:0}
+  );
+}
+enrichWordQuestQuestions();
+const QUESTIONS_PER_RUN = 8;
+function zoneTotal(){ return getZoneQs(currentZone).length; }
+
+// ═══════════════════════════════════════════════════════════════
+// ENGINE
+// ═══════════════════════════════════════════════════════════════
+const SAVE_KEY = "wordquest_stars_v2";
+let stars = {};
+let currentZone = 0;
+let currentQ = 0;
+let lives = 3;
+let score = 0;
+let totalCorrect = 0;
+let coins = 0;
+let zoneTreasures = 0;
+let gameData = {};         // scratch per question
+let questionAnswered = false;
+
+// ── UTILS ────────────────────────────────────────────────────
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+}
+function loadStars() {
+  try { stars = JSON.parse(localStorage.getItem(SAVE_KEY)) || {}; } catch(e){ stars={}; }
+}
+function saveStars() {
+  try { localStorage.setItem(SAVE_KEY, JSON.stringify(stars)); } catch(e){}
+}
+
+function loadRPG() {
+  try { coins = parseInt(localStorage.getItem("wordquest_coins_v1") || "0", 10); } catch(e){ coins = 0; }
+}
+function saveRPG() {
+  try { localStorage.setItem("wordquest_coins_v1", String(coins)); } catch(e){}
+}
+function heroLevel() {
+  return Math.max(1, Math.floor(getStarCount()/2) + 1);
+}
+const MONSTERS = ["Goblin", "Slime", "Troll", "Word Bat", "Grammar Gremlin", "Shadow Knight", "Riddle Rat", "Spelling Sprite", "Dungeon Dragon", "Noun Gnome", "Verb Viper", "Adjective Ogre"];
+const TREASURES = ["Golden Key", "Magic Scroll", "Ruby Apple", "Hero Shield", "Dragon Coin", "Star Potion", "Quest Gem", "Crystal Book"];
+function currentMonster() {
+  return MONSTERS[(currentZone * 3 + currentQ) % MONSTERS.length];
+}
+function maybeTreasure(correct) {
+  if(!correct) return;
+  if((score > 0 && score % 2 === 0) || currentQ === ZONES[currentZone-1].qs.length-1) {
+    const reward = 5 + heroLevel() * 2;
+    coins += reward;
+    zoneTreasures++;
+    saveRPG();
+    updateHUD();
+    showTreasurePopup(TREASURES[(currentZone + currentQ + zoneTreasures) % TREASURES.length], reward);
+  }
+}
+function showTreasurePopup(item, reward) {
+  const pop = document.createElement('div');
+  pop.className = 'treasure-pop';
+  pop.innerHTML = `<div class="treasure-icon">🎁</div><div class="treasure-title">TREASURE FOUND!</div><div class="treasure-item">${item}</div><div class="treasure-reward">+${reward} COINS</div>`;
+  document.body.appendChild(pop);
+  setTimeout(()=>pop.remove(), 1550);
+}
+function showEnemyHit() {
+  const hit = document.createElement('div');
+  hit.className = 'enemy-hit-pop';
+  hit.textContent = `${currentMonster()} attacks! Lose 1 heart!`;
+  document.body.appendChild(hit);
+  setTimeout(()=>hit.remove(), 1250);
+}
+
+
+// ── SHUFFLE (Fisher-Yates) ────────────────────────────────────
+function shuffle(arr) {
+  const a = [...arr];
+  for(let i = a.length-1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i+1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+// ── SHUFFLED QUESTION SETS per zone (so retry = different order) ──
+// We store shuffled copies per attempt; original ZONES data is never mutated.
+let zoneQOrder = {}; // zoneId -> array of shuffled question indices
+
+function getZoneQs(zoneId) {
+  if(!zoneQOrder[zoneId]) {
+    zoneQOrder[zoneId] = shuffle(ZONES[zoneId-1].qs.map((_,i)=>i)).slice(0, QUESTIONS_PER_RUN);
+  }
+  return zoneQOrder[zoneId];
+}
+
+function reshuffleZone(zoneId) {
+  zoneQOrder[zoneId] = shuffle(ZONES[zoneId-1].qs.map((_,i)=>i)).slice(0, QUESTIONS_PER_RUN);
+}
+
+// ── GAME OVER TRIGGER ─────────────────────────────────────────
+function triggerGameOver() {
+  // Flash red screen
+  const flash = document.createElement('div');
+  flash.className = 'game-flash';
+  document.body.appendChild(flash);
+  setTimeout(()=>flash.remove(), 400);
+
+  const z = ZONES[currentZone-1];
+  document.getElementById('goZoneName').textContent = z.emoji + ' ' + z.name.replace('\n',' ');
+  document.getElementById('goSkull').textContent = '💀';
+  document.getElementById('gameOver').classList.remove('hidden');
+}
+
+function restartZone() {
+  document.getElementById('gameOver').classList.add('hidden');
+  // Reshuffle so it's new questions
+  reshuffleZone(currentZone);
+  // Restart zone fresh
+  currentQ = 0;
+  lives = 3;
+  score = 0;
+  totalCorrect = 0;
+  zoneTreasures = 0;
+  questionAnswered = false;
+  // Reset UI
+  const z = ZONES[currentZone-1];
+  document.getElementById('hudZone').textContent = z.emoji+' '+z.name.replace('\n',' ');
+  document.getElementById('progFill').style.width = '0%';
+  updateHUD();
+  renderQuestion();
+}
+
+function gameOverToMap() {
+  document.getElementById('gameOver').classList.add('hidden');
+  buildMap();
+  showScreen('worldmap');
+}
+function getStarCount() { return Object.keys(stars).filter(k=>stars[k]).length; }
+function isUnlocked(zoneId) {
+  if(zoneId === 1) return true;
+  return stars[zoneId-1] === true;
+}
+
+// ── TITLE ────────────────────────────────────────────────────
+function startGame() { loadStars(); loadRPG(); buildMap(); showScreen('worldmap'); }
+
+// ── MAP ──────────────────────────────────────────────────────
+function buildMap() {
+  const grid = document.getElementById('mapGrid');
+  grid.innerHTML = '';
+  const total = getStarCount();
+  document.getElementById('mapSub').textContent = `STARS: ${total} / 12 — COINS: ${coins} — CHOOSE YOUR NEXT QUEST!`;
+  ZONES.forEach(z => {
+    const unlocked = isUnlocked(z.id);
+    const done = stars[z.id] === true;
+    const tile = document.createElement('div');
+    tile.className = 'zone-tile' + (unlocked?' unlocked':'') + (done?' done':'') + (!unlocked?' locked':'');
+    tile.innerHTML = `<div class="zt-num">${z.id}</div><div class="zt-emo">${z.emoji}</div><div class="zt-name">${z.name}</div><div class="zt-star">${done?'⭐':unlocked?'○':'🔒'}</div>`;
+    if(unlocked) tile.onclick = () => launchZone(z.id);
+    grid.appendChild(tile);
+  });
+}
+function goMap() { buildMap(); showScreen('worldmap'); }
+
+// ── LAUNCH ZONE ──────────────────────────────────────────────
+function launchZone(id) {
+  currentZone = id;
+  currentQ = 0;
+  lives = 3;
+  score = 0;
+  totalCorrect = 0;
+  zoneTreasures = 0;
+  // Fresh shuffle each new zone attempt
+  reshuffleZone(id);
+  const z = ZONES[id-1];
+  const bg = document.getElementById('gbg');
+  bg.className = 'gbg ' + z.bg;
+  // Floating decorations
+  document.querySelectorAll('.zone-deco').forEach(d=>d.remove());
+  const decoEmojis = [z.emoji, z.emoji, z.emoji];
+  decoEmojis.forEach((d,di)=>{
+    const el=document.createElement('div');el.className='zone-deco';el.textContent=d;
+    el.style.cssText=`top:${15+di*25}%;${di%2===0?'right':'left'}:${5+di*3}%;animation-delay:${di*1.3}s`;
+    bg.appendChild(el);
+  });
+  document.getElementById('hudZone').textContent = z.emoji + ' ' + z.name.replace('\n',' ');
+  // Add floating decorations
+  document.querySelectorAll('.zone-deco').forEach(d=>d.remove());
+  const decos = [z.emoji, z.emoji, z.emoji];
+  decos.forEach((d,i)=>{
+    const el = document.createElement('div');
+    el.className = 'zone-deco';
+    el.textContent = d;
+    el.style.cssText = `top:${15+i*25}%;${i%2===0?'right':'left'}:${5+i*3}%;animation-delay:${i*1.2}s`;
+    bg.appendChild(el);
+  });
+  showScreen('game');
+  document.getElementById('game').scrollTop = 0;
+  renderQuestion();
+}
+
+// ── HUD UPDATE ───────────────────────────────────────────────
+function updateHUD() {
+  const z = ZONES[currentZone-1];
+  document.getElementById('hudQ').textContent = `Q: ${currentQ+1}/${zoneTotal()}`;
+  const hpEl = document.getElementById('hudHP');
+  hpEl.textContent = '❤️'.repeat(lives) + '🖤'.repeat(Math.max(0,3-lives));
+  if(lives <= 1) {
+    hpEl.classList.remove('lost');
+    void hpEl.offsetWidth; // force reflow
+    hpEl.classList.add('lost');
+  }
+  document.getElementById('hudPts').textContent = `⭐ ${score}`;
+  const lvlEl = document.getElementById('hudLevel'); if(lvlEl) lvlEl.textContent = heroLevel();
+  const coinsEl = document.getElementById('hudCoins'); if(coinsEl) coinsEl.textContent = `🪙 ${coins}`;
+  document.getElementById('progFill').style.width = (currentQ / zoneTotal() * 100) + '%';
+}
+
+// ── NEXT QUESTION ────────────────────────────────────────────
+function nextQuestion() {
+  const z = ZONES[currentZone-1];
+  currentQ++;
+  if(currentQ >= zoneTotal()) {
+    endZone();
+  } else {
+    renderQuestion();
+  }
+}
+
+// ── END ZONE ─────────────────────────────────────────────────
+function endZone() {
+  const z = ZONES[currentZone-1];
+  const total = zoneTotal();
+  const perfect = totalCorrect === total;
+  const won = totalCorrect >= Math.ceil(total * 0.6);
+  document.getElementById('progFill').style.width = '100%';
+  if(perfect) {
+    document.getElementById('zcTitle').textContent = 'PERFECT! 🌟';
+    document.getElementById('zcStar').textContent = '🌟';
+  } else if(won) {
+    document.getElementById('zcTitle').textContent = 'ZONE CLEAR! ⭐';
+    document.getElementById('zcStar').textContent = '⭐';
+  } else {
+    document.getElementById('zcTitle').textContent = 'GOOD TRY! 💪';
+    document.getElementById('zcStar').textContent = '💪';
+  }
+  document.getElementById('zcScore').textContent = `YOU GOT ${totalCorrect} OUT OF ${total}!`;
+  const subMsg = document.getElementById('zcSubMsg');
+  if(subMsg) {
+    if(won) subMsg.textContent = 'A NEW STAR HAS BEEN ADDED TO YOUR MAP!';
+    else subMsg.textContent = 'YOU NEED ' + Math.ceil(total * 0.6) + '/' + total + ' TO EARN THE STAR. TRY AGAIN!';
+  }
+  if(won) { stars[currentZone] = true; saveStars(); }
+  document.getElementById('zoneOver').classList.remove('hidden');
+}
+function afterZone() {
+  document.getElementById('zoneOver').classList.add('hidden');
+  buildMap();
+  showScreen('worldmap');
+}
+function retryFromComplete() {
+  document.getElementById('zoneOver').classList.add('hidden');
+  // Fresh reshuffle for retry
+  reshuffleZone(currentZone);
+  currentQ = 0; lives = 3; score = 0; totalCorrect = 0; zoneTreasures = 0; questionAnswered = false;
+  const z = ZONES[currentZone-1];
+  document.getElementById('hudZone').textContent = z.emoji+' '+z.name.replace('\n',' ');
+  document.getElementById('progFill').style.width = '0%';
+  updateHUD();
+  renderQuestion();
+}
+
+// ── SHARED FEEDBACK ──────────────────────────────────────────
+function showFeedback(correct, el, explanation) {
+  if(correct) {
+    if(el) el.classList.add('correct');
+    score++;
+    totalCorrect++;
+    updateHUD();
+    maybeTreasure(true);
+  } else {
+    if(el) el.classList.add('wrong');
+    lives = Math.max(0, lives-1);
+    updateHUD();
+    showEnemyHit();
+        if(lives === 0) { setTimeout(triggerGameOver, 900); return; }
+    if(lives === 0) {
+      setTimeout(triggerGameOver, 900);
+    }
+  }
+}
+
+// ── NEXT BTN ─────────────────────────────────────────────────
+function addNextBtn(area) {
+  const wrap = document.createElement('div');
+  wrap.style.marginTop = '8px';
+  const btn = document.createElement('button');
+  btn.className = 'pxbtn';
+  btn.style.cssText = 'background:var(--gold);color:#000;font-size:clamp(.5rem,1.3vw,.65rem)';
+  btn.textContent = currentQ < ZONES[currentZone-1].qs.length-1 ? 'NEXT QUESTION ▶' : 'FINISH ZONE ✓';
+  btn.onclick = nextQuestion;
+  wrap.appendChild(btn);
+  area.appendChild(wrap);
+}
+
+// ── FEEDBACK BAR ─────────────────────────────────────────────
+function makeFeedbackEl() {
+  const f = document.createElement('div');
+  f.className = 'feedback';
+  f.style.minHeight = '1.4rem';
+  return f;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// RENDER QUESTION — dispatcher
+// ═══════════════════════════════════════════════════════════════
+function renderQuestion() {
+  questionAnswered = false;
+  updateHUD();
+  const z = ZONES[currentZone-1];
+  // Use shuffled question order so retry = different questions
+  const qOrder = getZoneQs(z.id);
+  const q = z.qs[qOrder[currentQ]];
+  const area = document.getElementById('gameArea');
+  area.innerHTML = '';
+
+  // Zone label banner + RPG encounter
+  const banner = document.createElement('div');
+  banner.className = 'quest-banner';
+  banner.innerHTML = `<div class="enemy-line">⚔️ A wild ${currentMonster()} appears!</div><div class="quest-instruction">${z.intro}</div>`;
+  area.appendChild(banner);
+
+  switch(z.type) {
+    case 'tap':  renderTap(z, q, area); break;
+    case 'sort': renderSort(z, q, area); break;
+    case 'mc':   renderMC(z, q, area); break;
+    case 'fix':  renderFix(z, q, area); break;
+    case 'fill': renderFill(z, q, area); break;
+    case 'match':renderMatch(z, q, area); break;
+  }
+}
+
+
+function dedupeWordChoices(choices, answerIndex){
+  const correct=choices[answerIndex];
+  const unique=[];
+  choices.forEach(c=>{if(!unique.includes(c)) unique.push(c);});
+  if(!unique.includes(correct)) unique.unshift(correct);
+  const shuffled=shuffle(unique).slice(0,4);
+  const idx=shuffled.indexOf(correct);
+  const z=ZONES[currentZone-1]; if(z && z.qs){ const qOrder=getZoneQs(z.id); const q=z.qs[qOrder[currentQ]]; q._newAnswer=idx; }
+  return shuffled;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// TYPE: MC (multiple choice)
+// ═══════════════════════════════════════════════════════════════
+function renderMC(z, q, area) {
+  const qbox = document.createElement('div');
+  qbox.className = 'q-box';
+  qbox.innerHTML = `<div class="q-label" style="margin-bottom:10px">${z.name.replace('\n',' ')} — Q${currentQ+1} of ${zoneTotal()}</div>${q.q}`;
+  area.appendChild(qbox);
+
+  const grid = document.createElement('div');
+  grid.className = 'ans-grid';
+  const fb = makeFeedbackEl();
+
+  q.choices = dedupeWordChoices(q.choices, q.answer);
+  if(q._newAnswer!==undefined) q.answer=q._newAnswer;
+  q.choices.forEach((c, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'ans-btn';
+    btn.textContent = c.toUpperCase();
+    btn.onclick = () => {
+      if(questionAnswered) return;
+      questionAnswered = true;
+      const correct = i === q.answer;
+      showFeedback(correct, btn, '');
+      grid.querySelectorAll('.ans-btn').forEach((b,j) => {
+        b.disabled = true;
+        if(j === q.answer) b.classList.add('correct');
+      });
+      fb.textContent = correct ? '✓ CORRECT!' : `✗ THE ANSWER WAS: ${q.choices[q.answer].toUpperCase()}`;
+      fb.className = 'feedback ' + (correct?'good':'bad');
+      addNextBtn(area);
+    };
+    grid.appendChild(btn);
+  });
+  area.appendChild(grid);
+  area.appendChild(fb);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// TYPE: TAP (tap all target words in a sentence)
+// ═══════════════════════════════════════════════════════════════
+function renderTap(z, q, area) {
+  const wrap = document.createElement('div');
+  wrap.className = 'tap-wrap';
+
+  const qbox = document.createElement('div');
+  qbox.className = 'q-box';
+  qbox.innerHTML = `<div class="q-label">${z.label}</div>Q${currentQ+1} of ${zoneTotal()}`;
+  wrap.appendChild(qbox);
+
+  const sentDiv = document.createElement('div');
+  sentDiv.className = 'tap-sentence';
+
+  const targets = new Set(q.targets);
+  let tapped = new Set();
+  const fb = makeFeedbackEl();
+
+  q.sentence.forEach((word, idx) => {
+    if(word === '.') { sentDiv.appendChild(document.createTextNode(' . ')); return; }
+    const span = document.createElement('button');
+    span.className = 'tap-word';
+    span.textContent = word;
+    span.dataset.idx = idx;
+    span.onclick = () => {
+      if(questionAnswered) return;
+      if(targets.has(idx)) {
+        span.classList.add('tapped-good');
+        tapped.add(idx);
+        fb.textContent = '✓ THAT IS A ' + (z.id===1?'NOUN':'VERB') + '!';
+        fb.className = 'feedback good';
+        if(tapped.size === targets.size) {
+          questionAnswered = true;
+          showFeedback(true, null, '');
+          fb.textContent = `✓ AMAZING! ALL ${z.id===1?'NOUNS':'VERBS'} FOUND!`;
+          addNextBtn(area);
+        }
+      } else {
+        span.classList.add('tapped-bad');
+        lives = Math.max(0, lives-1);
+        updateHUD();
+        if(lives === 0) { setTimeout(triggerGameOver, 900); return; }
+        fb.textContent = '✗ THAT IS NOT A ' + (z.id===1?'NOUN':'VERB') + '!';
+        fb.className = 'feedback bad';
+        setTimeout(() => span.classList.remove('tapped-bad'), 500);
+      }
+    };
+    sentDiv.appendChild(span);
+    sentDiv.appendChild(document.createTextNode(' '));
+  });
+
+  // Give Up button — reveals targets, costs one life, unlocks Next
+  const giveUpBtn = document.createElement('button');
+  giveUpBtn.className = 'pxbtn';
+  giveUpBtn.style.cssText = 'background:rgba(255,255,255,.08);border:2px solid rgba(255,255,255,.25);color:rgba(255,255,255,.6);font-size:clamp(.48rem,1.1vw,.6rem);margin-top:8px';
+  giveUpBtn.textContent = 'Show Me';
+  giveUpBtn.onclick = () => {
+    if(questionAnswered) return;
+    questionAnswered = true;
+    // Highlight all missed targets
+    sentDiv.querySelectorAll('.tap-word').forEach(s => {
+      const idx = parseInt(s.dataset.idx);
+      if(targets.has(idx) && !s.classList.contains('tapped-good')) {
+        s.classList.add('tapped-bad');
+      }
+    });
+    lives = Math.max(0, lives - 1);
+    updateHUD();
+    fb.textContent = '✗ Here are the answers!';
+    fb.className = 'feedback bad';
+    if(lives === 0) { setTimeout(triggerGameOver, 900); return; }
+    addNextBtn(area);
+  };
+
+  wrap.appendChild(sentDiv);
+  wrap.appendChild(fb);
+  wrap.appendChild(giveUpBtn);
+  area.appendChild(wrap);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// TYPE: SORT
+// ═══════════════════════════════════════════════════════════════
+function renderSort(z, q, area) {
+  const wrap = document.createElement('div');
+  wrap.className = 'sort-wrap';
+  const fb = makeFeedbackEl();
+
+  const header = document.createElement('div');
+  header.className = 'q-box';
+  header.innerHTML = `<div class="q-label">${z.name.replace('\n',' ')}</div>Q${currentQ+1} of ${zoneTotal()} — CLICK A WORD, THEN CLICK A BIN!`;
+  wrap.appendChild(header);
+
+  // Pool
+  const pool = document.createElement('div');
+  pool.className = 'sort-pool';
+  let selected = null;
+  let placed = {};
+
+  q.chips.forEach((chip, idx) => {
+    const c = document.createElement('button');
+    c.className = 'sort-chip';
+    c.textContent = chip;
+    c.dataset.idx = idx;
+    c.onclick = () => {
+      if(placed[idx]) return;
+      document.querySelectorAll('.sort-chip').forEach(x => x.classList.remove('selected'));
+      selected = idx;
+      c.classList.add('selected');
+      fb.textContent = 'NOW CLICK A BIN ▼';
+      fb.className = 'feedback';
+      fb.style.color = 'var(--yellow)';
+    };
+    pool.appendChild(c);
+  });
+  wrap.appendChild(pool);
+
+  // Bins
+  const binsDiv = document.createElement('div');
+  binsDiv.className = 'sort-bins';
+  const [labels] = [z.binLabels];
+  const correctBins = q.bins; // bins[0] = indices that go in bin 0
+
+  labels.forEach((lbl, binIdx) => {
+    const bin = document.createElement('div');
+    bin.className = 'sort-bin';
+    bin.innerHTML = `<div class="bin-label">${lbl}</div>`;
+    bin.onclick = () => {
+      if(selected === null) { fb.textContent='PICK A WORD FIRST!'; fb.className='feedback bad'; return; }
+      if(placed[selected]) return;
+      placed[selected] = binIdx;
+
+      const correct = correctBins[binIdx].includes(selected);
+      const chipEl = document.createElement('div');
+      chipEl.className = 'bin-chip ' + (correct?'correct-chip':'wrong-chip');
+      chipEl.textContent = q.chips[selected];
+      bin.appendChild(chipEl);
+
+      if(!correct) {
+        lives = Math.max(0,lives-1);
+        updateHUD();
+          if(lives === 0) { setTimeout(triggerGameOver, 900); return; }
+        fb.textContent = `✗ "${q.chips[selected]}" goes in the other bin!`;
+        fb.className = 'feedback bad';
+      } else {
+        fb.textContent = `✓ "${q.chips[selected]}" is correct!`;
+        fb.className = 'feedback good';
+      }
+
+      // Dim the pool chip
+      pool.querySelectorAll('.sort-chip').forEach(s => {
+        if(parseInt(s.dataset.idx)===selected) { s.classList.add('placed'); s.classList.remove('selected'); }
+      });
+      selected = null;
+
+      if(Object.keys(placed).length === q.chips.length) {
+        questionAnswered = true;
+        const allRight = q.chips.every((_,i) => {
+          const b = placed[i];
+          return correctBins[b] && correctBins[b].includes(i);
+        });
+        if(allRight) { score++; totalCorrect++; }
+        updateHUD();
+        addNextBtn(area);
+      }
+    };
+    binsDiv.appendChild(bin);
+  });
+
+  wrap.appendChild(binsDiv);
+  wrap.appendChild(fb);
+  area.appendChild(wrap);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// TYPE: FIX
+// ═══════════════════════════════════════════════════════════════
+function renderFix(z, q, area) {
+  const wrap = document.createElement('div');
+  wrap.className = 'fix-wrap';
+
+  const qbox = document.createElement('div');
+  qbox.className = 'q-box';
+  qbox.innerHTML = `<div class="q-label">${q.broken}</div>Q${currentQ+1} of ${zoneTotal()}`;
+  if(z.id===4) qbox.innerHTML = `<div class="q-label">MAKE IT POSSESSIVE:</div><div style="color:var(--gold);font-size:clamp(.65rem,1.8vw,.85rem)">${q.broken}</div>`;
+  wrap.appendChild(qbox);
+
+  const optsDiv = document.createElement('div');
+  optsDiv.className = 'fix-opts';
+  const fb = makeFeedbackEl();
+
+  q.opts.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'fix-opt';
+    btn.innerHTML = `<span style="color:var(--yellow);margin-right:8px">${['A','B','C','D'][i]})</span>${opt}`;
+    btn.onclick = () => {
+      if(questionAnswered) return;
+      questionAnswered = true;
+      const correct = i === q.answer;
+      showFeedback(correct, btn, '');
+      optsDiv.querySelectorAll('.fix-opt').forEach((b,j) => {
+        b.disabled = true;
+        if(j === q.answer) b.classList.add('correct');
+        else if(j === i && !correct) b.classList.add('wrong');
+      });
+      fb.textContent = correct ? '✓ THAT IS CORRECT!' : `✗ THE ANSWER WAS: ${['A','B','C','D'][q.answer]}`;
+      fb.className = 'feedback ' + (correct?'good':'bad');
+      addNextBtn(area);
+    };
+    optsDiv.appendChild(btn);
+  });
+
+  wrap.appendChild(optsDiv);
+  wrap.appendChild(fb);
+  area.appendChild(wrap);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// TYPE: FILL (prepositions word bank)
+// ═══════════════════════════════════════════════════════════════
+function renderFill(z, q, area) {
+  const wrap = document.createElement('div');
+  wrap.className = 'fill-wrap';
+  const fb = makeFeedbackEl();
+
+  const qbox = document.createElement('div');
+  qbox.className = 'q-box';
+  qbox.innerHTML = `<div class="q-label">PICK THE PREPOSITION — Q${currentQ+1}/${zoneTotal()}</div>`;
+  const parts = q.sentence.split('___');
+  qbox.innerHTML += parts[0] + `<span class="blank">___?___</span>` + (parts[1]||'');
+  wrap.appendChild(qbox);
+
+  const bank = document.createElement('div');
+  bank.className = 'word-bank';
+  q.bank.forEach((word, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'wb-chip';
+    btn.textContent = word.toUpperCase();
+    btn.onclick = () => {
+      if(questionAnswered) return;
+      questionAnswered = true;
+      const correct = i === q.answer;
+      showFeedback(correct, correct?btn:null, '');
+      if(!correct) btn.style.borderColor='var(--red)';
+      bank.querySelectorAll('.wb-chip').forEach((b,j) => {
+        b.classList.add('wb-used');
+        if(j===q.answer) { b.classList.remove('wb-used'); b.style.borderColor='var(--green)'; b.style.color='var(--green)'; }
+      });
+      // Fill blank
+      const blankEl = qbox.querySelector('.blank');
+      if(blankEl) { blankEl.textContent = q.bank[q.answer].toUpperCase(); blankEl.style.color = correct?'var(--green)':'var(--red)'; }
+      fb.textContent = correct ? '✓ CORRECT PREPOSITION!' : `✗ THE ANSWER WAS: ${q.bank[q.answer].toUpperCase()}`;
+      fb.className = 'feedback '+(correct?'good':'bad');
+      addNextBtn(area);
+    };
+    bank.appendChild(btn);
+  });
+
+  wrap.appendChild(bank);
+  wrap.appendChild(fb);
+  area.appendChild(wrap);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// TYPE: MATCH (contractions)
+// ═══════════════════════════════════════════════════════════════
+function renderMatch(z, q, area) {
+  const wrap = document.createElement('div');
+  wrap.className = 'match-wrap';
+
+  const qbox = document.createElement('div');
+  qbox.className = 'q-box';
+  qbox.innerHTML = `<div class="q-label">MATCH EACH PAIR — Q${currentQ+1}/${zoneTotal()}</div>TAP A WORD — THEN TAP ITS MATCH!`;
+  wrap.appendChild(qbox);
+
+  const instr = document.createElement('div');
+  instr.className = 'match-instr';
+  instr.textContent = 'PAIRS LEFT: ' + pairsToUse.length;
+  wrap.appendChild(instr);
+
+  // Use only 4 pairs at a time — easier to hold in memory
+  const pairsToUse = [...q.pairs].sort(()=>Math.random()-.5).slice(0,4);
+
+  // Flatten all cards (shuffle)
+  let cards = [];
+  pairsToUse.forEach((pair, pairIdx) => {
+    cards.push({text: pair[0], pairIdx, side:0});
+    cards.push({text: pair[1], pairIdx, side:1});
+  });
+  // shuffle
+  for(let i=cards.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[cards[i],cards[j]]=[cards[j],cards[i]];}
+
+  const grid = document.createElement('div');
+  grid.className = 'match-grid';
+  grid.style.gridTemplateColumns = 'repeat(2, 1fr)';
+  const fb = makeFeedbackEl();
+
+  let firstSel = null;
+  let matchedCount = 0;
+  const totalPairs = pairsToUse.length;
+
+  cards.forEach((card, idx) => {
+    const el = document.createElement('button');
+    el.className = 'm-card';
+    el.textContent = card.text.toUpperCase();
+    el.dataset.pair = card.pairIdx;
+    el.dataset.side = card.side;
+    el.dataset.idx = idx;
+    el.onclick = () => {
+      if(el.classList.contains('matched') || el.classList.contains('bad-match')) return;
+      if(firstSel === null) {
+        // first tap
+        firstSel = {el, pairIdx: card.pairIdx, idx};
+        el.classList.add('selected');
+        fb.textContent = 'NOW PICK THE MATCH!';
+        fb.className = 'feedback';
+        fb.style.color='var(--yellow)';
+      } else {
+        if(firstSel.idx === idx) { firstSel.el.classList.remove('selected'); firstSel=null; return; }
+        const match = firstSel.pairIdx === card.pairIdx;
+        if(match) {
+          firstSel.el.classList.remove('selected');
+          firstSel.el.classList.add('matched');
+          el.classList.add('matched');
+          matchedCount++;
+          instr.textContent = 'PAIRS LEFT: ' + (totalPairs - matchedCount);
+          fb.textContent = '✓ MATCH!';
+          fb.className = 'feedback good';
+          firstSel = null;
+          if(matchedCount === totalPairs) {
+            questionAnswered = true;
+            score++;
+            totalCorrect++;
+            updateHUD();
+            maybeTreasure(true);
+            fb.textContent = '✓ ALL MATCHED! AMAZING!';
+            addNextBtn(area);
+          }
+        } else {
+          firstSel.el.classList.remove('selected');
+          firstSel.el.classList.add('bad-match');
+          el.classList.add('bad-match');
+          lives = Math.max(0,lives-1);
+          updateHUD();
+          showEnemyHit();
+          if(lives === 0) { setTimeout(triggerGameOver, 900); return; }
+          fb.textContent = '✗ NOT A MATCH!';
+          fb.className = 'feedback bad';
+          setTimeout(() => {
+            firstSel.el.classList.remove('bad-match');
+            el.classList.remove('bad-match');
+            firstSel = null;
+          }, 700);
+        }
+      }
+    };
+    grid.appendChild(el);
+  });
+
+  wrap.appendChild(grid);
+  wrap.appendChild(fb);
+  area.appendChild(wrap);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// BOOT
+// ═══════════════════════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', () => {
+  loadStars();
+  loadRPG();
+});
+</script>
+
+<!-- Shared offline arcade helpers -->
+<script src="js/arcade.js"></script>
+</body>
+</html>
