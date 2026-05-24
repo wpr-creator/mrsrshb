@@ -1323,7 +1323,7 @@ function addNextBtn(area) {
   const btn = document.createElement('button');
   btn.className = 'pxbtn';
   btn.style.cssText = 'background:var(--gold);color:#000;font-size:clamp(.5rem,1.3vw,.65rem)';
-  btn.textContent = currentQ < ZONES[currentZone-1].qs.length-1 ? 'NEXT QUESTION ▶' : 'FINISH ZONE ✓';
+  btn.textContent = currentQ < zoneTotal()-1 ? 'NEXT QUESTION ▶' : 'FINISH ZONE ✓';
   btn.onclick = nextQuestion;
   wrap.appendChild(btn);
   area.appendChild(wrap);
@@ -1368,12 +1368,14 @@ function renderQuestion() {
 
 
 function dedupeWordChoices(choices, answerIndex){
-  const correct=choices[answerIndex];
+  const safeChoices = Array.isArray(choices) ? choices : [];
+  const validAnswerIndex = Number.isInteger(answerIndex) && answerIndex >= 0 && answerIndex < safeChoices.length ? answerIndex : 0;
+  const correct = safeChoices[validAnswerIndex];
   const unique=[];
-  choices.forEach(c=>{if(!unique.includes(c)) unique.push(c);});
-  if(!unique.includes(correct)) unique.unshift(correct);
+  safeChoices.forEach(c=>{if(!unique.includes(c)) unique.push(c);});
+  if(correct !== undefined && !unique.includes(correct)) unique.unshift(correct);
   const shuffled=shuffle(unique).slice(0,4);
-  const idx=shuffled.indexOf(correct);
+  const idx = correct !== undefined ? shuffled.indexOf(correct) : 0;
   const z=ZONES[currentZone-1]; if(z && z.qs){ const qOrder=getZoneQs(z.id); const q=z.qs[qOrder[currentQ]]; q._newAnswer=idx; }
   return shuffled;
 }
@@ -1387,11 +1389,21 @@ function renderMC(z, q, area) {
   qbox.innerHTML = `<div class="q-label" style="margin-bottom:10px">${z.name.replace('\n',' ')} — Q${currentQ+1} of ${zoneTotal()}</div>${q.q}`;
   area.appendChild(qbox);
 
+  q.choices = Array.isArray(q.choices) ? q.choices : [];
+  const answerIndex = Number.isInteger(q.answer) && q.answer >= 0 && q.answer < q.choices.length ? q.answer : 0;
+  if(q.choices.length === 0) {
+    const err = document.createElement('div');
+    err.className = 'feedback bad';
+    err.textContent = 'Sorry, this question has no available choices.';
+    area.appendChild(err);
+    return;
+  }
+
   const grid = document.createElement('div');
   grid.className = 'ans-grid';
   const fb = makeFeedbackEl();
 
-  q.choices = dedupeWordChoices(q.choices, q.answer);
+  q.choices = dedupeWordChoices(q.choices, answerIndex);
   if(q._newAnswer!==undefined) q.answer=q._newAnswer;
   q.choices.forEach((c, i) => {
     const btn = document.createElement('button');
@@ -1604,6 +1616,17 @@ function renderFix(z, q, area) {
   if(z.id===4) qbox.innerHTML = `<div class="q-label">MAKE IT POSSESSIVE:</div><div style="color:var(--gold);font-size:clamp(.65rem,1.8vw,.85rem)">${q.broken}</div>`;
   wrap.appendChild(qbox);
 
+  q.opts = Array.isArray(q.opts) ? q.opts : [];
+  const answerIndex = Number.isInteger(q.answer) && q.answer >= 0 && q.answer < q.opts.length ? q.answer : 0;
+  q.answer = answerIndex;
+  if(q.opts.length === 0) {
+    const err = document.createElement('div');
+    err.className = 'feedback bad';
+    err.textContent = 'Sorry, this question has no answer options.';
+    area.appendChild(err);
+    return;
+  }
+
   const optsDiv = document.createElement('div');
   optsDiv.className = 'fix-opts';
   const fb = makeFeedbackEl();
@@ -1645,9 +1668,21 @@ function renderFill(z, q, area) {
   const qbox = document.createElement('div');
   qbox.className = 'q-box';
   qbox.innerHTML = `<div class="q-label">PICK THE PREPOSITION — Q${currentQ+1}/${zoneTotal()}</div>`;
-  const parts = q.sentence.split('___');
+  const sentence = typeof q.sentence === 'string' ? q.sentence : '';
+  const parts = sentence.split('___');
   qbox.innerHTML += parts[0] + `<span class="blank">___?___</span>` + (parts[1]||'');
   wrap.appendChild(qbox);
+
+  q.bank = Array.isArray(q.bank) ? q.bank : [];
+  const answerIndex = Number.isInteger(q.answer) && q.answer >= 0 && q.answer < q.bank.length ? q.answer : 0;
+  q.answer = answerIndex;
+  if(q.bank.length === 0) {
+    const err = document.createElement('div');
+    err.className = 'feedback bad';
+    err.textContent = 'Sorry, this question has no word bank.';
+    area.appendChild(err);
+    return;
+  }
 
   const bank = document.createElement('div');
   bank.className = 'word-bank';
@@ -1692,13 +1727,14 @@ function renderMatch(z, q, area) {
   qbox.innerHTML = `<div class="q-label">MATCH EACH PAIR — Q${currentQ+1}/${zoneTotal()}</div>TAP A WORD — THEN TAP ITS MATCH!`;
   wrap.appendChild(qbox);
 
+  // Use only 4 pairs at a time — easier to hold in memory
+  const pairsToUse = [...q.pairs].sort(()=>Math.random()-.5).slice(0,4);
+
   const instr = document.createElement('div');
   instr.className = 'match-instr';
   instr.textContent = 'PAIRS LEFT: ' + pairsToUse.length;
   wrap.appendChild(instr);
 
-  // Use only 4 pairs at a time — easier to hold in memory
-  const pairsToUse = [...q.pairs].sort(()=>Math.random()-.5).slice(0,4);
 
   // Flatten all cards (shuffle)
   let cards = [];

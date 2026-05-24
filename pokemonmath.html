@@ -1234,6 +1234,17 @@ function renderMC(q, area){
   grid.className='ans-grid-4';
   const fb=addFeedback(area);
 
+  q.choices = Array.isArray(q.choices) ? q.choices : [];
+  const answerIndex = Number.isInteger(q.ans) && q.ans >= 0 && q.ans < q.choices.length ? q.ans : 0;
+  q.ans = answerIndex;
+  if(q.choices.length === 0){
+    const err = document.createElement('div');
+    err.className='feedback bad';
+    err.textContent='Sorry, this question has no answer choices available.';
+    area.appendChild(err);
+    return;
+  }
+
   q.choices = dedupeChoices(q.choices, q.ans);
   q.ans = q.choices.__newAns;
   q.choices.forEach((c,i)=>{
@@ -1309,6 +1320,18 @@ function renderPlaceVal(q, area){
 
   const grid=document.createElement('div');grid.className='ans-grid-4';
   const fb=addFeedback(area);
+
+  q.choices = Array.isArray(q.choices) ? q.choices : [];
+  const answerIndex = Number.isInteger(q.ans) && q.ans >= 0 && q.ans < q.choices.length ? q.ans : 0;
+  q.ans = answerIndex;
+  if(q.choices.length === 0){
+    const err = document.createElement('div');
+    err.className='feedback bad';
+    err.textContent='Sorry, this question has no answer choices available.';
+    area.appendChild(err);
+    return;
+  }
+
   q.choices = dedupeChoices(q.choices, q.ans);
   q.ans = q.choices.__newAns;
   q.choices.forEach((c,i)=>{
@@ -1355,6 +1378,18 @@ function renderSequence(q, area){
 
   const grid=document.createElement('div');grid.className='ans-grid-4';
   const fb=addFeedback(area);
+
+  q.choices = Array.isArray(q.choices) ? q.choices : [];
+  const answerIndex = Number.isInteger(q.ans) && q.ans >= 0 && q.ans < q.choices.length ? q.ans : 0;
+  q.ans = answerIndex;
+  if(q.choices.length === 0){
+    const err = document.createElement('div');
+    err.className='feedback bad';
+    err.textContent='Sorry, this question has no answer choices available.';
+    area.appendChild(err);
+    return;
+  }
+
   q.choices = dedupeChoices(q.choices, q.ans);
   q.ans = q.choices.__newAns;
   q.choices.forEach((c,i)=>{
@@ -1469,8 +1504,20 @@ function renderShapes(q, area){
   area.appendChild(dialog);
 
   const grid=document.createElement('div');
+  q.choices = Array.isArray(q.choices) ? q.choices : [];
   grid.className=q.choices.length<=2?'ans-grid-2':'ans-grid-4';
   const fb=addFeedback(area);
+
+  const answerIndex = Number.isInteger(q.ans) && q.ans >= 0 && q.ans < q.choices.length ? q.ans : 0;
+  q.ans = answerIndex;
+  if(q.choices.length === 0){
+    const err = document.createElement('div');
+    err.className='feedback bad';
+    err.textContent='Sorry, this question has no answer choices available.';
+    area.appendChild(err);
+    return;
+  }
+
   q.choices = dedupeChoices(q.choices, q.ans);
   q.ans = q.choices.__newAns;
   q.choices.forEach((c,i)=>{

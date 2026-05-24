@@ -735,6 +735,17 @@ function renderMC(q,area){
   area.appendChild(qc);
   gsap.from(qc,{y:24,opacity:0,duration:.35,ease:'power2.out'});
 
+  q.choices = Array.isArray(q.choices) ? q.choices : [];
+  const answerIndex = Number.isInteger(q.ans) && q.ans >= 0 && q.ans < q.choices.length ? q.ans : 0;
+  q.ans = answerIndex;
+  if(q.choices.length === 0){
+    const err = document.createElement('div');
+    err.className='feedback bad';
+    err.textContent='Sorry, this question has no choices available.';
+    area.appendChild(err);
+    return;
+  }
+
   const grid=document.createElement('div');grid.className='ans-grid';
   const fb=document.createElement('div');fb.className='feedback';
 
@@ -940,16 +951,17 @@ function renderPad(q,area){
 // MC BUILDER — guaranteed shuffled choices, no duplicates
 // ═══════════════════════════════════════════════════════
 function mc(q,choices,ansIdx,visual='',wide=false,type='mc'){
-  const correct=choices[ansIdx];
-  const deduped=[...new Set(choices.map(String))];
-  if(!deduped.includes(String(correct)))deduped.unshift(String(correct));
+  const normalizedChoices = Array.isArray(choices) ? choices : [];
+  const correct = normalizedChoices[ansIdx] !== undefined ? normalizedChoices[ansIdx] : normalizedChoices[0];
+  const deduped=[...new Set(normalizedChoices.map(String))];
+  if(correct !== undefined && !deduped.includes(String(correct))) deduped.unshift(String(correct));
   const shuffled=sh(deduped).slice(0,4);
   while(shuffled.length<4){
     const n=Number(correct);
-    const filler=Number.isFinite(n)?String(n+shuffled.length+10):correct+'?';
+    const filler=Number.isFinite(n)?String(n+shuffled.length+10):String(correct||'')+'?';
     if(!shuffled.includes(filler))shuffled.push(filler);
   }
-  return{q,choices:shuffled,ans:shuffled.indexOf(String(correct)),visual,wide,type};
+  return{q,choices:shuffled,ans:correct !== undefined ? shuffled.indexOf(String(correct)) : 0,visual,wide,type};
 }
 
 function makeBank(t){
