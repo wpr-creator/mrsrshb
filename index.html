@@ -4,7 +4,6 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Mrs. Rogers' Homebase</title>
-<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -209,6 +208,14 @@ body{
   color:#5d4772;
   padding-bottom:8px;
 }
+
+/* Offline Chromebook readability overrides */
+html{font-size:22px}
+body{font-size:22px}
+p, div, span, label, main, section{font-size:inherit}
+.battle-question,.q-text,.q-box,.tap-sentence,.broken-box,.fill-sent,.chain-q,.card-desc,.hero-line{font-size:clamp(1.1rem,2.8vw,1.5rem)}
+.battle-btn,.ans-btn,.btn,.play-btn,.tap-word,.sort-chip,.m-card,.fix-opt,.wb-chip,.pxbtn{font-size:clamp(1.1rem,3vw,1.6rem)}
+svg{max-width:100%;height:auto}
 </style>
 </head>
 <body>

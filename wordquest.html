@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Word Quest — Mrs. Rogers</title>
-<link href="https://fonts.googleapis.com/css2?family=Bree+Serif&family=Nunito:wght@700;800;900&family=Fredoka:wght@600;700&display=swap" rel="stylesheet">
 <style>
 /* ─── RESET & ROOT ──────────────────────────────────────────── */
 *{box-sizing:border-box;margin:0;padding:0}
@@ -177,7 +176,7 @@ button{cursor:pointer}
 /* ─── MATCH GAME ────────────────────────────────────────────── */
 .match-wrap{width:100%;max-width:700px;display:flex;flex-direction:column;gap:12px}
 .match-instr{font-size:clamp(.44rem,1.1vw,.56rem);color:var(--yellow);text-align:center;letter-spacing:1px;line-height:2}
-.match-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.match-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
 @media(max-width:500px){.match-grid{grid-template-columns:repeat(2,1fr)}}
 .m-card{
   font-family:var(--button-font);font-size:clamp(.52rem,1.4vw,.68rem);
@@ -543,6 +542,20 @@ body, button, input, select, textarea { font-family:var(--body-font) !important;
   .ans-grid,.sort-bins,.chain-grid{grid-template-columns:1fr !important;}
 }
 
+
+/* Offline Chromebook readability overrides */
+html{font-size:22px}
+body{font-size:22px}
+p, div, span, label, main, section{font-size:inherit}
+.battle-question,.q-text,.q-box,.tap-sentence,.broken-box,.fill-sent,.chain-q,.card-desc,.hero-line{font-size:clamp(1.1rem,2.8vw,1.5rem)}
+.battle-btn,.ans-btn,.btn,.play-btn,.tap-word,.sort-chip,.m-card,.fix-opt,.wb-chip,.pxbtn{font-size:clamp(1.1rem,3vw,1.6rem)}
+svg{max-width:100%;height:auto}
+
+.tap-sentence{font-size:clamp(1.35rem,3.6vw,2.1rem)!important;line-height:1.7!important;background:rgba(0,0,0,.82)!important}
+.tap-word{font-size:clamp(1.25rem,3.4vw,1.9rem)!important;min-height:64px!important;margin:5px!important;border-radius:14px!important;border:3px solid var(--sky)!important;background:#102a4d!important;color:#fff!important}
+.sort-bins{grid-template-columns:1fr!important}
+.bg-art::before{content:"";position:absolute;inset:0;background:rgba(0,0,0,.42);pointer-events:none;z-index:0}.bg-art>*{position:relative;z-index:1}
+.fix-opt{font-size:clamp(1.1rem,2.8vw,1.45rem)!important;line-height:1.45!important}
 </style>
 </head>
 <body>
@@ -580,7 +593,7 @@ body, button, input, select, textarea { font-family:var(--body-font) !important;
     <div class="hud-hp" id="hudHP">❤️❤️❤️</div>
     <div class="hud-pts" id="hudPts">⭐ 0</div>
     <div class="hud-coins" id="hudCoins">🪙 0</div>
-    <button class="hud-mapbtn" onclick="goMap()" id="hudMapBtn" style="display:none">MAP</button>
+    
   </div>
   <div class="gbg" id="gbg">
     <div class="prog-wrap"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
@@ -816,13 +829,13 @@ const ZONES = [
   intro:"Pick the sentence that is written CORRECTLY!",
   qs:[
     {broken:"One of these sentences is correct. Which one?",
-     opts:["me and Jake went to the store.","Me and Jake went to the store.","Jake and me went to the store.","Jake and I went to the store."],
+     opts:["Me went store Jake.","Jake went store I.","Jake and me store went.","Jake and I went to the store."],
      answer:3},
     {broken:"Find the correctly written sentence:",
-     opts:["She dont like snakes.","She doesn't like snakes.","She doesn't likes snakes.","She don't likes snakes."],
+     opts:["She no like snakes.","She doesn't like snakes.","She like not snakes.","She snakes doesn't like."],
      answer:1},
     {broken:"Find the correctly written sentence:",
-     opts:["The dogs is barking.","The dog are barking.","The dogs are barking.","The dogs was barking loud very."],
+     opts:["Dogs barking the are.","The dog are barking.","The dogs are barking.","The dogs barking was."],
      answer:2},
     {broken:"Find the correctly written sentence:",
      opts:["He and me played outside.","He played outside and me.","Him played outside.","He and I played outside."],
@@ -1350,6 +1363,18 @@ function renderQuestion() {
   }
 }
 
+
+function dedupeWordChoices(choices, answerIndex){
+  const correct=choices[answerIndex];
+  const unique=[];
+  choices.forEach(c=>{if(!unique.includes(c)) unique.push(c);});
+  if(!unique.includes(correct)) unique.unshift(correct);
+  const shuffled=shuffle(unique).slice(0,4);
+  const idx=shuffled.indexOf(correct);
+  const z=ZONES[currentZone-1]; if(z && z.qs){ const qOrder=getZoneQs(z.id); const q=z.qs[qOrder[currentQ]]; q._newAnswer=idx; }
+  return shuffled;
+}
+
 // ═══════════════════════════════════════════════════════════════
 // TYPE: MC (multiple choice)
 // ═══════════════════════════════════════════════════════════════
@@ -1363,6 +1388,8 @@ function renderMC(z, q, area) {
   grid.className = 'ans-grid';
   const fb = makeFeedbackEl();
 
+  q.choices = dedupeWordChoices(q.choices, q.answer);
+  if(q._newAnswer!==undefined) q.answer=q._newAnswer;
   q.choices.forEach((c, i) => {
     const btn = document.createElement('button');
     btn.className = 'ans-btn';
@@ -1442,7 +1469,7 @@ function renderTap(z, q, area) {
   const giveUpBtn = document.createElement('button');
   giveUpBtn.className = 'pxbtn';
   giveUpBtn.style.cssText = 'background:rgba(255,255,255,.08);border:2px solid rgba(255,255,255,.25);color:rgba(255,255,255,.6);font-size:clamp(.48rem,1.1vw,.6rem);margin-top:8px';
-  giveUpBtn.textContent = '💡 Show Me';
+  giveUpBtn.textContent = 'Show Me';
   giveUpBtn.onclick = () => {
     if(questionAnswered) return;
     questionAnswered = true;

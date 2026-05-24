@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Pokémon Math Quest — Mrs. Rogers</title>
-<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Fredoka+One&family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
 <style>
 /* ═══════════════════════════════════════════
    RESET & VARS
@@ -479,6 +478,19 @@ button{cursor:pointer;font-family:var(--body-font)}
 }
 .map-nav-btn:hover{transform:translate(-1px,-1px);box-shadow:4px 4px 0 #000;border-color:var(--poke-yellow)}
 
+
+/* Offline Chromebook readability overrides */
+html{font-size:22px}
+body{font-size:22px}
+p, div, span, label, main, section{font-size:inherit}
+.battle-question,.q-text,.q-box,.tap-sentence,.broken-box,.fill-sent,.chain-q,.card-desc,.hero-line{font-size:clamp(1.1rem,2.8vw,1.5rem)}
+.battle-btn,.ans-btn,.btn,.play-btn,.tap-word,.sort-chip,.m-card,.fix-opt,.wb-chip,.pxbtn{font-size:clamp(1.1rem,3vw,1.6rem)}
+svg{max-width:100%;height:auto}
+
+.math-visual{width:100%;max-width:700px;margin:14px auto 0;display:flex;justify-content:center;align-items:center}
+.math-visual svg{width:100%;height:auto;max-width:700px}
+.pcbox-title,.pc-card-name,.pc-stat-lbl,.pc-stat-val,.pc-total-num,.pc-tab{font-family:var(--body-font)!important;font-size:clamp(1rem,2.5vw,1.35rem)!important;letter-spacing:.5px!important;line-height:1.25!important}
+.pc-stat-bg{height:18px!important}
 </style>
 </head>
 <body>
@@ -557,7 +569,6 @@ button{cursor:pointer;font-family:var(--body-font)}
   <div class="go-title">YOUR POKÉMON FAINTED!</div>
   <div class="go-sub" id="goSub">You ran out of HP!<br>Try again with new questions!</div>
   <button class="pxbtn" style="background:var(--red);color:#fff;font-size:clamp(.55rem,1.4vw,.7rem)" onclick="retryZone()">▶ TRY AGAIN!</button>
-  <button class="pxbtn" style="background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.3);color:#fff;font-size:clamp(.5rem,1.2vw,.62rem)" onclick="goToMap()">MAP ▶</button>
 </div>
 
 <!-- FINAL SCREEN -->
@@ -1182,6 +1193,19 @@ function renderQ(){
   else if(ztype==='shapes')   renderShapes(q,area);
 }
 
+
+function dedupeChoices(choices, ansIndex){
+  const correct=String(choices[ansIndex]);
+  const unique=[];
+  choices.map(String).forEach(c=>{if(!unique.includes(c)) unique.push(c);});
+  if(!unique.includes(correct)) unique.unshift(correct);
+  while(unique.length<4){const filler=String(Number(correct||0)+unique.length+1);if(!unique.includes(filler))unique.push(filler);}
+  const shuffled=sh(unique).slice(0,4);
+  const newAns=shuffled.indexOf(correct);
+  if(newAns>=0) choices.__newAns=newAns;
+  return shuffled;
+}
+
 // ═══════════════════════════════════════════════════════════════
 // MC RENDER (zones 1-4)
 // ═══════════════════════════════════════════════════════════════
@@ -1201,6 +1225,7 @@ function renderMC(q, area){
   grid.className='ans-grid-4';
   const fb=addFeedback(area);
 
+  q.choices = dedupeChoices(q.choices, q.ans);
   q.choices.forEach((c,i)=>{
     const btn=document.createElement('button');
     btn.className='battle-btn';
@@ -1208,6 +1233,8 @@ function renderMC(q, area){
     btn.onclick=()=>{
       if(questionAnswered)return;
       questionAnswered=true;
+      if(q.choices.__newAns!==undefined) q.ans=q.choices.__newAns;
+      if(q.choices.__newAns!==undefined) q.ans=q.choices.__newAns;
       const ok=i===q.ans;
       grid.querySelectorAll('.battle-btn').forEach((b,j)=>{b.disabled=true;if(j===q.ans)b.classList.add('correct');else if(j===i&&!ok)b.classList.add('wrong');});
       if(ok){correctAnswer();setFeedback(true,'✓ CORRECT! Great job!');}
@@ -1217,6 +1244,30 @@ function renderMC(q, area){
     grid.appendChild(btn);
   });
   area.appendChild(grid);
+}
+
+
+function svgBase10Blocks(num){
+  const h=Math.floor(num/100), t=Math.floor((num%100)/10), o=num%10;
+  let shapes='', x=18;
+  for(let i=0;i<h;i++){
+    const ox=x+i*86;
+    for(let r=0;r<10;r++)for(let c=0;c<10;c++) shapes+=`<rect x="${ox+c*6}" y="${20+r*6}" width="5.5" height="5.5" fill="#3b82f6" stroke="#1e40af" stroke-width=".4"/>`;
+    shapes+=`<text x="${ox+30}" y="94" text-anchor="middle" font-size="11" font-weight="900" font-family="Nunito, sans-serif" fill="#1e40af">100</text>`;
+  }
+  x += h*86 + 12;
+  for(let i=0;i<t;i++){
+    const ox=x+i*20;
+    for(let r=0;r<10;r++) shapes+=`<rect x="${ox}" y="${20+r*6}" width="14" height="5.5" fill="#10b981" stroke="#065f46" stroke-width=".4"/>`;
+    shapes+=`<text x="${ox+7}" y="94" text-anchor="middle" font-size="11" font-weight="900" font-family="Nunito, sans-serif" fill="#065f46">10</text>`;
+  }
+  x += t*20 + 12;
+  for(let i=0;i<o;i++){
+    const ox=x+(i%5)*21, oy=24+Math.floor(i/5)*26;
+    shapes+=`<rect x="${ox}" y="${oy}" width="17" height="17" fill="#f97316" stroke="#9a3412" stroke-width="1"/>`;
+    shapes+=`<text x="${ox+8.5}" y="${oy+31}" text-anchor="middle" font-size="10" font-weight="900" font-family="Nunito, sans-serif" fill="#9a3412">1</text>`;
+  }
+  return `<svg viewBox="0 0 700 120" style="width:100%;height:auto;max-width:700px" role="img" aria-label="Base ten blocks showing ${num}">${shapes}<text x="350" y="112" text-anchor="middle" font-size="16" font-weight="900" font-family="Nunito, sans-serif" fill="#111827">Base-10 blocks</text></svg>`;
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -1241,7 +1292,8 @@ function renderPlaceVal(q, area){
       <div class="pv-column"><div class="pv-label">TENS</div><div class="pv-value t">${t}</div></div>
       <div class="pv-separator">—</div>
       <div class="pv-column"><div class="pv-label">ONES</div><div class="pv-value o">${o}</div></div>
-    </div>`;
+    </div>
+    <div class="math-visual">${svgBase10Blocks(q.num)}</div>`;
   } else {
     dialog.innerHTML=`<span class="battle-label">Q${currentQ+1} OF ${shuffledQs.length} — PLACE VALUE</span><div class="battle-question">${q.q}</div>`;
   }
@@ -1249,6 +1301,7 @@ function renderPlaceVal(q, area){
 
   const grid=document.createElement('div');grid.className='ans-grid-4';
   const fb=addFeedback(area);
+  q.choices = dedupeChoices(q.choices, q.ans);
   q.choices.forEach((c,i)=>{
     const btn=document.createElement('button');btn.className='battle-btn';btn.textContent=c;
     btn.onclick=()=>{

@@ -4,7 +4,6 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>Portal Park — Mrs. Rogers</title>
-<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -114,14 +113,17 @@ button{font-family:var(--body);font-weight:900;color:var(--ink);cursor:pointer}
 .hud-coins{font-family:var(--display);font-size:clamp(.9rem,2.2vw,1.1rem);background:#fff;border:3px solid var(--line);border-radius:12px;padding:6px 10px;white-space:nowrap}
 .prog-wrap{width:100%;height:16px;background:#f3f4f6;border:3px solid var(--line);border-radius:999px;overflow:hidden;flex-shrink:0}
 .prog-fill{height:100%;background:linear-gradient(90deg,var(--green),#84cc16);border-radius:999px;transition:.3s}
-.game-wrap{width:100%;max-width:880px;padding:18px 14px 80px;display:flex;flex-direction:column;gap:14px;align-items:center}
+.game-wrap{width:100%;max-width:960px;padding:18px 14px 80px;display:flex;flex-direction:column;gap:14px;align-items:center}
 .event-bar{width:100%;font-size:clamp(1rem,2.5vw,1.25rem);font-weight:900;text-align:center;padding:10px 14px;border-radius:18px;background:#fff;border:3px solid var(--line);color:#374151}
 
 /* question */
 .q-card{width:100%;padding:20px}
+.q-card.wide{max-width:100%}
 .q-text{font-size:clamp(1.3rem,3.5vw,2rem);line-height:1.3;font-weight:900;text-align:center;color:#1f2937}
-.q-visual{display:flex;justify-content:center;align-items:center;flex-wrap:wrap;gap:12px;margin-top:14px}
-.q-visual svg{display:block}
+.q-visual{display:flex;justify-content:center;align-items:center;flex-wrap:wrap;gap:12px;margin-top:14px;overflow:visible}
+.q-visual svg{display:block;max-width:100%;height:auto}
+.q-visual.wide-visual{flex-direction:column;align-items:stretch}
+.q-visual.wide-visual svg{width:100%;height:auto}
 
 /* answers */
 .ans-grid{width:100%;display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
@@ -148,6 +150,14 @@ button{font-family:var(--body);font-weight:900;color:var(--ink);cursor:pointer}
 .modal-icon{font-size:4.5rem}
 .modal-title{font-family:var(--display);font-size:clamp(2rem,6vw,3.2rem);color:#1e3a5f;line-height:1}
 .modal-text{font-size:clamp(1rem,2.5vw,1.3rem);font-weight:900;line-height:1.45;color:#374151}
+
+/* Offline Chromebook readability overrides */
+html{font-size:22px}
+body{font-size:22px}
+p, div, span, label, main, section{font-size:inherit}
+.battle-question,.q-text,.q-box,.tap-sentence,.broken-box,.fill-sent,.chain-q,.card-desc,.hero-line{font-size:clamp(1.1rem,2.8vw,1.5rem)}
+.battle-btn,.ans-btn,.btn,.play-btn,.tap-word,.sort-chip,.m-card,.fix-opt,.wb-chip,.pxbtn{font-size:clamp(1.1rem,3vw,1.6rem)}
+svg{max-width:100%;height:auto}
 </style>
 </head>
 <body>
@@ -168,7 +178,7 @@ button{font-family:var(--body);font-weight:900;color:var(--ink);cursor:pointer}
 <section id="hub" class="screen">
   <div class="topbar">
     <div class="stat" id="rankStat">🌟 Rank 1</div>
-    <div class="stat" id="coinStat">🪙 0</div>
+    <div class="stat" id="coinStat">Coins: 0</div>
     <div class="stat" id="badgeStat">🏅 0 / 7</div>
     <button class="btn sm ghost" onclick="resetAll()">↺ Reset</button>
   </div>
@@ -188,7 +198,7 @@ button{font-family:var(--body);font-weight:900;color:var(--ink);cursor:pointer}
       </div>
     </div>
     <div class="hearts" id="hearts">❤️❤️❤️</div>
-    <div class="hud-coins" id="hudCoins">🪙 0</div>
+    <div class="hud-coins" id="hudCoins">Coins: 0</div>
     <div class="prog-wrap" style="flex-basis:100%"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
   </div>
   <main class="game-wrap">
@@ -723,13 +733,13 @@ const HUD_ICONS={
 // PORTALS CONFIG
 // ═══════════════════════════════════════════════════════
 const PORTALS=[
-  {id:"candy",  name:"Candy Land",   desc:"Sweet treats and sugary challenges.",  types:["add","sub","place"]},
-  {id:"animals",name:"Wild Safari",  desc:"Animals and numbers across the savanna.",types:["skip","measure","graphs"]},
-  {id:"space",  name:"Space Mission",desc:"Numbers in orbit — can you handle zero gravity?",types:["add10","sub10","add100","place"]},
-  {id:"zootopia",name:"Zootopia",    desc:"Cases to crack and counts to make in the city.",types:["money","add","sub","graphs"]},
-  {id:"stitch", name:"Lilo & Stitch",desc:"Ohana means everybody helps with the math.",types:["time","fractions","sub","measure"]},
-  {id:"roblox", name:"Roblox",       desc:"Level up your skills — Robux on the line.",types:["place","add","skip","money"]},
-  {id:"katseye",name:"Katseye",      desc:"Light up the stage with every right answer.",types:["time","graphs","skip","add"]},
+  {id:"candy",  name:"Candy Land",   desc:"Nouns, adding, and sweet surprises.", types:["add","sub","ela_nouns"]},
+  {id:"animals",name:"Wild Safari",  desc:"Describe the animals and measure the wild.",types:["skip","measure","ela_adj"]},
+  {id:"space",  name:"Space Mission",desc:"Blast off with tens, hundreds, and blocks.",types:["add10","sub10","add100","base10"]},
+  {id:"zootopia",name:"Zootopia",    desc:"Crack ZPD cases with money, graphs, and sentences.",types:["money","graphs","ela_sent"]},
+  {id:"stitch", name:"Lilo & Stitch",desc:"Ohana helps with time, fractions, and synonyms.",types:["time","fractions","ela_syn"]},
+  {id:"roblox", name:"Roblox",       desc:"Balance, place value, and opposites to level up.",types:["place","balance","ela_ant"]},
+  {id:"katseye",name:"Katseye",      desc:"Charts, verbs, and temperature on the big stage.",types:["pictograph","therm","ela_verbs"]},
 ];
 
 const EVENTS={
@@ -761,7 +771,7 @@ function goHub(){buildHub();show("hub")}
 function buildHub(){
   state.rank=1+Math.floor(Object.keys(state.badges).length/2);
   document.getElementById("rankStat").textContent="🌟 Rank "+state.rank;
-  document.getElementById("coinStat").textContent="🪙 "+state.coins;
+  document.getElementById("coinStat").textContent="Coins: "+state.coins;
   document.getElementById("badgeStat").textContent="🏅 "+Object.keys(state.badges).length+" / "+PORTALS.length;
   const grid=document.getElementById("portalGrid");grid.innerHTML="";
   PORTALS.forEach(p=>{
@@ -792,7 +802,7 @@ function launch(id){
 function updateHud(){
   document.getElementById("hudQ").textContent=`Challenge ${qIdx+1} of ${deck.length}`;
   document.getElementById("hearts").textContent="❤️".repeat(hearts)+"🤍".repeat(Math.max(0,3-hearts));
-  document.getElementById("hudCoins").textContent="🪙 "+state.coins;
+  document.getElementById("hudCoins").textContent="Coins: "+state.coins;
   document.getElementById("progFill").style.width=(qIdx/deck.length*100)+"%";
   document.getElementById("eventBar").textContent=rand(EVENTS[current.id]);
 }
@@ -800,9 +810,9 @@ function updateHud(){
 function renderQ(){
   locked=false;updateHud();
   const q=deck[qIdx],area=document.getElementById("gameArea");area.innerHTML="";
-  const qcard=document.createElement("div");qcard.className="q-card card";
+  const qcard=document.createElement("div");qcard.className="q-card card"+(q.wide?" wide":"");
   qcard.innerHTML=`<div class="q-text">${q.q}</div>`;
-  if(q.visual){const vDiv=document.createElement("div");vDiv.className="q-visual";vDiv.innerHTML=q.visual;qcard.appendChild(vDiv)}
+  if(q.visual){const vDiv=document.createElement("div");vDiv.className="q-visual"+(q.wide?" wide-visual":"");vDiv.innerHTML=q.visual;qcard.appendChild(vDiv)}
   area.appendChild(qcard);
   const grid=document.createElement("div");grid.className="ans-grid";
   const fb=document.createElement("div");fb.className="feedback";
@@ -867,17 +877,24 @@ function restartRun(){
 // QUESTION BANKS
 // ═══════════════════════════════════════════════════════
 function makeBank(type){
-  const map={add:addBank,sub:subBank,add10:add10Bank,sub10:sub10Bank,
-             add100:add100Bank,place:placeBank,skip:skipBank,money:moneyBank,
-             time:timeBank,fractions:fracBank,measure:measureBank,graphs:graphBank};
+  const map={
+    add:addBank,sub:subBank,add10:add10Bank,sub10:sub10Bank,
+    add100:add100Bank,place:placeBank,skip:skipBank,money:moneyBank,
+    time:timeBank,fractions:fracCircleBank,measure:rulerBank,graphs:graphBank,
+    balance:balanceBank,therm:thermBank,base10:base10Bank,pictograph:pictographBank,
+    ela_nouns:elaNouns,ela_verbs:elaVerbs,ela_adj:elaAdj,
+    ela_syn:elaSyn,ela_ant:elaAnt,ela_sent:elaSent
+  };
   return(map[type]||addBank)();
 }
 
 // shortcut: make a simple MC question
 function mc(q,choices,ans,visual=""){
   const correct=choices[ans];
-  const sh2=sh([...choices]);
-  return{q,choices:sh2,ans:sh2.indexOf(correct),visual};
+  const unique=[...new Set(choices.map(String))];
+  if(!unique.includes(String(correct))) unique.unshift(String(correct));
+  const sh2=sh(unique).slice(0,4);
+  return{q,choices:sh2,ans:sh2.indexOf(String(correct)),visual};
 }
 
 // ── ADDITION FACTS ─────────────────────────────────────
@@ -942,19 +959,39 @@ function add100Bank(){
 // ── PLACE VALUE ────────────────────────────────────────
 function placeBank(){
   const qs=[];
-  for(let i=0;i<40;i++){
-    const n=Math.floor(Math.random()*900)+100;
+  // fixed set of numbers with all-unique digit combos
+  const nums=[
+    123,145,267,318,432,516,624,738,841,952,
+    174,285,396,417,528,639,741,852,963,137,
+    248,359,461,572,683,794,815,926,132,246,
+    351,462,573,684,795,813,924,135,246,357
+  ];
+  nums.forEach(n=>{
     const h=Math.floor(n/100),t=Math.floor((n%100)/10),o=n%10;
-    qs.push(mc(`In ${n}, what is the hundreds digit?`,
-      [String(h),String(t),String(o),String(h*100)],0,
-      `<div style="display:flex;gap:10px;justify-content:center">
-        <div style="background:#ffd6e8;border:3px solid #111;border-radius:12px;padding:10px 18px;font-size:1.8rem;font-weight:900">H<br/><span style="font-size:2.4rem;color:#cc0066">${h}</span></div>
-        <div style="background:#d6e8ff;border:3px solid #111;border-radius:12px;padding:10px 18px;font-size:1.8rem;font-weight:900">T<br/><span style="font-size:2.4rem;color:#0044cc">${t}</span></div>
-        <div style="background:#d6ffe8;border:3px solid #111;border-radius:12px;padding:10px 18px;font-size:1.8rem;font-weight:900">O<br/><span style="font-size:2.4rem;color:#008833">${o}</span></div>
-      </div>`));
+    const hVis=`<div style="display:flex;gap:10px;justify-content:center;margin-top:10px">
+      <div style="background:#ffd6e8;border:3px solid #111;border-radius:12px;padding:10px 18px;font-size:1.8rem;font-weight:900;text-align:center">H<br/><span style="font-size:2.4rem;color:#cc0066">${h}</span></div>
+      <div style="background:#d6e8ff;border:3px solid #111;border-radius:12px;padding:10px 18px;font-size:1.8rem;font-weight:900;text-align:center">T<br/><span style="font-size:2.4rem;color:#0044cc">${t}</span></div>
+      <div style="background:#d6ffe8;border:3px solid #111;border-radius:12px;padding:10px 18px;font-size:1.8rem;font-weight:900;text-align:center">O<br/><span style="font-size:2.4rem;color:#008833">${o}</span></div>
+    </div>`;
+
+    // what is the hundreds digit — choices must be unique
+    const hChoices=[String(h),String(t),String(o),String(h*100)];
+    const hUniq=[...new Set(hChoices)];
+    while(hUniq.length<4) hUniq.push(String(h*100+Math.floor(Math.random()*9)+1));
+    qs.push(mc(`In ${n}, what is the HUNDREDS digit?`,hUniq.slice(0,4),hUniq.indexOf(String(h)),hVis));
+
+    // expanded value of a digit
+    const valQ=Math.random()<0.5?
+      {digit:h,val:h*100,place:"hundreds"}:
+      {digit:t,val:t*10,place:"tens"};
+    const vChoices=[...new Set([String(valQ.val),String(valQ.digit),String(valQ.val+10),String(valQ.val-10>0?valQ.val-10:valQ.val+20)])].slice(0,4);
+    while(vChoices.length<4) vChoices.push(String(valQ.val+vChoices.length));
+    qs.push(mc(`What is the VALUE of the ${valQ.place}s digit in ${n}?`,vChoices,vChoices.indexOf(String(valQ.val)),hVis));
+
+    // build the number
     qs.push(mc(`${h} hundreds + ${t} tens + ${o} ones = ?`,
-      [String(n),String(n+1),String(n-1),String(h+t+o)],0));
-  }
+      [...new Set([String(n),String(n+1),String(n-1),String(n+10)])].slice(0,4),0));
+  });
   return sh(qs);
 }
 
@@ -1013,7 +1050,7 @@ function moneyBank(){
   [[25,30],[35,40],[40,50],[60,75],[50,55]].forEach(([cost,pay])=>{
     const change=pay-cost;
     qs.push(mc(`A snack costs ${cost}¢. You pay ${pay}¢. How much change do you get?`,
-      [change+"¢",(change+5)+"¢",(change-5)+"¢",(change+10)+"¢"],0,"🛒"));
+      [change+"¢",(change+5)+"¢",(change-5)+"¢",(change+10)+"¢"],0,svgPenny(70)+svgNickel(70)));
   });
   return sh(qs);
 }
@@ -1051,10 +1088,10 @@ function timeBank(){
   // elapsed time
   [[8,0,1,`9:00`],[3,30,1,`4:30`],[11,15,0.5,`11:45`]].forEach(([h,m,addH,ans])=>{
     qs.push(mc(`A movie starts at ${h}:${m===0?"00":m}. It lasts ${addH===0.5?"30 minutes":"1 hour"}. When does it end?`,
-      [ans,`${h}:00`,`${h+2}:00`,`${h-1}:00`],0,"⏰"));
+      [ans,`${h}:00`,`${h+2}:00`,`${h-1}:00`],0,svgClock(h,m)));
   });
-  qs.push(mc("How many minutes are in one hour?",["60","30","100","24"],0,"⏱️"));
-  qs.push(mc("How many hours are in one day?",["24","12","60","48"],0,"📅"));
+  qs.push(mc("How many minutes are in one hour?",["60","30","100","24"],0,svgClock(1,0)));
+  qs.push(mc("How many hours are in one day?",["24","12","60","48"],0,svgClock(12,0)));
   return sh(qs);
 }
 
@@ -1133,6 +1170,486 @@ function graphBank(){
   });
   return sh(qs);
 }
+
+// ═══════════════════════════════════════════════════════
+// NEW SVG COMPONENTS
+// ═══════════════════════════════════════════════════════
+
+// ── RULER with object ─────────────────────────────────
+function svgRuler(objLen, totalLen=12, label=""){
+  const W=700,H=120,rLeft=40,rRight=660,rTop=60,rBot=90;
+  const rW=rRight-rLeft;
+  const pxPerIn=rW/totalLen;
+  const objPx=objLen*pxPerIn;
+  // tick marks
+  let ticks='';
+  for(let i=0;i<=totalLen;i++){
+    const x=rLeft+i*pxPerIn;
+    const isHalf=i!==Math.floor(i);
+    const major=Number.isInteger(i);
+    ticks+=`<line x1="${x.toFixed(1)}" y1="${rTop}" x2="${x.toFixed(1)}" y2="${major?rTop-12:rTop-7}" stroke="#1f2937" stroke-width="${major?2:1}"/>`;
+    if(major) ticks+=`<text x="${x.toFixed(1)}" y="${rTop-16}" text-anchor="middle" font-size="13" font-weight="700" font-family="sans-serif" fill="#1f2937">${i}</text>`;
+  }
+  // half marks
+  for(let i=0;i<totalLen;i++){
+    const x=rLeft+(i+0.5)*pxPerIn;
+    ticks+=`<line x1="${x.toFixed(1)}" y1="${rTop}" x2="${x.toFixed(1)}" y2="${rTop-5}" stroke="#555" stroke-width="1"/>`;
+  }
+  // object on ruler
+  const objX=rLeft;
+  const objSvg=`<rect x="${objX}" y="${rTop-52}" width="${objPx.toFixed(1)}" height="32" rx="5" fill="#f97316" stroke="#1f2937" stroke-width="2"/>
+  <text x="${(objX+objPx/2).toFixed(1)}" y="${rTop-32}" text-anchor="middle" font-size="13" font-weight="900" font-family="sans-serif" fill="white">${label||'?'}</text>
+  <line x1="${objX}" y1="${rTop-20}" x2="${objX}" y2="${rTop}" stroke="#1f2937" stroke-width="1.5" stroke-dasharray="3 2"/>
+  <line x1="${(objX+objPx).toFixed(1)}" y1="${rTop-20}" x2="${(objX+objPx).toFixed(1)}" y2="${rTop}" stroke="#1f2937" stroke-width="1.5" stroke-dasharray="3 2"/>`;
+  return`<svg viewBox="0 0 ${W} ${H}" style="width:100%;max-width:700px;height:auto">
+    <rect width="${W}" height="${H}" fill="#fffef0" rx="8" stroke="#d1d5db" stroke-width="1.5"/>
+    <rect x="${rLeft}" y="${rTop}" width="${rW}" height="${rBot-rTop}" fill="#e5e7eb" stroke="#1f2937" stroke-width="2" rx="3"/>
+    ${ticks}
+    ${objSvg}
+    <text x="${rLeft}" y="${rBot+16}" font-size="12" font-family="sans-serif" fill="#555">0</text>
+    <text x="${rRight}" y="${rBot+16}" text-anchor="end" font-size="12" font-family="sans-serif" fill="#555">${totalLen} inches</text>
+  </svg>`;
+}
+
+// ── BALANCE SCALE ────────────────────────────────────
+function svgBalance(leftLabel,rightLabel,tilt="level"){
+  const liftLeft=tilt==="right"?-18:tilt==="left"?18:0;
+  const liftRight=tilt==="left"?-18:tilt==="right"?18:0;
+  return`<svg viewBox="0 0 320 200" style="width:100%;max-width:320px;height:auto">
+    <rect width="320" height="200" fill="#f0f9ff" rx="8" stroke="#d1d5db" stroke-width="1.5"/>
+    <!-- base -->
+    <polygon points="160,170 140,195 180,195" fill="#78716c" stroke="#1f2937" stroke-width="1.5"/>
+    <rect x="148" y="90" width="24" height="84" rx="4" fill="#a8a29e" stroke="#1f2937" stroke-width="1.5"/>
+    <!-- beam -->
+    <line x1="60" y1="${90+liftLeft}" x2="260" y2="${90+liftRight}" stroke="#1f2937" stroke-width="5" stroke-linecap="round"/>
+    <!-- left pan strings -->
+    <line x1="80" y1="${90+liftLeft}" x2="60" y2="${125+liftLeft}" stroke="#555" stroke-width="2"/>
+    <line x1="80" y1="${90+liftLeft}" x2="100" y2="${125+liftLeft}" stroke="#555" stroke-width="2"/>
+    <!-- left pan -->
+    <ellipse cx="80" cy="${128+liftLeft}" rx="42" ry="10" fill="#d97706" stroke="#1f2937" stroke-width="2"/>
+    <text x="80" y="${133+liftLeft}" text-anchor="middle" font-size="15" font-weight="900" font-family="sans-serif" fill="white">${leftLabel}</text>
+    <!-- right pan strings -->
+    <line x1="240" y1="${90+liftRight}" x2="220" y2="${125+liftRight}" stroke="#555" stroke-width="2"/>
+    <line x1="240" y1="${90+liftRight}" x2="260" y2="${125+liftRight}" stroke="#555" stroke-width="2"/>
+    <!-- right pan -->
+    <ellipse cx="240" cy="${128+liftRight}" rx="42" ry="10" fill="#d97706" stroke="#1f2937" stroke-width="2"/>
+    <text x="240" y="${133+liftRight}" text-anchor="middle" font-size="15" font-weight="900" font-family="sans-serif" fill="white">${rightLabel}</text>
+    <!-- pivot dot -->
+    <circle cx="160" cy="90" r="8" fill="#1f2937"/>
+  </svg>`;
+}
+
+// ── THERMOMETER ──────────────────────────────────────
+function svgThermometer(temp, min=0, max=100){
+  const H=220,bulbY=180,tubeTop=40,tubeH=140;
+  const pct=Math.max(0,Math.min(1,(temp-min)/(max-min)));
+  const mercH=Math.round(tubeH*pct);
+  const mercY=tubeTop+tubeH-mercH;
+  let labels='';
+  for(let t=min;t<=max;t+=10){
+    const y=tubeTop+tubeH-(t-min)/(max-min)*tubeH;
+    labels+=`<line x1="72" y1="${y.toFixed(1)}" x2="82" y2="${y.toFixed(1)}" stroke="#374151" stroke-width="${t%20===0?2:1}"/>`;
+    if(t%20===0) labels+=`<text x="84" y="${(y+4).toFixed(1)}" font-size="12" font-family="sans-serif" fill="#374151">${t}°</text>`;
+  }
+  return`<svg viewBox="0 0 140 ${H}" style="width:140px;height:${H}px">
+    <rect width="140" height="${H}" fill="#fffef0" rx="8"/>
+    <!-- tube outline -->
+    <rect x="62" y="${tubeTop}" width="18" height="${tubeH}" rx="9" fill="#e5e7eb" stroke="#1f2937" stroke-width="2"/>
+    <!-- mercury fill -->
+    <rect x="64" y="${mercY}" width="14" height="${mercH}" rx="4" fill="#ef4444"/>
+    <!-- bulb -->
+    <circle cx="71" cy="${bulbY}" r="16" fill="#ef4444" stroke="#1f2937" stroke-width="2"/>
+    <circle cx="71" cy="${bulbY}" r="11" fill="#f87171"/>
+    <!-- labels -->
+    ${labels}
+    <text x="71" y="${tubeTop-10}" text-anchor="middle" font-size="13" font-weight="900" font-family="sans-serif" fill="#1f2937">${temp}°F</text>
+  </svg>`;
+}
+
+// ── FRACTION CIRCLE ──────────────────────────────────
+function svgFracCircle(shaded, total){
+  const cx=80,cy=80,r=65;
+  let paths='';
+  const slice=(2*Math.PI)/total;
+  for(let i=0;i<total;i++){
+    const a1=i*slice-Math.PI/2;
+    const a2=(i+1)*slice-Math.PI/2;
+    const x1=(cx+r*Math.cos(a1)).toFixed(2);
+    const y1=(cy+r*Math.sin(a1)).toFixed(2);
+    const x2=(cx+r*Math.cos(a2)).toFixed(2);
+    const y2=(cy+r*Math.sin(a2)).toFixed(2);
+    const large=slice>Math.PI?1:0;
+    const fill=i<shaded?"#f97316":"#fff";
+    paths+=`<path d="M${cx},${cy} L${x1},${y1} A${r},${r} 0 ${large} 1 ${x2},${y2} Z" fill="${fill}" stroke="#1f2937" stroke-width="2"/>`;
+  }
+  return`<svg viewBox="0 0 160 160" style="width:160px;height:160px">
+    <rect width="160" height="160" fill="#fffef0" rx="8"/>
+    ${paths}
+    <text x="80" y="152" text-anchor="middle" font-size="14" font-weight="900" font-family="sans-serif" fill="#1f2937">${shaded}/${total} shaded</text>
+  </svg>`;
+}
+
+// ── BASE-10 BLOCKS ────────────────────────────────────
+function svgBase10(hundreds,tens,ones){
+  const W=560,H=180;
+  let shapes='',x=20;
+  // hundreds - 10x10 grid squares
+  for(let h=0;h<Math.min(hundreds,4);h++){
+    for(let row=0;row<10;row++)for(let col=0;col<10;col++){
+      shapes+=`<rect x="${(x+col*8).toFixed(0)}" y="${(20+row*8).toFixed(0)}" width="7" height="7" fill="#3b82f6" stroke="#1e40af" stroke-width=".5"/>`;
+    }
+    shapes+=`<text x="${(x+40).toFixed(0)}" y="115" text-anchor="middle" font-size="11" font-weight="900" font-family="sans-serif" fill="#1e40af">100</text>`;
+    x+=95;
+  }
+  if(hundreds>0) x+=10;
+  // tens - tall thin rectangles
+  for(let t=0;t<Math.min(tens,9);t++){
+    for(let row=0;row<10;row++){
+      shapes+=`<rect x="${x.toFixed(0)}" y="${(20+row*8).toFixed(0)}" width="14" height="7" fill="#10b981" stroke="#065f46" stroke-width=".5"/>`;
+    }
+    shapes+=`<text x="${(x+7).toFixed(0)}" y="115" text-anchor="middle" font-size="11" font-weight="900" font-family="sans-serif" fill="#065f46">10</text>`;
+    x+=20;
+  }
+  if(tens>0) x+=10;
+  // ones - small squares
+  for(let o=0;o<Math.min(ones,9);o++){
+    shapes+=`<rect x="${x.toFixed(0)}" y="28" width="18" height="18" fill="#f97316" stroke="#9a3412" stroke-width="1"/>`;
+    shapes+=`<text x="${(x+9).toFixed(0)}" y="115" text-anchor="middle" font-size="11" font-weight="900" font-family="sans-serif" fill="#9a3412">1</text>`;
+    x+=24;
+  }
+  return`<svg viewBox="0 0 ${W} ${H}" style="width:100%;max-width:${W}px;height:auto">
+    <rect width="${W}" height="${H}" fill="#fffef0" rx="8" stroke="#d1d5db" stroke-width="1.5"/>
+    ${shapes}
+    <text x="${W/2}" y="${H-8}" text-anchor="middle" font-size="14" font-weight="900" font-family="sans-serif" fill="#1f2937">${hundreds} hundreds + ${tens} tens + ${ones} ones</text>
+  </svg>`;
+}
+
+// ── PICTOGRAPH ───────────────────────────────────────
+function svgPictograph(labels,values,icon,keyVal=2){
+  const W=500,colW=Math.floor((W-80)/labels.length);
+  const maxV=Math.max(...values);
+  const maxIcons=Math.ceil(maxV/keyVal);
+  const H=40+maxIcons*32+60;
+  let cols='';
+  labels.forEach((lbl,i)=>{
+    const icons=Math.round(values[i]/keyVal);
+    const x=80+i*colW+colW/2;
+    for(let j=0;j<icons;j++){
+      const iy=H-80-j*32;
+      cols+=`<text x="${x.toFixed(0)}" y="${iy.toFixed(0)}" text-anchor="middle" font-size="24">${icon}</text>`;
+    }
+    cols+=`<text x="${x.toFixed(0)}" y="${H-32}" text-anchor="middle" font-size="14" font-weight="900" font-family="sans-serif" fill="#1f2937">${lbl}</text>`;
+    cols+=`<text x="${x.toFixed(0)}" y="${H-14}" text-anchor="middle" font-size="13" font-family="sans-serif" fill="#555">(${values[i]})</text>`;
+  });
+  // axes
+  const axisX=`<line x1="68" y1="20" x2="68" y2="${H-45}" stroke="#374151" stroke-width="2"/>
+  <line x1="68" y1="${H-45}" x2="${W-10}" y2="${H-45}" stroke="#374151" stroke-width="2"/>`;
+  const keyText=`<text x="${W/2}" y="${H-2}" text-anchor="middle" font-size="12" font-family="sans-serif" fill="#555">${icon} = ${keyVal}</text>`;
+  return`<svg viewBox="0 0 ${W} ${H}" style="width:100%;max-width:${W}px;height:auto">
+    <rect width="${W}" height="${H}" fill="#fffef0" rx="8" stroke="#d1d5db" stroke-width="1.5"/>
+    ${axisX}${cols}${keyText}
+  </svg>`;
+}
+
+// ═══════════════════════════════════════════════════════
+// NEW QUESTION BANKS
+// ═══════════════════════════════════════════════════════
+
+// ── ELA: NOUNS ───────────────────────────────────────
+function elaNouns(){
+  return sh([
+    mc("Which word is a NOUN (person, place, or thing)?",["jump","happy","dog","quickly"],2),
+    mc("Which word is a NOUN?",["run","table","blue","slowly"],1),
+    mc("Which word names a PLACE?",["park","run","cold","loudly"],0),
+    mc("Which word is a NOUN?",["bright","under","teacher","skip"],2),
+    mc("In 'The big cat sat on the mat,' what is the NOUN?",["big","sat","cat","on"],2),
+    mc("Which is a COMMON noun (any person, place, or thing)?",["London","Emma","city","Tuesday"],2),
+    mc("Which is a PROPER noun (a special name)?",["dog","Monday","river","school"],1),
+    mc("Which word is a NOUN?",["slowly","dog","run","red"],1),
+    mc("In 'The teacher read a book,' which word is a NOUN?",["read","teacher","The","a"],1),
+    mc("Which sentence has TWO nouns?",["The dog ran fast.","She jumped high.","The cat chased a bird.","He ran outside."],2),
+    mc("Which word names a THING?",["pencil","jump","happy","quickly"],0),
+    mc("A noun can be a person, place, or ___.",["action","thing","color","feeling"],2),
+    mc("'The children played at the park.' How many nouns?",["1","2","3","4"],2),
+    mc("Which is a POSSESSIVE noun (showing ownership)?",["dogs","dog's","the dog","dogged"],1),
+    mc("Which word is a PLURAL noun (more than one)?",["child","cat","books","run"],2),
+  ]);
+}
+
+// ── ELA: VERBS ────────────────────────────────────────
+function elaVerbs(){
+  return sh([
+    mc("Which word is a VERB (action word)?",["run","happy","table","green"],0),
+    mc("Which word shows ACTION?",["blue","chair","swim","tiny"],2),
+    mc("In 'The dog barked loudly,' what is the VERB?",["dog","barked","loudly","the"],1),
+    mc("Which sentence uses the correct VERB?",["She don't like it.","She doesn't like it.","She doesn't likes it.","She don't likes it."],1),
+    mc("Which word is a VERB?",["slowly","cat","jump","red"],2),
+    mc("In 'She sings every morning,' what is the verb?",["She","sings","every","morning"],1),
+    mc("'The rabbit ___ over the log.' Which verb fits?",["hopped","fluffy","quickly","big"],0),
+    mc("Which word is a past-tense verb?",["run","runs","ran","running"],2),
+    mc("Which is an action the dog does?",["furry","barks","loud","the"],1),
+    mc("'The kids ___ and played.' Which verb fits?",["laughed","happy","fast","tiny"],0),
+    mc("In 'We cooked dinner together,' what is the verb?",["We","cooked","dinner","together"],1),
+    mc("Which word is a verb?",["purple","sing","chair","quickly"],1),
+    mc("'The bird ___ south for winter.' Which verb fits?",["fluffy","flew","nest","warm"],1),
+    mc("Which shows TWO verbs?",["The big dog.","She runs and jumps.","A red ball.","My pencil."],1),
+    mc("A verb tells us what something ___ or is.",["looks","does","smells","sounds"],1),
+  ]);
+}
+
+// ── ELA: ADJECTIVES ──────────────────────────────────
+function elaAdj(){
+  return sh([
+    mc("Which word DESCRIBES a noun (adjective)?",["tiny","teacher","under","skip"],0),
+    mc("In 'She has a fluffy cat,' what is the adjective?",["She","has","fluffy","cat"],2),
+    mc("Which word describes HOW SOMETHING LOOKS?",["sparkling","running","when","table"],0),
+    mc("Which is an adjective?",["jump","enormous","she","quickly"],1),
+    mc("In 'The cold, windy day made us shiver,' name one adjective.",["day","shiver","cold","made"],2),
+    mc("'The ___ puppy wagged its tail.' Which adjective fits best?",["ran","fluffy","quickly","under"],1),
+    mc("Which word tells WHAT KIND of animal?",["The striped zebra","ran","fast","over"],0),
+    mc("Adjectives describe ___.",["verbs","nouns","adverbs","sentences"],1),
+    mc("In 'She wore a sparkly blue dress,' how many adjectives are there?",["1","2","3","0"],1),
+    mc("Which word is an adjective?",["shout","purple","ran","him"],1),
+    mc("'A ___ elephant walked slowly.' Which adjective fits?",["enormous","ran","outside","because"],0),
+    mc("In 'The tiny bird flew away,' which word is the adjective?",["The","tiny","flew","away"],1),
+    mc("Which pair of words are BOTH adjectives?",["run and jump","hot and cold","fast and slowly","table and chair"],1),
+    mc("'The ___ ocean was beautiful.' Which word is an adjective?",["sparkling","swim","wave","deeply"],0),
+    mc("An adjective answers the question 'what kind?' or ___.",["where?","when?","how many?","why?"],2),
+  ]);
+}
+
+// ── ELA: SYNONYMS ─────────────────────────────────────
+function elaSyn(){
+  return sh([
+    mc("Which word means almost the same as HAPPY?",["sad","joyful","angry","tired"],1),
+    mc("Which word means almost the same as BIG?",["tiny","fast","huge","soft"],2),
+    mc("Which word means almost the same as RUN?",["sleep","jog","swim","sit"],1),
+    mc("Which word means almost the same as COLD?",["warm","chilly","bright","loud"],1),
+    mc("Which word means almost the same as FAST?",["slow","loud","quick","tired"],2),
+    mc("Which word means almost the same as TALK?",["listen","run","jump","speak"],3),
+    mc("Which word means almost the same as PRETTY?",["ugly","beautiful","boring","loud"],1),
+    mc("Which word means almost the same as SCARY?",["funny","cute","spooky","pretty"],2),
+    mc("Which word means almost the same as LITTLE?",["huge","tiny","loud","soft"],1),
+    mc("Which word means almost the same as START?",["end","stop","begin","finish"],2),
+    mc("Which word means almost the same as GLAD?",["mad","sad","happy","scared"],2),
+    mc("Which word means almost the same as YELL?",["whisper","shout","sing","listen"],1),
+    mc("Which word means almost the same as SLEEPY?",["awake","tired","fast","loud"],1),
+    mc("Which word means almost the same as DIRTY?",["clean","new","muddy","bright"],2),
+    mc("Which word means almost the same as STRANGE?",["normal","usual","weird","pretty"],2),
+  ]);
+}
+
+// ── ELA: ANTONYMS ─────────────────────────────────────
+function elaAnt(){
+  return sh([
+    mc("What is the OPPOSITE of HOT?",["warm","cold","heat","cook"],1),
+    mc("What is the OPPOSITE of HAPPY?",["joyful","glad","sad","excited"],2),
+    mc("What is the OPPOSITE of FAST?",["quick","slow","zoom","speedy"],1),
+    mc("What is the OPPOSITE of TALL?",["big","large","short","huge"],2),
+    mc("What is the OPPOSITE of NIGHT?",["dark","stars","day","moon"],2),
+    mc("What is the OPPOSITE of PUSH?",["shove","carry","lift","pull"],3),
+    mc("What is the OPPOSITE of LOUD?",["noisy","quiet","shout","boom"],1),
+    mc("What is the OPPOSITE of EMPTY?",["hollow","bare","full","open"],2),
+    mc("What is the OPPOSITE of CLEAN?",["fresh","bright","dirty","new"],2),
+    mc("What is the OPPOSITE of OPEN?",["shut","wide","big","jar"],0),
+    mc("What is the OPPOSITE of START?",["begin","go","end","try"],2),
+    mc("What is the OPPOSITE of HARD?",["rough","tough","soft","strong"],2),
+    mc("What is the OPPOSITE of SMILE?",["laugh","grin","frown","sing"],2),
+    mc("What is the OPPOSITE of ABOVE?",["over","high","below","sky"],2),
+    mc("What is the OPPOSITE of EARLY?",["soon","now","never","late"],3),
+  ]);
+}
+
+// ── ELA: SENTENCES ────────────────────────────────────
+function elaSent(){
+  return sh([
+    mc("Which sentence is written CORRECTLY?",["i like pizza.","I like pizza.","i Like pizza.","I Like Pizza."],1),
+    mc("Which sentence is written CORRECTLY?",["Me and Jake went.","Jake and me went.","Jake and I went.","I and Jake went."],2),
+    mc("Which sentence needs a QUESTION MARK?",["I like dogs","Where is my bag","The dog ran","She has a hat"],1),
+    mc("Which is a COMPLETE sentence?",["The big dog.","Ran to school.","The cat slept on the mat.","Because it rained."],2),
+    mc("Which sentence has CORRECT punctuation?",["She runs fast.","She runs fast","she runs fast.","She runs fast!"],0),
+    mc("Find the CORRECTLY written sentence.",["The dogs is barking.","The dog are barking.","The dogs are barking.","Dogs barking is."],2),
+    mc("Which sentence uses the correct verb?",["She don't like snakes.","She doesn't like snakes.","She doesn't likes snakes.","She don't likes snakes."],1),
+    mc("Which is NOT a complete sentence?",["She jumped high.","A tiny happy bird.","The book fell down.","We ate lunch."],1),
+    mc("Which sentence starts correctly?",["the cat sat.","The cat sat.","THE cat sat.","tHE cat sat."],1),
+    mc("Choose the correct sentence.",["We went to Target.","we went to Target.","We went to target.","we went to target."],0),
+    mc("Which uses CORRECT capitalization for a proper noun?",["I saw mrs. jones.","I saw Mrs. Jones.","i saw Mrs. Jones.","I saw Mrs. jones."],1),
+    mc("Which is a TELLING sentence (statement)?",["Is that your dog?","Watch out!","My dog is fluffy.","Come here now!"],2),
+    mc("Which is an ASKING sentence (question)?",["I eat at noon.","Sit down please.","Did you see that?","What a great day!"],2),
+    mc("'The two ___ sat on the mat.' Which word is correct?",["cat","cats","catted","cating"],1),
+    mc("Which sentence uses THEY'RE correctly?",["Their going to the park.","There going to the park.","They're going to the park.","Theyre going."],2),
+  ]);
+}
+
+// ── RULER QUESTIONS ───────────────────────────────────
+function rulerBank(){
+  const qs=[];
+  const items=[
+    {name:"crayon",len:6,total:12},{name:"pencil",len:7,total:12},
+    {name:"eraser",len:3,total:8},{name:"marker",len:5,total:10},
+    {name:"stick",len:4,total:8},{name:"ribbon",len:9,total:12},
+    {name:"worm",len:2,total:6},{name:"paper clip",len:1,total:4},
+  ];
+  items.forEach(item=>{
+    const w=[item.len-1,item.len+1,item.len+2,item.len-2].filter(x=>x>0&&x!==item.len);
+    qs.push({
+      q:`How long is the ${item.name}?`,
+      choices:sh([`${item.len} inches`,...w.slice(0,3).map(x=>`${x} inch${x===1?'':'es'}`)]),
+      ans:0,wide:true,visual:svgRuler(item.len,item.total,item.name),
+      get ans(){return this.choices.indexOf(`${item.len} inches`)||0}
+    });
+  });
+  // comparison questions
+  const pairs=[
+    {a:{name:"pencil",len:7},b:{name:"crayon",len:4},total:12},
+    {a:{name:"marker",len:9},b:{name:"eraser",len:3},total:12},
+  ];
+  pairs.forEach(p=>{
+    qs.push(mc(`A ${p.a.name} is ${p.a.len} inches. A ${p.b.name} is ${p.b.len} inches. How much longer is the ${p.a.name}?`,
+      [String(p.a.len-p.b.len)+"inch",String(p.a.len)+"inch",String(p.b.len)+"inch",String(p.a.len+p.b.len)+"inch"].map(x=>x.replace("inch"," inches")),0));
+  });
+  return sh(qs);
+}
+
+// ── BALANCE QUESTIONS ─────────────────────────────────
+function balanceBank(){
+  return sh([
+    {q:"Which side is HEAVIER?",choices:sh(["Left side","Right side","Same weight","Can't tell"]),ans:0,visual:svgBalance("10 lbs","5 lbs","left"),get ans(){return this.choices.indexOf("Left side")}},
+    {q:"Which side is HEAVIER?",choices:sh(["Left side","Right side","Same weight","Can't tell"]),ans:0,visual:svgBalance("3 lbs","8 lbs","right"),get ans(){return this.choices.indexOf("Right side")}},
+    {q:"The scale is balanced. What does that mean?",choices:sh(["Both sides weigh the same","Left is heavier","Right is heavier","Nothing"]),ans:0,visual:svgBalance("6 lbs","6 lbs","level"),get ans(){return this.choices.indexOf("Both sides weigh the same")}},
+    {q:"Which side is LIGHTER?",choices:sh(["Left side","Right side","Same weight","Both heavy"]),ans:0,visual:svgBalance("2 lbs","9 lbs","right"),get ans(){return this.choices.indexOf("Left side")}},
+    {q:"Which side is HEAVIER?",choices:sh(["Left side","Right side","Same weight","Can't tell"]),ans:0,visual:svgBalance("15 lbs","7 lbs","left"),get ans(){return this.choices.indexOf("Left side")}},
+    mc("A kitten weighs 2 pounds. A puppy weighs 5 pounds. Which is heavier?",["kitten","puppy","same","can't tell"],1,svgBalance("2 lbs","5 lbs","right")),
+    mc("A book weighs 1 pound. A backpack weighs 6 pounds. How much heavier is the backpack?",["4 pounds","5 pounds","6 pounds","7 pounds"],1,svgBalance("1 lb","6 lbs","right")),
+    mc("Which tool do you use to measure weight?",["ruler","thermometer","scale","clock"],2,svgBalance("5 lbs","5 lbs","level")),
+    mc("What unit is used to measure weight in the US?",["inches","pounds","gallons","miles"],1,svgBalance("1 lb","1 lb","level")),
+    mc("A watermelon weighs 10 pounds. An apple weighs 1 pound. The watermelon is ___ pounds heavier.",["8","9","10","11"],1,svgBalance("10 lbs","1 lb","left")),
+    mc("A bag weighs 4 pounds. A box weighs 4 pounds. Which is heavier?",["bag","box","same","can't tell"],2,svgBalance("4 lbs","4 lbs","level")),
+    mc("A ball weighs 3 pounds. A dog weighs 12 pounds. Which is lighter?",["ball","dog","same","both"],0,svgBalance("3 lbs","12 lbs","right")),
+    mc("A pumpkin weighs 8 pounds. A melon weighs 5 pounds. How much heavier is the pumpkin?",["2 pounds","3 pounds","4 pounds","5 pounds"],1,svgBalance("8 lbs","5 lbs","left")),
+    mc("If both sides are level, the weights are ___.",["equal","different","lighter","missing"],0,svgBalance("7 lbs","7 lbs","level")),
+  ]);
+}
+
+// ── THERMOMETER QUESTIONS ─────────────────────────────
+function thermBank(){
+  const temps=[32,50,68,72,80,90,98,100];
+  const qs=[];
+  temps.forEach(t=>{
+    const w=[t-10,t+10,t-5,t+5].filter(x=>x>=0&&x!==t);
+    qs.push({
+      q:"What temperature does the thermometer show?",
+      choices:sh([`${t}°F`,...w.slice(0,3).map(x=>`${x}°F`)]),
+      ans:0,visual:svgThermometer(t,0,100),
+      get ans(){return this.choices.indexOf(`${t}°F`)}
+    });
+  });
+  qs.push(...[
+    mc("Water freezes at ___ degrees F.",["0°F","32°F","50°F","100°F"],1,svgThermometer(32,0,100)),
+    mc("On a hot summer day, the temperature might be ___.",["20°F","32°F","90°F","200°F"],2,svgThermometer(90,0,100)),
+    mc("If it is 70°F outside and it drops 10 degrees, what is the temperature?",["50°F","60°F","70°F","80°F"],1,svgThermometer(60,0,100)),
+    mc("Which temperature is coldest?",["80°F","45°F","72°F","60°F"],1,svgThermometer(45,0,100)),
+    mc("A thermometer measures ___.",["weight","length","temperature","time"],2,svgThermometer(72,0,100)),
+    mc("Which temperature is warmer?",["40°F","55°F","30°F","20°F"],1,svgThermometer(55,0,100)),
+    mc("If it is 80°F and gets 5 degrees hotter, what is it?",["75°F","80°F","85°F","90°F"],2,svgThermometer(85,0,100)),
+    mc("Which reading is closest to room temperature?",["32°F","70°F","100°F","10°F"],1,svgThermometer(70,0,100)),
+  ]);
+  return sh(qs);
+}
+
+// ── FRACTION CIRCLE QUESTIONS ─────────────────────────
+function fracCircleBank(){
+  const qs=[];
+  const fracs=[
+    {s:1,t:2,name:"one half"},{s:1,t:4,name:"one fourth"},
+    {s:3,t:4,name:"three fourths"},{s:1,t:3,name:"one third"},
+    {s:2,t:3,name:"two thirds"},{s:2,t:4,name:"two fourths"},{s:3,t:3,name:"one whole"},{s:4,t:4,name:"one whole"},{s:1,t:6,name:"one sixth"},{s:5,t:6,name:"five sixths"},
+  ];
+  fracs.forEach(f=>{
+    qs.push({
+      q:`What fraction of the circle is shaded?`,
+      choices:sh([`${f.s}/${f.t}`,`${f.t-f.s}/${f.t}`,`${f.s}/${f.t+1}`,`${f.s+1}/${f.t}`]),
+      ans:0,visual:svgFracCircle(f.s,f.t),
+      get ans(){return this.choices.indexOf(`${f.s}/${f.t}`)}
+    });
+    qs.push({
+      q:`Is the shaded part more than half or less than half?`,
+      choices:sh([f.s/f.t>0.5?"More than half":"Less than half",f.s/f.t>0.5?"Less than half":"More than half","Exactly half","Can't tell"]),
+      ans:0,visual:svgFracCircle(f.s,f.t),
+      get ans(){return this.choices.indexOf(f.s/f.t>0.5?"More than half":"Less than half")}
+    });
+  });
+  return sh(qs);
+}
+
+// ── BASE-10 BLOCK QUESTIONS ───────────────────────────
+function base10Bank(){
+  const nums=[
+    [2,3,5],[1,4,7],[3,0,2],[2,5,0],[1,8,3],[4,2,6],[3,6,1],[2,0,8],[1,1,4],[3,3,9]
+  ];
+  const qs=[];
+  nums.forEach(([h,t,o])=>{
+    const n=h*100+t*10+o;
+    const w=[n+1,n-1,n+10,n-10,n+100].filter(x=>x>0&&x!==n);
+    // ensure unique choices
+    const wUniq=[...new Set(w)].slice(0,3);
+    qs.push({
+      q:"What number do the blocks show?",
+      choices:sh([String(n),...wUniq.map(String)]),
+      ans:0,wide:true,visual:svgBase10(h,t,o),
+      get ans(){return this.choices.indexOf(String(n))}
+    });
+    qs.push({
+      q:`In ${n}, what does the TENS digit represent?`,
+      choices:sh([String(t*10),String(h*100),String(o),String(n)]),
+      ans:0,visual:svgBase10(h,t,o),wide:true,
+      get ans(){
+        const choices=sh([String(t*10),String(h*100),String(o),String(n)]);
+        return choices.indexOf(String(t*10));
+      }
+    });
+  });
+  return sh(qs);
+}
+
+// ── PICTOGRAPH QUESTIONS ──────────────────────────────
+function pictographBank(){
+  const qs=[];
+  const sets=[
+    {labels:["Dogs","Cats"],values:[8,4],icon:"🐾",key:2},
+    {labels:["⚽ Soccer","🏀 Basketball"],values:[10,6],icon:"🏅",key:2},
+    {labels:["🌞 Sunny","🌧️ Rainy"],values:[6,2],icon:"⭐",key:2},
+    {labels:["🍕 Pizza","🌮 Tacos"],values:[4,6],icon:"🍽️",key:2},
+    {labels:["Boys","Girls"],values:[8,10],icon:"👤",key:2},
+  ];
+  sets.forEach(s=>{
+    const [la,lb]=[s.labels[0],s.labels[1]];
+    const [va,vb]=[s.values[0],s.values[1]];
+    const total=va+vb,diff=Math.abs(va-vb),more=va>vb?la:lb;
+    const vis=svgPictograph(s.labels,s.values,s.icon,s.key);
+    qs.push({q:`Look at the pictograph.
+${s.icon} = ${s.key}
+Which has MORE?`,
+      choices:sh([more,la===more?lb:la,"Same","Can't tell"]),
+      ans:0,wide:true,visual:vis,
+      get ans(){return this.choices.indexOf(more)}});
+    qs.push({q:`Look at the pictograph.
+${s.icon} = ${s.key}
+How many ${la} in all?`,
+      choices:sh([String(va),String(vb),String(total),String(diff)]),
+      ans:0,wide:true,visual:vis,
+      get ans(){return this.choices.indexOf(String(va))}});
+    qs.push({q:`Look at the pictograph.
+${s.icon} = ${s.key}
+How many total?`,
+      choices:sh([String(total),String(va),String(vb),String(diff)]),
+      ans:0,wide:true,visual:vis,
+      get ans(){return this.choices.indexOf(String(total))}});
+  });
+  return sh(qs);
+}
+
+
 </script>
 </body>
 </html>
