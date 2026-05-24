@@ -222,9 +222,9 @@ button{cursor:pointer}
   font-size:inherit;font-family:inherit;background:transparent;color:var(--white)
 }
 .tap-word:hover{background:rgba(255,215,0,.2);border-color:var(--gold)}
-.tap-word.tapped-good{background:rgba(46,213,115,.25);border-color:var(--green);color:var(--green)}
-.tap-word.tapped-bad{background:rgba(255,71,87,.25);border-color:var(--red);color:var(--red);animation:shake .25s}
-.tap-word.should-be{animation:blink .5s step-end 4}
+.tap-word.tapped-good{background:rgba(46,213,115,.45)!important;border-color:var(--green)!important;border-width:4px!important;color:#2ed573!important;transform:scale(1.06)}
+.tap-word.tapped-bad{background:rgba(255,71,87,.4)!important;border-color:var(--red)!important;border-width:4px!important;color:#ff6b81!important;animation:shake .25s}
+.tap-word.should-be{background:rgba(46,213,115,.55)!important;border-color:var(--green)!important;border-width:4px!important;color:#2ed573!important;animation:blink .5s step-end 4}
 
 /* ─── ZONE COMPLETE ─────────────────────────────────────────── */
 #zoneOver{
@@ -1480,7 +1480,7 @@ function renderTap(z, q, area) {
     sentDiv.querySelectorAll('.tap-word').forEach(s => {
       const idx = parseInt(s.dataset.idx);
       if(targets.has(idx) && !s.classList.contains('tapped-good')) {
-        s.classList.add('tapped-bad');
+        s.classList.add('tapped-good');
       }
     });
     lives = Math.max(0, lives - 1);

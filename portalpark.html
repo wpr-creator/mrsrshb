@@ -225,21 +225,21 @@ button{font-family:var(--body);font-weight:900;cursor:pointer}
   background:#fff;box-shadow:0 6px 0 var(--line);
   transition:.08s;display:flex;align-items:center;justify-content:center;gap:10px;
   /* use Kenney button style */
-  background-image:url('/mrsrshb/assets/kenney-ui/PNG/Blue/Default/button_rectangle_depth_gloss.png');
+  /* kenney button applied via JS */
   background-size:100% 100%;background-repeat:no-repeat;
   color:var(--ink);
 }
 .ans-btn:hover:not(:disabled){
   transform:translateY(-3px);box-shadow:0 9px 0 var(--line);
-  background-image:url('/mrsrshb/assets/kenney-ui/PNG/Yellow/Default/button_rectangle_depth_gloss.png');
+  /* kenney hover button via JS */
 }
 .ans-btn:active:not(:disabled){transform:translateY(4px);box-shadow:0 2px 0 var(--line)}
 .ans-btn.correct{
-  background-image:url('/mrsrshb/assets/kenney-ui/PNG/Green/Default/button_rectangle_depth_gloss.png');
+  /* kenney correct button via JS */
   border-color:var(--green);color:#14532d;animation:pop .25s;
 }
 .ans-btn.wrong{
-  background-image:url('/mrsrshb/assets/kenney-ui/PNG/Red/Default/button_rectangle_depth_gloss.png');
+  /* kenney wrong button via JS */
   border-color:var(--red);color:#7f1d1d;animation:shake .3s;
 }
 .ans-btn:disabled{cursor:default}
@@ -423,7 +423,7 @@ button{font-family:var(--body);font-weight:900;cursor:pointer}
 // ═══════════════════════════════════════════════════════
 // ASSET PATHS (relative to /mrsrshb/ base)
 // ═══════════════════════════════════════════════════════
-const BASE = '/mrsrshb/assets/';
+const BASE = (location.hostname==='localhost'||location.hostname==='127.0.0.1') ? '/assets/' : '/mrsrshb/assets/';
 const A = {
   animals: {
     elephant: BASE+'kenney-animals/PNG/Round/elephant.png',
@@ -680,7 +680,7 @@ function onWrong(btn){
   hearts--;
   updateHud();
   gsap.to(btn,{x:-8,duration:.05,repeat:5,yoyo:true});
-  if(hearts<=0)setTimeout(showGameOver,1000);
+  if(hearts<=0){locked=true;setTimeout(showGameOver,1000);return;}
 }
 
 function nextQ(){qIdx++;if(qIdx>=deck.length)endRun();else{locked=false;renderQ()}}
@@ -885,9 +885,7 @@ function renderDrag(q,area){
       fb.textContent='Drag some coins into the box first!';fb.className='feedback bad';
     }
   };
-  // skip/reveal after wrong attempts
-  let attempts=0;
-  checkBtn.addEventListener('click',()=>{attempts++;if(attempts>=3&&currentTotal!==q.target){locked=true;onWrong(checkBtn);fb.textContent='The answer was '+q.target+'¢';fb.className='feedback bad';if(hearts>0)setTimeout(nextQ,1600);}},true);
+
 
   area.appendChild(bank);area.appendChild(drop);area.appendChild(total);area.appendChild(checkBtn);area.appendChild(fb);
 }
@@ -1148,7 +1146,7 @@ function graphBank(){
     // ensure unique choices for diff question
     const diffChoices=[...new Set([String(diff),String(va),String(vb),String(total)])];
     while(diffChoices.length<4)diffChoices.push(String(diff+diffChoices.length));
-    qs.push({q:`Look at the graph.\nWhich has MORE?`,choices:sh([more,la===more?lb:la,'Same','Can\'t tell']),wide:true,type:'mc',get ans(){return this.choices.indexOf(more)}});
+    qs.push({q:`Look at the graph.\nWhich has MORE?`,choices:sh([more,la===more?lb:la,'Same','Can\'t tell']),wide:true,visual:vis,type:'mc',get ans(){return this.choices.indexOf(more)}});
     qs.push({q:`Look at the graph.\nHow many more ${la} than ${lb}?`,choices:sh(diffChoices),wide:true,visual:vis,type:'mc',get ans(){return this.choices.indexOf(String(diff))}});
     qs.push({q:`Look at the graph.\nHow many in all?`,choices:sh([...new Set([String(total),String(diff),String(va),String(vb)])]),wide:true,visual:vis,type:'mc',get ans(){return this.choices.indexOf(String(total))}});
   });
@@ -1181,6 +1179,11 @@ function elaNouns(){return sh([
   mc("Which sentence has TWO nouns?",["The dog ran fast.","She jumped high.","The cat chased a bird.","He ran outside."],2),
   mc("A noun names a person, place, or ___.",["action","thing","color","verb"],1),
   mc("Which is a POSSESSIVE noun?",["dogs","dog's","the dog","dogged"],1),
+  // TAP questions - find the noun
+  {q:'Tap every NOUN in the sentence:',type:'tap',sentence:['The','big','cat','sat','on','the','mat','.'],targets:[2,6]},
+  {q:'Tap every NOUN in the sentence:',type:'tap',sentence:['A','dog','ran','to','the','park','.'],targets:[1,5]},
+  {q:'Tap every NOUN in the sentence:',type:'tap',sentence:['The','teacher','read','a','book','today','.'],targets:[1,4]},
+  {q:'Tap every NOUN in the sentence:',type:'tap',sentence:['My','friend','has','a','rabbit','and','a','fish','.'],targets:[1,4,7]},
 ])}
 
 function elaVerbs(){return sh([
@@ -1195,6 +1198,10 @@ function elaVerbs(){return sh([
   mc("'The bird ___ south for winter.' Which verb fits?",['fluffy','flew','nest','warm'],1),
   mc("In 'We cooked dinner together,' what is the verb?",['We','cooked','dinner','together'],1),
   mc("Which sentence has a verb?",["The big red apple.","She runs every day.","A happy little dog.","Under the tall tree."],1),
+  // TAP questions - find the verb
+  {q:'Tap every VERB in the sentence:',type:'tap',sentence:['The','dog','barked','and','ran','away','.'],targets:[2,4]},
+  {q:'Tap every VERB in the sentence:',type:'tap',sentence:['She','sings','and','dances','every','day','.'],targets:[1,3]},
+  {q:'Tap every VERB in the sentence:',type:'tap',sentence:['The','kids','laughed','and','played','outside','.'],targets:[2,4]},
 ])}
 
 function elaAdj(){return sh([
