@@ -44,8 +44,9 @@ button{font-family:var(--body);font-weight:900;color:var(--ink);cursor:pointer}
   gap:20px;padding:28px 16px;position:relative;overflow:hidden;
 }
 #title::before{
-  content:"✦ ✧ ✦ ✧ ✦ ✧ ✦ ✧ ✦";position:absolute;top:14px;left:0;right:0;
-  color:rgba(255,255,255,.15);font-size:1.4rem;letter-spacing:18px;pointer-events:none;
+  content:'';position:absolute;top:14px;left:0;right:0;height:72px;
+  background:url('assets/kenney/backgrounds/Platformer Assets Base/PNG/Background/bg_clouds.png') center/contain repeat-x;
+  opacity:.15;pointer-events:none;
 }
 .title-card{padding:28px;max-width:800px;width:100%;background:rgba(255,255,255,.95)}
 .title-portals{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-bottom:8px}
@@ -94,6 +95,7 @@ button{font-family:var(--body);font-weight:900;color:var(--ink);cursor:pointer}
 .portal-name{font-family:var(--display);font-size:clamp(1.3rem,3vw,1.7rem);line-height:1;color:#1e3a5f}
 .portal-desc{font-size:clamp(.9rem,2.1vw,1.05rem);font-weight:900;color:#374151;line-height:1.3}
 .portal-status{font-size:clamp(.8rem,1.8vw,.95rem);font-weight:900;color:#6b7280;margin-top:2px}
+.portal-status-icon{width:1rem;height:1rem;vertical-align:middle;margin-right:6px;}
 .portal.done .portal-info{background:linear-gradient(180deg,rgba(255,255,255,.96),rgba(255,240,180,.6))}
 
 /* ══════════════════════════════════
@@ -110,7 +112,8 @@ button{font-family:var(--body);font-weight:900;color:var(--ink);cursor:pointer}
 .hud-icon svg{width:100%;height:100%}
 .hud-name{font-family:var(--display);font-size:clamp(1rem,2.5vw,1.4rem);color:#1e3a5f;line-height:1.1}
 .hud-q{font-size:clamp(.85rem,2vw,1rem);font-weight:900;color:#6b7280}
-.hearts{font-size:clamp(1rem,2.5vw,1.3rem);letter-spacing:2px;flex-shrink:0}
+.hearts{font-size:clamp(1rem,2.5vw,1.3rem);letter-spacing:2px;flex-shrink:0;display:flex;align-items:center;gap:4px}
+.hearts img{width:1.3rem;height:1.3rem;object-fit:contain;}
 .hud-coins{font-family:var(--display);font-size:clamp(.9rem,2.2vw,1.1rem);background:#fff;border:3px solid var(--line);border-radius:12px;padding:6px 10px;white-space:nowrap}
 .prog-wrap{width:100%;height:16px;background:#f3f4f6;border:3px solid var(--line);border-radius:999px;overflow:hidden;flex-shrink:0}
 .prog-fill{height:100%;background:linear-gradient(90deg,var(--green),#84cc16);border-radius:999px;transition:.3s}
@@ -152,6 +155,7 @@ button{font-family:var(--body);font-weight:900;color:var(--ink);cursor:pointer}
 .modal{position:fixed;inset:0;z-index:90;display:flex;align-items:center;justify-content:center;background:rgba(249,245,235,.92);padding:18px}
 .modal-card{max-width:620px;width:100%;padding:26px;text-align:center;display:flex;flex-direction:column;gap:14px;align-items:center}
 .modal-icon{font-size:4.5rem}
+.modal-icon img{width:2.2rem;height:2.2rem;object-fit:contain;vertical-align:middle;}
 .modal-title{font-family:var(--display);font-size:clamp(2rem,6vw,3.2rem);color:#1e3a5f;line-height:1}
 .modal-text{font-size:clamp(1rem,2.5vw,1.3rem);font-weight:900;line-height:1.45;color:#374151}
 
@@ -190,10 +194,10 @@ svg{max-width:100%;height:auto}
 <!-- HUB -->
 <section id="hub" class="screen">
   <div class="topbar">
-    <div class="stat" id="rankStat">🌟 Rank 1</div>
+    <div class="stat" id="rankStat"><img src="assets/kenney/ui/Medals/PNG/flat_medal1.png" alt="Rank"/> Rank 1</div>
     <div class="stat" id="coinStat">Coins: 0</div>
-    <div class="stat" id="badgeStat">🏅 0 / 7</div>
-    <button class="btn sm ghost" onclick="resetAll()">↺ Reset</button>
+    <div class="stat" id="badgeStat"><img src="assets/kenney/ui/Medals/PNG/flat_medal5.png" alt="Badge"/> 0 / 7</div>
+    <button class="btn sm ghost" onclick="resetAll()">Reset</button>
   </div>
   <h2 class="hub-title">Pick Your Portal</h2>
   <p class="hub-sub">Find the badge in each world to unlock the next one.</p>
@@ -210,7 +214,7 @@ svg{max-width:100%;height:auto}
         <div class="hud-q" id="hudQ">Challenge 1 of 8</div>
       </div>
     </div>
-    <div class="hearts" id="hearts">❤️❤️❤️</div>
+    <div class="hearts" id="hearts"><img src="assets/kenney/backgrounds/Platformer Assets Base/PNG/HUD/hud_heartFull.png" alt="Heart"/><img src="assets/kenney/backgrounds/Platformer Assets Base/PNG/HUD/hud_heartFull.png" alt="Heart"/><img src="assets/kenney/backgrounds/Platformer Assets Base/PNG/HUD/hud_heartFull.png" alt="Heart"/></div>
     <div class="hud-coins" id="hudCoins">Coins: 0</div>
     <div class="prog-wrap" style="flex-basis:100%"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
   </div>
@@ -224,7 +228,7 @@ svg{max-width:100%;height:auto}
 <!-- TREASURE -->
 <div id="treasure" class="modal hidden">
   <div class="modal-card card">
-    <div class="modal-icon" id="treasureIcon">🎁</div>
+    <div class="modal-icon" id="treasureIcon"><img src="assets/kenney/ui/Medals/PNG/flat_medal3.png" alt="Treasure"/></div>
     <div class="modal-title">Portal Prize!</div>
     <div class="modal-text" id="treasureText">You found coins!</div>
     <button class="btn" onclick="closeTreasure()">Keep Going ▶</button>
@@ -234,7 +238,7 @@ svg{max-width:100%;height:auto}
 <!-- COMPLETE -->
 <div id="complete" class="modal hidden">
   <div class="modal-card card">
-    <div class="modal-icon" id="completeIcon">🏅</div>
+    <div class="modal-icon" id="completeIcon"><img src="assets/kenney/ui/Medals/PNG/flatshadow_medal5.png" alt="Complete"/></div>
     <div class="modal-title" id="completeTitle">Badge Found!</div>
     <div class="modal-text" id="completeText">Great work!</div>
     <button class="btn" onclick="finishRun()">Back to Portal Park ▶</button>
@@ -245,7 +249,7 @@ svg{max-width:100%;height:auto}
 <!-- GAME OVER -->
 <div id="gameover" class="modal hidden">
   <div class="modal-card card">
-    <div class="modal-icon">💤</div>
+    <div class="modal-icon"><img src="assets/kenney/ui/Medals/PNG/flat_medal9.png" alt="Rest"/></div>
     <div class="modal-title">Portal Closed!</div>
     <div class="modal-text">You ran out of hearts. Try again!</div>
     <button class="btn" onclick="restartRun()">Try Again ▶</button>
@@ -401,18 +405,19 @@ const PORTALS=[
 ];
 
 const EVENTS={
-  candy:["A gumdrop door appears! 🍬","A candy chest sparkles!","The lollipop path glows!","Sugar rush activated!"],
-  animals:["A lion roars nearby! 🦁","Zebra herd spotted!","An elephant splashes!","Giraffe peers over!"],
-  space:["Mission Control calling! 📡","Asteroid belt ahead!","Rocket fuel check!","Stars aligning!"],
-  zootopia:["Case file opened! 📋","ZPD dispatch!","Judy has a lead!","Nick spots something!"],
-  stitch:["Experiment 626 appears! 👽","Ohana moment!","Hawaii vibes!","Nani needs help!"],
-  roblox:["New game loading! 🎮","Robux incoming!","Obby checkpoint!","Avatar unlocked!"],
-  katseye:["Stage lights on! 🎤","Fan vote time!","STAR fandom rising!","Concert starts now!"]
+  candy:["A gumdrop door appears!","A candy chest sparkles!","The lollipop path glows!","Sugar rush activated!"],
+  animals:["A lion roars nearby!","Zebra herd spotted!","An elephant splashes!","Giraffe peers over!"],
+  space:["Mission Control calling!","Asteroid belt ahead!","Rocket fuel check!","Stars aligning!"],
+  zootopia:["Case file opened!","ZPD dispatch!","Judy has a lead!","Nick spots something!"],
+  stitch:["Experiment 626 appears!","Ohana moment!","Hawaii vibes!","Nani needs help!"],
+  roblox:["New game loading!","Robux incoming!","Obby checkpoint!","Avatar unlocked!"],
+  katseye:["Stage lights on!","Fan vote time!","STAR fandom rising!","Concert starts now!"]
 };
 
 // ═══════════════════════════════════════════════════════
 // ENGINE
 // ═══════════════════════════════════════════════════════
+const QUESTION_ICON = '<img src="assets/kenney/ui/Medals/PNG/flat_medal1.png" alt="Question icon"/>';
 const SAVE_KEY="portal_park_v4";
 let state={coins:0,badges:{},rank:1};
 let current=null,deck=[],qIdx=0,hearts=3,correct=0,locked=false;
@@ -440,7 +445,7 @@ function buildHub(){
       <div class="portal-info">
         <div class="portal-name">${p.name}</div>
         <div class="portal-desc">${p.desc}</div>
-        <div class="portal-status">${done?"🏅 Badge earned — portal open":"Tap to enter"}</div>
+        <div class="portal-status">${done?'<img src="assets/kenney/ui/Medals/PNG/flatshadow_medal5.png" alt="Badge" class="portal-status-icon"/> Badge earned — portal open':'Tap to enter'}</div>
       </div>`;
     el.onclick=()=>launch(p.id);
     grid.appendChild(el);
@@ -460,7 +465,7 @@ function launch(id){
 
 function updateHud(){
   document.getElementById("hudQ").textContent=`Challenge ${qIdx+1} of ${deck.length}`;
-  document.getElementById("hearts").textContent="❤️".repeat(hearts)+"🤍".repeat(Math.max(0,3-hearts));
+  document.getElementById("hearts").innerHTML= '<img src="assets/kenney/backgrounds/Platformer Assets Base/PNG/HUD/hud_heartFull.png" alt="Heart"/>' .repeat(hearts) + '<img src="assets/kenney/backgrounds/Platformer Assets Base/PNG/HUD/hud_heartEmpty.png" alt="Empty heart"/>' .repeat(Math.max(0,3-hearts));
   document.getElementById("hudCoins").innerHTML=`<img src="assets/kenney/sprites/Generic Items/PNG/Colored/genericItem_color_057.png" alt="Coins"/> ${state.coins}`;
   document.getElementById("progFill").style.width=(qIdx/deck.length*100)+"%";
   document.getElementById("eventBar").textContent=rand(EVENTS[current.id]);
@@ -507,8 +512,17 @@ function answer(i){
 function nextQ(){qIdx++;if(qIdx>=deck.length)endRun();else renderQ()}
 
 function showTreasure(gain){
-  const icons=["🎁","💎","🌟","🪄","🍀","🎟️","⭐","🏆"];
-  document.getElementById("treasureIcon").textContent=rand(icons);
+  const icons=[
+    'assets/kenney/ui/Medals/PNG/flatshadow_medal1.png',
+    'assets/kenney/ui/Medals/PNG/flatshadow_medal2.png',
+    'assets/kenney/ui/Medals/PNG/flatshadow_medal3.png',
+    'assets/kenney/ui/Medals/PNG/flatshadow_medal4.png',
+    'assets/kenney/ui/Medals/PNG/flatshadow_medal5.png',
+    'assets/kenney/ui/Medals/PNG/flatshadow_medal6.png',
+    'assets/kenney/ui/Medals/PNG/flatshadow_medal7.png',
+    'assets/kenney/ui/Medals/PNG/flatshadow_medal8.png'
+  ];
+  document.getElementById("treasureIcon").innerHTML=`<img src="${rand(icons)}" alt="Treasure"/>`;
   document.getElementById("treasureText").textContent=`You found ${gain} coins inside ${current.name}!`;
   document.getElementById("treasure").classList.remove("hidden");
 }
@@ -518,7 +532,7 @@ function endRun(){
   document.getElementById("progFill").style.width="100%";
   const won=correct>=6;
   if(won){state.badges[current.id]=true;state.coins+=20;save()}
-  document.getElementById("completeIcon").textContent=won?"🏅":"⭐";
+  document.getElementById("completeIcon").innerHTML=won?'<img src="assets/kenney/ui/Medals/PNG/flatshadow_medal5.png" alt="Badge"/>':'<img src="assets/kenney/ui/Medals/PNG/flatshadow_medal9.png" alt="Complete"/>';
   document.getElementById("completeTitle").textContent=won?"Badge Found!":"Run Complete!";
   document.getElementById("completeText").textContent=won
     ?`${correct}/8 correct — ${current.name} badge earned! +20 bonus coins!`
@@ -775,22 +789,22 @@ function timeBank(){
 // ── FRACTIONS ─────────────────────────────────────────
 function fracBank(){
   return sh([
-    mc("A pizza has 4 equal slices. You eat 1. What fraction did you eat?",["1/4","1/2","1/3","4/1"],0,"🍕"),
-    mc("Which fraction shows one half?",["1/2","1/4","2/1","2/4"],0,"🥧"),
-    mc("Which fraction shows one fourth?",["1/4","1/2","4/1","2/4"],0,"🍫"),
-    mc("Two equal parts of a whole are called…",["halves","thirds","fourths","fifths"],0,"✂️"),
-    mc("Four equal parts of a whole are called…",["fourths","halves","thirds","sixths"],0,"🍰"),
-    mc("Which is larger — 1/2 or 1/4?",["1/2","1/4","same","can't tell"],0,"📐"),
-    mc("3 out of 4 equal parts = ?",["3/4","1/4","3/3","4/3"],0,"🥧"),
-    mc("Which shows a whole?",["4/4","1/4","2/4","0/4"],0,"🍕"),
-    mc("A sandwich is cut in half. How many pieces?",["2","1","3","4"],0,"🥪"),
-    mc("You share a cake equally with 1 friend. Each gets…",["1/2","1/4","1/3","1 whole"],0,"🎂"),
-    mc("What does the bottom number in a fraction tell you?",["Total equal parts","Parts eaten","The whole number","The color"],0,"🔢"),
-    mc("A pie is cut into 4 equal pieces. 2 are eaten. What fraction is left?",["2/4","1/4","3/4","4/4"],0,"🥧"),
-    mc("Which fraction shows one third?",["1/3","1/2","1/4","3/4"],0,"🍰"),
-    mc("What fraction is equal to 2/4?",["1/2","2/4","3/4","1/4"],0,"🍕"),
-    mc("Which is smaller — 1/3 or 1/2?",["1/3","1/2","same","can't tell"],0,"📏"),
-    mc("You shade 3 of 6 equal parts. What fraction is shaded?",["3/6","1/6","2/6","4/6"],0,"🎨"),
+    mc("A pizza has 4 equal slices. You eat 1. What fraction did you eat?",["1/4","1/2","1/3","4/1"],0,QUESTION_ICON),
+    mc("Which fraction shows one half?",["1/2","1/4","2/1","2/4"],0,QUESTION_ICON),
+    mc("Which fraction shows one fourth?",["1/4","1/2","4/1","2/4"],0,QUESTION_ICON),
+    mc("Two equal parts of a whole are called…",["halves","thirds","fourths","fifths"],0,QUESTION_ICON),
+    mc("Four equal parts of a whole are called…",["fourths","halves","thirds","sixths"],0,QUESTION_ICON),
+    mc("Which is larger — 1/2 or 1/4?",["1/2","1/4","same","can't tell"],0,QUESTION_ICON),
+    mc("3 out of 4 equal parts = ?",["3/4","1/4","3/3","4/3"],0,QUESTION_ICON),
+    mc("Which shows a whole?",["4/4","1/4","2/4","0/4"],0,QUESTION_ICON),
+    mc("A sandwich is cut in half. How many pieces?",["2","1","3","4"],0,QUESTION_ICON),
+    mc("You share a cake equally with 1 friend. Each gets…",["1/2","1/4","1/3","1 whole"],0,QUESTION_ICON),
+    mc("What does the bottom number in a fraction tell you?",["Total equal parts","Parts eaten","The whole number","The color"],0,QUESTION_ICON),
+    mc("A pie is cut into 4 equal pieces. 2 are eaten. What fraction is left?",["2/4","1/4","3/4","4/4"],0,QUESTION_ICON),
+    mc("Which fraction shows one third?",["1/3","1/2","1/4","3/4"],0,QUESTION_ICON),
+    mc("What fraction is equal to 2/4?",["1/2","2/4","3/4","1/4"],0,QUESTION_ICON),
+    mc("Which is smaller — 1/3 or 1/2?",["1/3","1/2","same","can't tell"],0,QUESTION_ICON),
+    mc("You shade 3 of 6 equal parts. What fraction is shaded?",["3/6","1/6","2/6","4/6"],0,QUESTION_ICON),
   ]);
 }
 
@@ -798,22 +812,22 @@ function fracBank(){
 function measureBank(){
   const qs=[];
   qs.push(...[
-    mc("Which unit measures a pencil?",["inches","miles","yards","kilometers"],0,"✏️"),
-    mc("Which unit measures a football field?",["yards","inches","centimeters","millimeters"],0,"🏈"),
-    mc("How many inches are in 1 foot?",["12","6","10","24"],0,"📏"),
-    mc("How many feet are in 1 yard?",["3","2","4","12"],0,"📐"),
-    mc("How many inches are in 2 feet?",["24","12","18","20"],0,"📏"),
-    mc("How many feet are in 2 yards?",["3","6","9","12"],1,"📐"),
-    mc("A crate is 36 inches long. How many feet is that?",["3","4","6","9"],0,"📦"),
-    mc("Which tool measures weight?",["scale","ruler","thermometer","clock"],0,"⚖️"),
-    mc("Which tool measures temperature?",["thermometer","ruler","scale","clock"],0,"🌡️"),
-    mc("A door is about ___ tall.",["7 feet","7 inches","7 miles","7 yards"],0,"🚪"),
-    mc("A book is about ___ wide.",["8 inches","8 feet","8 yards","8 miles"],0,"📚"),
+    mc("Which unit measures a pencil?",["inches","miles","yards","kilometers"],0,QUESTION_ICON),
+    mc("Which unit measures a football field?",["yards","inches","centimeters","millimeters"],0,QUESTION_ICON),
+    mc("How many inches are in 1 foot?",["12","6","10","24"],0,QUESTION_ICON),
+    mc("How many feet are in 1 yard?",["3","2","4","12"],0,QUESTION_ICON),
+    mc("How many inches are in 2 feet?",["24","12","18","20"],0,QUESTION_ICON),
+    mc("How many feet are in 2 yards?",["3","6","9","12"],1,QUESTION_ICON),
+    mc("A crate is 36 inches long. How many feet is that?",["3","4","6","9"],0,QUESTION_ICON),
+    mc("Which tool measures weight?",["scale","ruler","thermometer","clock"],0,QUESTION_ICON),
+    mc("Which tool measures temperature?",["thermometer","ruler","scale","clock"],0,QUESTION_ICON),
+    mc("A door is about ___ tall.",["7 feet","7 inches","7 miles","7 yards"],0,QUESTION_ICON),
+    mc("A book is about ___ wide.",["8 inches","8 feet","8 yards","8 miles"],0,QUESTION_ICON),
   ]);
   for(let a=4;a<14;a++){
     const b=a+Math.ceil(Math.random()*7);
     qs.push(mc(`A pencil is ${a} inches. A marker is ${b} inches. How much longer is the marker?`,
-      [String(b-a),String(a),String(b),String(a+b)],0,"✏️"));
+      [String(b-a),String(a),String(b),String(a+b)],0,QUESTION_ICON));
   }
   return sh(qs);
 }
@@ -1303,14 +1317,14 @@ function base10Bank(){
 function pictographBank(){
   const qs=[];
   const sets=[
-    {labels:["Dogs","Cats"],values:[8,4],icon:"🐾",key:2},
-    {labels:["⚽ Soccer","🏀 Basketball"],values:[10,6],icon:"🏅",key:2},
-    {labels:["🌞 Sunny","🌧️ Rainy"],values:[6,2],icon:"⭐",key:2},
-    {labels:["🍕 Pizza","🌮 Tacos"],values:[4,6],icon:"🍽️",key:2},
-    {labels:["Boys","Girls"],values:[8,10],icon:"👤",key:2},
-    {labels:["🥛 Milk","🧃 Juice"],values:[5,7],icon:"🥤",key:1},
-    {labels:["🚚 Trucks","🚌 Buses"],values:[4,6],icon:"🚍",key:1},
-    {labels:["📚 Books","🧸 Toys"],values:[3,8],icon:"📦",key:1},
+    {labels:["Dogs","Cats"],values:[8,4],icon:"■",key:2},
+    {labels:["Soccer","Basketball"],values:[10,6],icon:"■",key:2},
+    {labels:["Sunny","Rainy"],values:[6,2],icon:"■",key:2},
+    {labels:["Pizza","Tacos"],values:[4,6],icon:"■",key:2},
+    {labels:["Boys","Girls"],values:[8,10],icon:"■",key:2},
+    {labels:["Milk","Juice"],values:[5,7],icon:"■",key:1},
+    {labels:["Trucks","Buses"],values:[4,6],icon:"■",key:1},
+    {labels:["Books","Toys"],values:[3,8],icon:"■",key:1},
   ];
   sets.forEach(s=>{
     const [la,lb]=[s.labels[0],s.labels[1]];

@@ -344,11 +344,13 @@ button{cursor:pointer}
 .bg-art .q-label{color:#c4b0ff;}
 
 /* ─── ZONE COMPLETE CELEBRATION ──────────────────────────── */
-#zoneOver{background:radial-gradient(ellipse at center,#1a1a4e 0%,#0f0f23 100%)}
+#zoneOver{background:radial-gradient(ellipse at center,#1a1a4e 0%,#0f0f23 100%);position:relative;overflow:hidden}
 #zoneOver::before{
-  content:'⭐ ✨ 🌟 ⭐ ✨ 🌟 ⭐ ✨ 🌟';
-  display:block;text-align:center;font-size:1.5rem;opacity:.3;
-  letter-spacing:8px;margin-bottom:.5rem
+  content:'';
+  position:absolute;inset:0;
+  background:url('assets/kenney/ui/Medals/PNG/flat_medal1.png') center/7rem repeat;
+  opacity:.08;
+  pointer-events:none;
 }
 
 /* ─── ANSWER SHIMMER ON CORRECT ───────────────────────────── */
@@ -363,14 +365,18 @@ button{cursor:pointer}
   position:fixed;inset:0;
   background:radial-gradient(ellipse at center, #1a0000 0%, #000 100%);
   display:flex;flex-direction:column;align-items:center;justify-content:center;
-  gap:1.4rem;z-index:700;text-align:center;padding:2rem;
+  gap:1.4rem;z-index:700;text-align:center;padding:2rem;position:relative;overflow:hidden;
 }
 #gameOver::before {
-  content:'💀 💀 💀';
-  font-size:2rem;letter-spacing:12px;opacity:0.3;display:block;margin-bottom:.5rem;
+  content:'';
+  position:absolute;inset:0;
+  background:url('assets/kenney/ui/Medals/PNG/flatshadow_medal4.png') center/10rem no-repeat;
+  opacity:.12;
+  pointer-events:none;
 }
 .go-skull {
-  font-size:5rem;
+  width:5rem;
+  height:5rem;
   animation:shake .5s ease-in-out 3;
   filter:drop-shadow(0 0 20px rgba(255,50,50,.6));
 }
@@ -462,8 +468,11 @@ body, button, input, select, textarea { font-family:var(--body-font) !important;
 .zone-tile{min-height:180px !important;padding:22px 14px !important;gap:12px !important;}
 .zt-num{font-size:1rem !important;}
 .zt-emo{font-size:4rem !important;}
+.zt-emo img{width:3.6rem;height:3.6rem;object-fit:contain;display:block;margin:0 auto;}
 .zt-name{font-size:clamp(1.15rem,2.4vw,1.5rem) !important;line-height:1.25 !important;}
 .zt-star{font-size:1.7rem !important;}
+.zt-status img{width:1.5rem;height:1.5rem;object-fit:contain;display:block;margin:0 auto;}
+.zone-deco img{width:4rem;height:4rem;object-fit:contain;display:block;opacity:.16;}
 
 .gbg{gap:18px !important;padding:18px !important;padding-bottom:90px !important;}
 #gameArea{max-width:920px !important;gap:18px !important;}
@@ -573,9 +582,9 @@ svg{max-width:100%;height:auto}
 <div id="title" class="screen active">
   <div class="scan-line"></div>
   <div style="display:flex;gap:6px;justify-content:center;margin-top:1rem;font-size:1.4rem">
-    <span style="animation:twinkle 2s ease-in-out infinite">⭐</span>
-    <span style="animation:twinkle 2s ease-in-out infinite .3s">✨</span>
-    <span style="animation:twinkle 2s ease-in-out infinite .6s">⭐</span>
+    <img src="assets/kenney/ui/Medals/PNG/flat_medal1.png" alt="Sparkle" style="width:24px;height:24px;animation:twinkle 2s ease-in-out infinite"/>
+    <img src="assets/kenney/ui/Medals/PNG/flat_medal2.png" alt="Sparkle" style="width:24px;height:24px;animation:twinkle 2s ease-in-out infinite .3s"/>
+    <img src="assets/kenney/ui/Medals/PNG/flat_medal1.png" alt="Sparkle" style="width:24px;height:24px;animation:twinkle 2s ease-in-out infinite .6s"/>
   </div>
   <div class="title-logo" style="margin-top:.5rem">WORD<br>QUEST</div>
   <div class="title-letters">
@@ -605,9 +614,9 @@ svg{max-width:100%;height:auto}
     <div class="hud-hero"><img class="hud-hero-icon" src="assets/kenney/ui/Medals/PNG/flatshadow_medal2.png" alt="Hero"/> LVL <span id="hudLevel">1</span></div>
     <div class="hud-zone" id="hudZone">ZONE 1</div>
     <div class="hud-q" id="hudQ">Q: 1/8</div>
-    <div class="hud-hp" id="hudHP">❤️❤️❤️</div>
-    <div class="hud-pts" id="hudPts">⭐ 0</div>
-    <div class="hud-coins" id="hudCoins">🪙 0</div>
+    <div class="hud-hp" id="hudHP">Lives: 3</div>
+    <div class="hud-pts" id="hudPts">Points: 0</div>
+    <div class="hud-coins" id="hudCoins">Coins: 0</div>
     
   </div>
   <div class="gbg" id="gbg">
@@ -619,7 +628,7 @@ svg{max-width:100%;height:auto}
 
 <!-- GAME OVER -->
 <div id="gameOver" class="hidden">
-  <div class="go-skull" id="goSkull">💀</div>
+  <div class="go-skull" id="goSkull"><img src="assets/kenney/ui/Medals/PNG/flatshadow_medal4.png" alt="Defeated"/></div>
   <div class="go-title">GAME OVER!</div>
   <div class="go-zone" id="goZoneName">ZONE 1</div>
   <div class="go-sub">YOU RAN OUT OF LIVES!<br>TIME TO TRY AGAIN!</div>
@@ -644,7 +653,7 @@ svg{max-width:100%;height:auto}
 const ZONES = [
 // ── ZONE 1: NOUNS (tap the noun) ────────────────────────────
 {
-  id:1, name:"NOUN\nCASTLE", emoji:"🏰", bg:"bg-castle",
+  id:1, name:"NOUN\nCASTLE", emoji:"", icon:'assets/kenney/ui/Medals/PNG/flatshadow_medal1.png', bg:"bg-castle",
   type:"tap",
   intro:"TAP every NOUN in each sentence!",
   label:"TAP ALL THE NOUNS",
@@ -661,7 +670,7 @@ const ZONES = [
 },
 // ── ZONE 2: PROPER NOUNS (sort proper vs common) ─────────────
 {
-  id:2, name:"PROPER NOUN\nVOLCANO", emoji:"🌋", bg:"bg-volcano",
+  id:2, name:"PROPER NOUN\nVOLCANO", emoji:"", icon:'assets/kenney/ui/Medals/PNG/flatshadow_medal2.png', bg:"bg-volcano",
   type:"sort",
   intro:"SORT the words! Which are PROPER NOUNS?",
   binLabels:["PROPER NOUN\n(special name!)","COMMON NOUN\n(any person/place/thing)"],
@@ -686,7 +695,7 @@ const ZONES = [
 },
 // ── ZONE 3: COMMON NOUNS (pick the common noun from 4) ───────
 {
-  id:3, name:"COMMON NOUN\nVILLAGE", emoji:"🏡", bg:"bg-village",
+  id:3, name:"COMMON NOUN\nVILLAGE", emoji:"", icon:'assets/kenney/ui/Medals/PNG/flatshadow_medal3.png', bg:"bg-village",
   type:"mc",
   intro:"PICK the COMMON NOUN — a general name for any person, place, or thing!",
   qs:[
@@ -702,7 +711,7 @@ const ZONES = [
 },
 // ── ZONE 4: POSSESSIVE NOUNS (fix it) ────────────────────────
 {
-  id:4, name:"POSSESSIVE\nDUNGEON", emoji:"💎", bg:"bg-dungeon",
+  id:4, name:"POSSESSIVE\nDUNGEON", emoji:"", icon:'assets/kenney/ui/Medals/PNG/flatshadow_medal4.png', bg:"bg-dungeon",
   type:"fix",
   intro:"Find the CORRECT possessive noun!",
   qs:[
@@ -734,7 +743,7 @@ const ZONES = [
 },
 // ── ZONE 5: ADJECTIVES (choose the adjective) ────────────────
 {
-  id:5, name:"ADJECTIVE\nART STUDIO", emoji:"🎨", bg:"bg-art",
+  id:5, name:"ADJECTIVE\nART STUDIO", emoji:"", icon:'assets/kenney/ui/Medals/PNG/flatshadow_medal5.png', bg:"bg-art",
   type:"mc",
   intro:"ADJECTIVES describe nouns! Pick the adjective in each sentence!",
   qs:[
@@ -750,7 +759,7 @@ const ZONES = [
 },
 // ── ZONE 6: VERBS (tap all verbs) ────────────────────────────
 {
-  id:6, name:"VERB\nBATTLEFIELD", emoji:"⚔️", bg:"bg-battle",
+  id:6, name:"VERB\nBATTLEFIELD", emoji:"", icon:'assets/kenney/ui/Medals/PNG/flatshadow_medal6.png', bg:"bg-battle",
   type:"tap",
   intro:"VERBS are action words! TAP every VERB!",
   label:"TAP ALL THE VERBS",
@@ -767,7 +776,7 @@ const ZONES = [
 },
 // ── ZONE 7: ADVERBS (pick the adverb) ────────────────────────
 {
-  id:7, name:"ADVERB\nOCEAN", emoji:"🌊", bg:"bg-ocean",
+  id:7, name:"ADVERB\nOCEAN", emoji:"", icon:'assets/kenney/ui/Medals/PNG/flatshadow_medal7.png', bg:"bg-ocean",
   type:"mc",
   intro:"ADVERBS describe verbs — HOW, WHEN, or WHERE! Pick the adverb!",
   qs:[
@@ -783,7 +792,7 @@ const ZONES = [
 },
 // ── ZONE 8: PREPOSITIONS ─────────────────────────────────────
 {
-  id:8, name:"PREPOSITION\nMAP ROOM", emoji:"🗺️", bg:"bg-map",
+  id:8, name:"PREPOSITION\nMAP ROOM", emoji:"", icon:'assets/kenney/ui/Medals/PNG/flatshadow_medal8.png', bg:"bg-map",
   type:"fill",
   intro:"Fill in the PREPOSITION that makes sense!",
   qs:[
@@ -823,7 +832,7 @@ const ZONES = [
 },
 // ── ZONE 9: CONTRACTIONS (match pairs) ──────────────────────
 {
-  id:9, name:"CONTRACTION\nLIGHTNING LAB", emoji:"⚡", bg:"bg-lab",
+  id:9, name:"CONTRACTION\nLIGHTNING LAB", emoji:"", icon:'assets/kenney/ui/Medals/PNG/flatshadow_medal9.png', bg:"bg-lab",
   type:"match",
   intro:"Match the two words to their CONTRACTION! Tap a pair!",
   qs:[
@@ -839,7 +848,7 @@ const ZONES = [
 },
 // ── ZONE 10: SENTENCE CORRECTIONS ───────────────────────────
 {
-  id:10, name:"SENTENCE\nFIX-IT SHOP", emoji:"🔧", bg:"bg-fix",
+  id:10, name:"SENTENCE\nFIX-IT SHOP", emoji:"", icon:'assets/kenney/ui/Medals/PNG/flat_medal1.png', bg:"bg-fix",
   type:"fix",
   intro:"Pick the sentence that is written CORRECTLY!",
   qs:[
@@ -871,7 +880,7 @@ const ZONES = [
 },
 // ── ZONE 11: SYNONYMS ────────────────────────────────────────
 {
-  id:11, name:"SYNONYM\nGARDEN", emoji:"🌸", bg:"bg-garden",
+  id:11, name:"SYNONYM\nGARDEN", emoji:"", icon:'assets/kenney/ui/Medals/PNG/flat_medal2.png', bg:"bg-garden",
   type:"mc",
   intro:"SYNONYMS mean almost the SAME thing! Pick the synonym for the bold word!",
   qs:[
@@ -887,7 +896,7 @@ const ZONES = [
 },
 // ── ZONE 12: ANTONYMS ────────────────────────────────────────
 {
-  id:12, name:"ANTONYM\nSHADOW WORLD", emoji:"🌑", bg:"bg-shadow",
+  id:12, name:"ANTONYM\nSHADOW WORLD", emoji:"", icon:'assets/kenney/ui/Medals/PNG/flat_medal3.png', bg:"bg-shadow",
   type:"mc",
   intro:"ANTONYMS are OPPOSITES! Find the antonym of the bold word!",
   qs:[
@@ -1123,7 +1132,7 @@ function maybeTreasure(correct) {
 function showTreasurePopup(item, reward) {
   const pop = document.createElement('div');
   pop.className = 'treasure-pop';
-  pop.innerHTML = `<div class="treasure-icon">🎁</div><div class="treasure-title">TREASURE FOUND!</div><div class="treasure-item">${item}</div><div class="treasure-reward">+${reward} COINS</div>`;
+  pop.innerHTML = `<div class="treasure-icon"><img src="assets/kenney/ui/Medals/PNG/flat_medal3.png" alt="Treasure"/></div><div class="treasure-title">TREASURE FOUND!</div><div class="treasure-item">${item}</div><div class="treasure-reward">+${reward} COINS</div>`;
   document.body.appendChild(pop);
   setTimeout(()=>pop.remove(), 1550);
 }
@@ -1170,8 +1179,8 @@ function triggerGameOver() {
   setTimeout(()=>flash.remove(), 400);
 
   const z = ZONES[currentZone-1];
-  document.getElementById('goZoneName').textContent = z.emoji + ' ' + z.name.replace('\n',' ');
-  document.getElementById('goSkull').textContent = '💀';
+  document.getElementById('goZoneName').innerHTML = `<img src="${z.icon}" alt="Zone" class="zone-title-icon"/> ${z.name.replace('\n',' ')}`;
+  document.getElementById('goSkull').innerHTML = '<img src="assets/kenney/ui/Medals/PNG/flatshadow_medal4.png" alt="Defeated"/>';
   document.getElementById('gameOver').classList.remove('hidden');
 }
 
@@ -1188,7 +1197,7 @@ function restartZone() {
   questionAnswered = false;
   // Reset UI
   const z = ZONES[currentZone-1];
-  document.getElementById('hudZone').textContent = z.emoji+' '+z.name.replace('\n',' ');
+  document.getElementById('hudZone').innerHTML = `<img src="${z.icon}" alt="Zone" class="zone-title-icon"/> ${z.name.replace('\n',' ')}`;
   document.getElementById('progFill').style.width = '0%';
   updateHUD();
   renderQuestion();
@@ -1223,7 +1232,12 @@ function buildMap() {
     if(image) {
       tile.style.backgroundImage = 'linear-gradient(rgba(0,0,0,.38),rgba(0,0,0,.65)),url("' + image + '")';
     }
-    tile.innerHTML = `<div class="zt-num">${z.id}</div><div class="zt-emo">${z.emoji}</div><div class="zt-name">${z.name}</div><div class="zt-star">${done?'⭐':unlocked?'○':'🔒'}</div>`;
+    const status = done
+      ? '<img src="assets/kenney/ui/Medals/PNG/flat_medal1.png" alt="Done" class="zt-status"/>'
+      : unlocked
+        ? '<img src="assets/kenney/ui/Medals/PNG/flatshadow_medal8.png" alt="Unlocked" class="zt-status"/>'
+        : '<img src="assets/kenney/ui/Medals/PNG/flatshadow_medal9.png" alt="Locked" class="zt-status"/>';
+    tile.innerHTML = `<div class="zt-num">${z.id}</div><div class="zt-emo"><img src="${z.icon}" alt="Zone icon"/></div><div class="zt-name">${z.name}</div><div class="zt-star">${status}</div>`;
     if(unlocked) tile.onclick = () => launchZone(z.id);
     grid.appendChild(tile);
   });
@@ -1245,20 +1259,20 @@ function launchZone(id) {
   bg.className = 'gbg ' + z.bg;
   // Floating decorations
   document.querySelectorAll('.zone-deco').forEach(d=>d.remove());
-  const decoEmojis = [z.emoji, z.emoji, z.emoji];
-  decoEmojis.forEach((d,di)=>{
-    const el=document.createElement('div');el.className='zone-deco';el.textContent=d;
+  const decoIcons = [z.icon, z.icon, z.icon];
+  decoIcons.forEach((d,di)=>{
+    const el=document.createElement('div');el.className='zone-deco';el.innerHTML=`<img src="${d}" alt="Zone decoration"/>`;
     el.style.cssText=`top:${15+di*25}%;${di%2===0?'right':'left'}:${5+di*3}%;animation-delay:${di*1.3}s`;
     bg.appendChild(el);
   });
-  document.getElementById('hudZone').textContent = z.emoji + ' ' + z.name.replace('\n',' ');
+  document.getElementById('hudZone').innerHTML = `<img src="${z.icon}" alt="Zone" class="zone-title-icon"/> ${z.name.replace('\n',' ')}`;
   // Add floating decorations
   document.querySelectorAll('.zone-deco').forEach(d=>d.remove());
-  const decos = [z.emoji, z.emoji, z.emoji];
+  const decos = [z.icon, z.icon, z.icon];
   decos.forEach((d,i)=>{
     const el = document.createElement('div');
     el.className = 'zone-deco';
-    el.textContent = d;
+    el.innerHTML = `<img src="${d}" alt="Zone decoration"/>`;
     el.style.cssText = `top:${15+i*25}%;${i%2===0?'right':'left'}:${5+i*3}%;animation-delay:${i*1.2}s`;
     bg.appendChild(el);
   });
@@ -1272,15 +1286,15 @@ function updateHUD() {
   const z = ZONES[currentZone-1];
   document.getElementById('hudQ').textContent = `Q: ${currentQ+1}/${zoneTotal()}`;
   const hpEl = document.getElementById('hudHP');
-  hpEl.textContent = '❤️'.repeat(lives) + '🖤'.repeat(Math.max(0,3-lives));
+  hpEl.textContent = `Lives: ${lives}`;
   if(lives <= 1) {
     hpEl.classList.remove('lost');
     void hpEl.offsetWidth; // force reflow
     hpEl.classList.add('lost');
   }
-  document.getElementById('hudPts').textContent = `⭐ ${score}`;
+  document.getElementById('hudPts').textContent = `Points: ${score}`;
   const lvlEl = document.getElementById('hudLevel'); if(lvlEl) lvlEl.textContent = heroLevel();
-  const coinsEl = document.getElementById('hudCoins'); if(coinsEl) coinsEl.textContent = `🪙 ${coins}`;
+  const coinsEl = document.getElementById('hudCoins'); if(coinsEl) coinsEl.textContent = `Coins: ${coins}`;
   document.getElementById('progFill').style.width = (currentQ / zoneTotal() * 100) + '%';
 }
 
@@ -1303,14 +1317,14 @@ function endZone() {
   const won = totalCorrect >= Math.ceil(total * 0.6);
   document.getElementById('progFill').style.width = '100%';
   if(perfect) {
-    document.getElementById('zcTitle').textContent = 'PERFECT! 🌟';
-    document.getElementById('zcStar').textContent = '🌟';
+    document.getElementById('zcTitle').textContent = 'PERFECT!';
+    document.getElementById('zcStar').innerHTML = '<img src="assets/kenney/ui/Medals/PNG/flatshadow_medal1.png" alt="Perfect"/>';
   } else if(won) {
-    document.getElementById('zcTitle').textContent = 'ZONE CLEAR! ⭐';
-    document.getElementById('zcStar').textContent = '⭐';
+    document.getElementById('zcTitle').textContent = 'ZONE CLEAR!';
+    document.getElementById('zcStar').innerHTML = '<img src="assets/kenney/ui/Medals/PNG/flat_medal5.png" alt="Zone clear"/>';
   } else {
-    document.getElementById('zcTitle').textContent = 'GOOD TRY! 💪';
-    document.getElementById('zcStar').textContent = '💪';
+    document.getElementById('zcTitle').textContent = 'GOOD TRY!';
+    document.getElementById('zcStar').innerHTML = '<img src="assets/kenney/ui/Medals/PNG/flat_medal8.png" alt="Good try"/>';
   }
   document.getElementById('zcScore').textContent = `YOU GOT ${totalCorrect} OUT OF ${total}!`;
   const subMsg = document.getElementById('zcSubMsg');
@@ -1332,7 +1346,7 @@ function retryFromComplete() {
   reshuffleZone(currentZone);
   currentQ = 0; lives = 3; score = 0; totalCorrect = 0; zoneTreasures = 0; questionAnswered = false;
   const z = ZONES[currentZone-1];
-  document.getElementById('hudZone').textContent = z.emoji+' '+z.name.replace('\n',' ');
+  document.getElementById('hudZone').innerHTML = `<img src="${z.icon}" alt="Zone" class="zone-title-icon"/> ${z.name.replace('\n',' ')}`;
   document.getElementById('progFill').style.width = '0%';
   updateHUD();
   renderQuestion();
@@ -1365,7 +1379,7 @@ function addNextBtn(area) {
   const btn = document.createElement('button');
   btn.className = 'pxbtn';
   btn.style.cssText = 'background:var(--gold);color:#000;font-size:clamp(.5rem,1.3vw,.65rem)';
-  btn.textContent = currentQ < ZONES[currentZone-1].qs.length-1 ? 'NEXT QUESTION ▶' : 'FINISH ZONE ✓';
+  btn.textContent = currentQ < ZONES[currentZone-1].qs.length-1 ? 'NEXT QUESTION >' : 'FINISH ZONE';
   btn.onclick = nextQuestion;
   wrap.appendChild(btn);
   area.appendChild(wrap);
@@ -1395,7 +1409,7 @@ function renderQuestion() {
   // Zone label banner + RPG encounter
   const banner = document.createElement('div');
   banner.className = 'quest-banner';
-  banner.innerHTML = `<div class="enemy-line">⚔️ A wild ${currentMonster()} appears!</div><div class="quest-instruction">${z.intro}</div>`;
+  banner.innerHTML = `<div class="enemy-line">A wild ${currentMonster()} appears!</div><div class="quest-instruction">${z.intro}</div>`;
   area.appendChild(banner);
 
   switch(z.type) {
@@ -1448,7 +1462,7 @@ function renderMC(z, q, area) {
         b.disabled = true;
         if(j === q.answer) b.classList.add('correct');
       });
-      fb.textContent = correct ? '✓ CORRECT!' : `✗ THE ANSWER WAS: ${q.choices[q.answer].toUpperCase()}`;
+      fb.textContent = correct ? 'Correct!' : `The answer was: ${q.choices[q.answer].toUpperCase()}`;
       fb.className = 'feedback ' + (correct?'good':'bad');
       addNextBtn(area);
     };
@@ -1488,12 +1502,12 @@ function renderTap(z, q, area) {
       if(targets.has(idx)) {
         span.classList.add('tapped-good');
         tapped.add(idx);
-        fb.textContent = '✓ THAT IS A ' + (z.id===1?'NOUN':'VERB') + '!';
+        fb.textContent = 'That is a ' + (z.id===1?'noun':'verb') + '!';
         fb.className = 'feedback good';
         if(tapped.size === targets.size) {
           questionAnswered = true;
           showFeedback(true, null, '');
-          fb.textContent = `✓ AMAZING! ALL ${z.id===1?'NOUNS':'VERBS'} FOUND!`;
+          fb.textContent = `Amazing! All ${z.id===1?'nouns':'verbs'} found!`;
           addNextBtn(area);
         }
       } else {
@@ -1501,7 +1515,7 @@ function renderTap(z, q, area) {
         lives = Math.max(0, lives-1);
         updateHUD();
         if(lives === 0) { setTimeout(triggerGameOver, 900); return; }
-        fb.textContent = '✗ THAT IS NOT A ' + (z.id===1?'NOUN':'VERB') + '!';
+        fb.textContent = 'That is not a ' + (z.id===1?'noun':'verb') + '!';
         fb.className = 'feedback bad';
         setTimeout(() => span.classList.remove('tapped-bad'), 500);
       }
@@ -1527,7 +1541,7 @@ function renderTap(z, q, area) {
     });
     lives = Math.max(0, lives - 1);
     updateHUD();
-    fb.textContent = '✗ Here are the answers!';
+    fb.textContent = 'Here are the answers!';
     fb.className = 'feedback bad';
     if(lives === 0) { setTimeout(triggerGameOver, 900); return; }
     addNextBtn(area);
@@ -1601,10 +1615,10 @@ function renderSort(z, q, area) {
         lives = Math.max(0,lives-1);
         updateHUD();
           if(lives === 0) { setTimeout(triggerGameOver, 900); return; }
-        fb.textContent = `✗ "${q.chips[selected]}" goes in the other bin!`;
+        fb.textContent = `"${q.chips[selected]}" goes in the other bin!`;
         fb.className = 'feedback bad';
       } else {
-        fb.textContent = `✓ "${q.chips[selected]}" is correct!`;
+        fb.textContent = `"${q.chips[selected]}" is correct!`;
         fb.className = 'feedback good';
       }
 
@@ -1664,7 +1678,7 @@ function renderFix(z, q, area) {
         if(j === q.answer) b.classList.add('correct');
         else if(j === i && !correct) b.classList.add('wrong');
       });
-      fb.textContent = correct ? '✓ THAT IS CORRECT!' : `✗ THE ANSWER WAS: ${['A','B','C','D'][q.answer]}`;
+      fb.textContent = correct ? 'That is correct!' : `The answer was: ${['A','B','C','D'][q.answer]}`;
       fb.className = 'feedback ' + (correct?'good':'bad');
       addNextBtn(area);
     };
@@ -1710,7 +1724,7 @@ function renderFill(z, q, area) {
       // Fill blank
       const blankEl = qbox.querySelector('.blank');
       if(blankEl) { blankEl.textContent = q.bank[q.answer].toUpperCase(); blankEl.style.color = correct?'var(--green)':'var(--red)'; }
-      fb.textContent = correct ? '✓ CORRECT PREPOSITION!' : `✗ THE ANSWER WAS: ${q.bank[q.answer].toUpperCase()}`;
+      fb.textContent = correct ? 'Correct preposition!' : `The answer was: ${q.bank[q.answer].toUpperCase()}`;
       fb.className = 'feedback '+(correct?'good':'bad');
       addNextBtn(area);
     };
@@ -1785,7 +1799,7 @@ function renderMatch(z, q, area) {
           el.classList.add('matched');
           matchedCount++;
           instr.textContent = 'PAIRS LEFT: ' + (totalPairs - matchedCount);
-          fb.textContent = '✓ MATCH!';
+          fb.textContent = 'Match!';
           fb.className = 'feedback good';
           firstSel = null;
           if(matchedCount === totalPairs) {
@@ -1794,7 +1808,7 @@ function renderMatch(z, q, area) {
             totalCorrect++;
             updateHUD();
             maybeTreasure(true);
-            fb.textContent = '✓ ALL MATCHED! AMAZING!';
+            fb.textContent = 'All matched! Amazing!';
             addNextBtn(area);
           }
         } else {
@@ -1805,7 +1819,7 @@ function renderMatch(z, q, area) {
           updateHUD();
           showEnemyHit();
           if(lives === 0) { setTimeout(triggerGameOver, 900); return; }
-          fb.textContent = '✗ NOT A MATCH!';
+          fb.textContent = 'Not a match!';
           fb.className = 'feedback bad';
           setTimeout(() => {
             firstSel.el.classList.remove('bad-match');
