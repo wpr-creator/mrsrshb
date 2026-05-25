@@ -69,6 +69,12 @@ button{cursor:pointer}
   animation:float 3s ease-in-out infinite
 }
 .title-hero{font-size:5rem;animation:bounce 1.8s ease-in-out infinite;filter:drop-shadow(0 6px 12px rgba(255,215,0,.4))}
+.title-hero img{width:140px;max-width:140px;height:auto;display:block;margin:0 auto;}
+.title-letters{display:flex;justify-content:center;gap:8px;margin-top:1rem}
+.title-letters img{width:50px;height:50px;object-fit:contain;}
+.map-title img,.hud-hero-icon{width:1.2rem;height:1.2rem;vertical-align:middle;margin-right:.35rem;}
+.zone-tile{background-size:cover;background-position:center;}
+#worldmap .zone-tile{transition:transform .15s,box-shadow .15s,background-image .4s;}
 .blink-txt{animation:blink 1.2s step-end infinite;font-size:clamp(.5rem,1.4vw,.68rem);letter-spacing:2px}
 
 /* ─── WORLD MAP ─────────────────────────────────────────────── */
@@ -572,8 +578,14 @@ svg{max-width:100%;height:auto}
     <span style="animation:twinkle 2s ease-in-out infinite .6s">⭐</span>
   </div>
   <div class="title-logo" style="margin-top:.5rem">WORD<br>QUEST</div>
+  <div class="title-letters">
+    <img src="assets/kenney/ui/Letter Tiles/PNG/Brown/letter_W.png" alt="W">
+    <img src="assets/kenney/ui/Letter Tiles/PNG/Brown/letter_O.png" alt="O">
+    <img src="assets/kenney/ui/Letter Tiles/PNG/Brown/letter_R.png" alt="R">
+    <img src="assets/kenney/ui/Letter Tiles/PNG/Brown/letter_D.png" alt="D">
+  </div>
   <div style="font-size:clamp(.44rem,1.3vw,.62rem);color:var(--purple);letter-spacing:4px;margin-top:-.3rem">AN ELA ADVENTURE</div>
-  <div class="title-hero">🧙</div>
+  <div class="title-hero"><img src="assets/kenney/backgrounds/Background Elements/PNG/Flat/castle.png" alt="Word Quest"/></div>
   <div style="font-size:clamp(.44rem,1.3vw,.6rem);color:rgba(255,255,255,.5);letter-spacing:1px;text-align:center;max-width:400px;line-height:2.2">COLLECT ALL 12 STARS<br>TO SAVE WORD KINGDOM!</div>
   <button class="pxbtn" style="background:var(--gold);color:#000;font-size:clamp(.58rem,1.8vw,.78rem);margin-top:.5rem" onclick="startGame()">▶ START QUEST</button>
   <div class="blink-txt" style="color:var(--white);margin-top:.3rem">PRESS START!</div>
@@ -582,7 +594,7 @@ svg{max-width:100%;height:auto}
 
 <!-- WORLD MAP -->
 <div id="worldmap" class="screen">
-  <div class="map-title">🗺️ WORD KINGDOM MAP</div>
+  <div class="map-title"><img class="map-icon" src="assets/kenney/ui/Medals/PNG/flatshadow_medal3.png" alt="Map"/> WORD KINGDOM MAP</div>
   <div class="map-sub" id="mapSub">STARS: 0 / 12 — CHOOSE YOUR NEXT ZONE!</div>
   <div class="map-grid" id="mapGrid"></div>
 </div>
@@ -590,7 +602,7 @@ svg{max-width:100%;height:auto}
 <!-- GAME -->
 <div id="game" class="screen">
   <div class="hud">
-    <div class="hud-hero">🧙 LVL <span id="hudLevel">1</span></div>
+    <div class="hud-hero"><img class="hud-hero-icon" src="assets/kenney/ui/Medals/PNG/flatshadow_medal2.png" alt="Hero"/> LVL <span id="hudLevel">1</span></div>
     <div class="hud-zone" id="hudZone">ZONE 1</div>
     <div class="hud-q" id="hudQ">Q: 1/8</div>
     <div class="hud-hp" id="hudHP">❤️❤️❤️</div>
@@ -891,6 +903,21 @@ const ZONES = [
 },
 ];
 
+const ZONE_IMAGES = {
+  1: 'assets/kenney/backgrounds/Background Elements/PNG/Flat/house_front_tall.png',
+  2: 'assets/kenney/backgrounds/Background Elements/PNG/Flat/mountain2.png',
+  3: 'assets/kenney/backgrounds/Background Elements/PNG/Flat/house_side_short.png',
+  4: 'assets/kenney/backgrounds/Background Elements/PNG/Flat/castle.png',
+  5: 'assets/kenney/backgrounds/Background Elements/PNG/Flat/castle_wall.png',
+  6: 'assets/kenney/backgrounds/Background Elements/PNG/Flat/fence.png',
+  7: 'assets/kenney/backgrounds/Background Elements/PNG/Flat/tree01.png',
+  8: 'assets/kenney/backgrounds/Background Elements/PNG/Flat/sky.png',
+  9: 'assets/kenney/backgrounds/Background Elements/PNG/Flat/temple.png',
+  10: 'assets/kenney/backgrounds/Background Elements/PNG/Flat/fence_piece.png',
+  11: 'assets/kenney/backgrounds/Background Elements/PNG/Flat/tree06.png',
+  12: 'assets/kenney/backgrounds/Background Elements/PNG/Flat/tower.png',
+};
+
 // ── EXPANDED 2ND GRADE REVIEW BANK ───────────────────────────
 // Adds more second-grade ELA practice while each quest stays 8 random questions.
 function enrichWordQuestQuestions(){
@@ -904,13 +931,15 @@ function enrichWordQuestQuestions(){
     {sentence:["The","team","won","the","game","after","lunch","."], targets:[1,4,6]},
     {sentence:["A","rabbit","hid","behind","the","basket","."], targets:[1,5]},
     {sentence:["The","artist","painted","a","picture","of","a","horse","."], targets:[1,4,7]},
-    {sentence:["The","children","played","music","in","the","room","."], targets:[1,3,6]}
+    {sentence:["The","children","played","music","in","the","room","."], targets:[1,3,6]},
+    {sentence:["Roblox","is","a","game","for","friends","."], targets:[0,3,5]}
   );
 
   z(2).qs.push(
     {chips:["California","state","Ava","girl","Target","store"], bins:[[0,2,4],[1,3,5]]},
     {chips:["Dr. Lee","doctor","San Diego","city","Friday","day"], bins:[[0,2,4],[1,3,5]]},
     {chips:["January","month","Minecraft","game","Snoopy","dog"], bins:[[0,2,4],[1,3,5]]},
+    {chips:["Roblox","game","Logan","boy","Tuesday","day"], bins:[[0,2,4],[1,3,5]]},
     {chips:["school","Roosevelt School","park","Balboa Park","restaurant","In-N-Out"], bins:[[1,3,5],[0,2,4]]},
     {chips:["Elsa","queen","Earth","planet","Nike","shoe"], bins:[[0,2,4],[1,3,5]]},
     {chips:["book","Charlotte's Web","boy","Mateo","ocean","Pacific"], bins:[[1,3,5],[0,2,4]]}
@@ -924,7 +953,8 @@ function enrichWordQuestQuestions(){
     {q:"Which is a common noun?", choices:["city","Chicago","Earth","Christmas"], answer:0},
     {q:"Pick the common noun!", choices:["phone","Apple","Rover","Friday"], answer:0},
     {q:"Which word names any thing, not a special name?", choices:["Oreo","cookie","July","Aiden"], answer:1},
-    {q:"Which is a common noun?", choices:["team","Lakers","Padres","Dodgers"], answer:0}
+    {q:"Which is a common noun?", choices:["team","Lakers","Padres","Dodgers"], answer:0},
+    {q:"Which word is a common noun?", choices:["Roblox","game","Minecraft","Xbox"], answer:1}
   );
 
   z(4).qs.push(
@@ -1009,7 +1039,11 @@ function enrichWordQuestQuestions(){
     {q:"Find a synonym for HELP!", choices:["assist","ignore","break","forget"], answer:0},
     {q:"Find a synonym for QUIET!", choices:["silent","noisy","angry","round"], answer:0},
     {q:"Find a synonym for LOOK!", choices:["see","sleep","carry","melt"], answer:0},
-    {q:"Find a synonym for END!", choices:["finish","begin","open","mix"], answer:0}
+    {q:"Find a synonym for END!", choices:["finish","begin","open","mix"], answer:0},
+    {q:"Find a synonym for FAST!", choices:["quick","slow","big","warm"], answer:0},
+    {q:"Find a synonym for DARK!", choices:["dim","bright","loud","cold"], answer:0},
+    {q:"Find a synonym for HAPPY!", choices:["joyful","sad","angry","tired"], answer:0},
+    {q:"Find a synonym for BIG!", choices:["large","small","fast","cold"], answer:0}
   );
 
   z(12).qs.push(
@@ -1022,7 +1056,11 @@ function enrichWordQuestQuestions(){
     {q:"Find the OPPOSITE of REMEMBER!", choices:["forget","think","know","learn"], answer:0},
     {q:"Find the OPPOSITE of STRONG!", choices:["weak","brave","tall","fast"], answer:0},
     {q:"Find the OPPOSITE of ARRIVE!", choices:["leave","come","enter","visit"], answer:0},
-    {q:"Find the OPPOSITE of KIND!", choices:["mean","nice","helpful","sweet"], answer:0}
+    {q:"Find the OPPOSITE of KIND!", choices:["mean","nice","helpful","sweet"], answer:0},
+    {q:"Find the OPPOSITE of DAY!", choices:["night","rest","sun","light"], answer:0},
+    {q:"Find the OPPOSITE of ABOVE!", choices:["under","on","near","after"], answer:0},
+    {q:"Find the OPPOSITE of FAST!", choices:["slow","quick","hard","wide"], answer:0},
+    {q:"Find the OPPOSITE of HAPPY!", choices:["sad","glad","kind","nice"], answer:0}
   );
 }
 enrichWordQuestQuestions();
@@ -1181,6 +1219,10 @@ function buildMap() {
     const done = stars[z.id] === true;
     const tile = document.createElement('div');
     tile.className = 'zone-tile' + (unlocked?' unlocked':'') + (done?' done':'') + (!unlocked?' locked':'');
+    const image = ZONE_IMAGES[z.id];
+    if(image) {
+      tile.style.backgroundImage = 'linear-gradient(rgba(0,0,0,.38),rgba(0,0,0,.65)),url("' + image + '")';
+    }
     tile.innerHTML = `<div class="zt-num">${z.id}</div><div class="zt-emo">${z.emoji}</div><div class="zt-name">${z.name}</div><div class="zt-star">${done?'⭐':unlocked?'○':'🔒'}</div>`;
     if(unlocked) tile.onclick = () => launchZone(z.id);
     grid.appendChild(tile);

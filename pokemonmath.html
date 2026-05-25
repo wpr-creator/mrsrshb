@@ -99,10 +99,13 @@ button{cursor:pointer;font-family:var(--body-font)}
   font-family:var(--title-font);font-size:clamp(1.2rem,3vw,1.8rem);
   color:var(--purple);letter-spacing:2px;
 }
-.title-hero{font-size:6rem;animation:float 3s ease-in-out infinite;filter:drop-shadow(0 6px 12px rgba(255,203,5,.4))}
+.title-hero{font-size:6rem;animation:float 3s ease-in-out infinite;filter:drop-shadow(0 6px 12px rgba(255,203,5,.4));padding:0;}
+.title-hero img{width:220px;max-width:100%;height:auto;display:block;margin:0 auto;border-radius:24px;box-shadow:0 10px 35px rgba(0,0,0,.25);}
+.title-sub{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;font-family:var(--title-font);font-size:clamp(1.2rem,3vw,1.8rem);color:var(--purple);letter-spacing:2px;}
+.title-sub img{width:1.4rem;height:1.4rem;vertical-align:middle;}
 .title-desc{
   font-size:clamp(1rem,2.5vw,1.2rem);font-weight:700;
-  color:rgba(255,255,255,.7);max-width:420px;line-height:1.8;
+  color:rgba(255,255,255,.8);max-width:460px;line-height:1.8;
   font-family:var(--body-font);
 }
 .title-start{
@@ -110,6 +113,21 @@ button{cursor:pointer;font-family:var(--body-font)}
   font-family:var(--title-font);padding:14px 32px;border:4px solid #000;
   box-shadow:5px 5px 0 #000;letter-spacing:2px;transition:all .1s;
 }
+.map-nav-btn img,.pdx-title img,.hud-poke img,.go-skull img,.final-title img{width:1.2rem;height:1.2rem;vertical-align:middle;margin-right:.4rem;}
+.hud-poke{width:72px;height:72px;background:rgba(255,255,255,.14);border:4px solid rgba(255,255,255,.22);border-radius:24px;display:flex;align-items:center;justify-content:center;box-shadow:inset 0 0 0 rgba(255,255,255,.1);}
+.hud-poke img{width:56px;height:56px;object-fit:contain;}
+.pdx-card{position:relative;overflow:hidden;}
+.pdx-card::before{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.1),rgba(0,0,0,.55));opacity:0;transition:opacity .3s;}
+.pdx-card.unlocked:hover::before{opacity:1;}
+.pdx-emo{font-size:0;}
+.pdx-emo img{width:48px;height:48px;display:block;margin:0 auto;}
+.pdx-star img{width:1rem;height:1rem;}
+.evo-poke-before,.evo-poke-after{width:100px;height:100px;margin:0 auto 1rem;border-radius:26px;background:rgba(255,255,255,.12);border:4px solid rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;box-shadow:0 10px 30px rgba(0,0,0,.15);}
+.evo-poke-before img,.evo-poke-after img{width:84px;height:84px;object-fit:contain;}
+.go-skull{display:flex;align-items:center;justify-content:center;gap:.75rem;}
+.final-title{display:flex;align-items:center;justify-content:center;gap:.75rem;}
+.final-poke{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.45rem;background:rgba(255,255,255,.08);border:4px solid var(--poke-yellow);padding:10px 12px;box-shadow:4px 4px 0 #000;}
+.final-poke img{width:72px;height:72px;object-fit:contain;}
 .title-start:hover{transform:translate(-2px,-2px);box-shadow:7px 7px 0 #000}
 .blink{animation:blink 1.2s step-end infinite;font-family:var(--pixel-font);font-size:clamp(.5rem,1.2vw,.65rem);letter-spacing:2px}
 
@@ -501,20 +519,20 @@ svg{max-width:100%;height:auto}
 <!-- TITLE -->
 <div id="title" class="screen active">
   <div class="title-logo">POKÉMON<br>MATH QUEST</div>
-  <div class="title-sub">⚡ Grade 2 Adventure ⚡</div>
-  <div class="title-hero">🥚</div>
-  <div class="title-desc">Start with an egg — answer math questions — EVOLVE your Pokémon team!</div>
+  <div class="title-sub"><img src="assets/kenney/ui/Medals/PNG/flatshadow_medal8.png" alt="Electric"/> Grade 2 Adventure</div>
+  <div class="title-hero"><img src="assets/kenney/backgrounds/Platformer Assets Base/PNG/Background/bg_castle.png" alt="Math Adventure"/></div>
+  <div class="title-desc">Ready your team, answer challenge math questions, and evolve through nine adventure zones.</div>
   <button class="title-start" onclick="startGame()">▶ START ADVENTURE!</button>
   <div class="blink" style="color:var(--white);margin-top:.5rem">PRESS START!</div>
 </div>
 
 <!-- POKÉDEX / ZONE SELECT -->
 <div id="pokedex" class="screen">
-  <div class="pdx-title">🗺️ POKÉMON MATH QUEST</div>
+  <div class="pdx-title"><img src="assets/kenney/ui/Medals/PNG/flatshadow_medal9.png" alt="Map"/> POKÉMON MATH QUEST</div>
   <div class="pdx-stars-total" id="pdxTotal">BADGES: 0 / 9</div>
   <div class="map-nav">
-    <button class="map-nav-btn" onclick="showScreen('pcBox');buildPCBox()">💾 PC BOX</button>
-    <button class="map-nav-btn" style="border-color:var(--red);color:var(--red)" onclick="confirmReset()">↺ RESET</button>
+    <button class="map-nav-btn" onclick="showScreen('pcBox');buildPCBox()"><img src="assets/kenney/ui/Medals/PNG/flatshadow_medal1.png" alt="PC"/> PC BOX</button>
+    <button class="map-nav-btn reset" onclick="confirmReset()"><img src="assets/kenney/ui/Medals/PNG/flatshadow_medal2.png" alt="Reset"/> RESET</button>
   </div>
   <div class="pdx-sub" id="pdxSub">Choose a zone to battle!</div>
   <div class="pdx-grid" id="pdxGrid"></div>
@@ -523,7 +541,7 @@ svg{max-width:100%;height:auto}
 <!-- GAME -->
 <div id="game" class="screen">
   <div class="battle-hud">
-    <div class="hud-poke" id="hudPoke">🥚</div>
+    <div class="hud-poke" id="hudPoke"><img src="assets/kenney/sprites/Generic Items/PNG/Colored/genericItem_color_057.png" alt="Pokémon"/></div>
     <div class="hud-info">
       <div class="hud-name" id="hudName">EGG</div>
       <div class="hud-hp-row">
@@ -558,7 +576,7 @@ svg{max-width:100%;height:auto}
 
 <!-- ZONE COMPLETE (no evolution) -->
 <div id="zoneOver" class="overlay hidden">
-  <div class="zo-star">⭐</div>
+  <div class="zo-star"><img src="assets/kenney/ui/Medals/PNG/flat_medal1.png" alt="Star"/></div>
   <div class="zo-title" id="zoTitle">ZONE CLEAR!</div>
   <div class="zo-score" id="zoScore">YOU GOT 8/8!</div>
   <div style="font-size:1rem;font-weight:800;color:rgba(255,255,255,.5)" id="zoSub">A BADGE HAS BEEN EARNED!</div>
@@ -568,7 +586,7 @@ svg{max-width:100%;height:auto}
 
 <!-- GAME OVER -->
 <div id="gameOver" class="overlay hidden">
-  <div class="go-skull">💀</div>
+  <div class="go-skull"><img src="assets/kenney/ui/Medals/PNG/flatshadow_medal4.png" alt="Fainted"/></div>
   <div class="go-title">YOUR POKÉMON FAINTED!</div>
   <div class="go-sub" id="goSub">You ran out of HP!<br>Try again with new questions!</div>
   <button class="pxbtn" style="background:var(--red);color:#fff;font-size:clamp(.55rem,1.4vw,.7rem)" onclick="retryZone()">▶ TRY AGAIN!</button>
@@ -577,8 +595,8 @@ svg{max-width:100%;height:auto}
 <!-- FINAL SCREEN -->
 <div id="finalScreen" class="screen">
   <div style="display:flex;flex-direction:column;align-items:center;gap:1.5rem;padding:2rem 1rem;width:100%">
-    <div class="final-title">🏆 YOU COMPLETED POKÉMON MATH QUEST! 🏆</div>
-    <div style="font-size:5rem;animation:spin360 2s ease-in-out 1">🏆</div>
+    <div class="final-title"><img src="assets/kenney/ui/Medals/PNG/flatshadow_medal9.png" alt="Champion"/> YOU COMPLETED POKÉMON MATH QUEST! <img src="assets/kenney/ui/Medals/PNG/flatshadow_medal9.png" alt="Champion"/></div>
+    <div style="font-size:5rem;animation:spin360 2s ease-in-out 1"><img src="assets/kenney/ui/Medals/PNG/flat_medal1.png" alt="Trophy" style="width:3rem;height:3rem;"/></div>
     <div style="font-family:var(--title-font);font-size:clamp(1.5rem,4vw,2.5rem);color:var(--gold)">YOUR FULL TEAM:</div>
     <div class="final-team" id="finalTeam"></div>
     <div style="font-size:1.1rem;font-weight:800;color:rgba(255,255,255,.7);text-align:center;max-width:480px;line-height:1.8">You mastered all 9 Math Zones!<br>You are a TRUE Pokémon Math Champion!</div>
@@ -601,6 +619,42 @@ const POKEMON_CHAIN = [
   {before:'🦊', after:'💧', name:'VAPOREON',   type:'WATER',    atk:'+16', def:'+16', spd:'+18'},
   {before:'💧', after:'⚡', name:'JOLTEON',    type:'ELECTRIC', atk:'+22', def:'+12', spd:'+30'},
 ];
+
+const ZONE_IMAGES = {
+  1: 'assets/kenney/backgrounds/Background Elements/PNG/Flat/house_front_tall.png',
+  2: 'assets/kenney/backgrounds/Background Elements/PNG/Flat/mountain2.png',
+  3: 'assets/kenney/backgrounds/Background Elements/PNG/Flat/tree06.png',
+  4: 'assets/kenney/backgrounds/Background Elements/PNG/Flat/castle.png',
+  5: 'assets/kenney/backgrounds/Background Elements/PNG/Flat/temple.png',
+  6: 'assets/kenney/backgrounds/Background Elements/PNG/Flat/grass2.png',
+  7: 'assets/kenney/backgrounds/Background Elements/PNG/Flat/tower.png',
+  8: 'assets/kenney/backgrounds/Background Elements/PNG/Flat/fence.png',
+  9: 'assets/kenney/backgrounds/Background Elements/PNG/Flat/tree07.png'
+};
+
+const BADGE_ICONS = {
+  1: 'assets/kenney/ui/Medals/PNG/flatshadow_medal1.png',
+  2: 'assets/kenney/ui/Medals/PNG/flatshadow_medal2.png',
+  3: 'assets/kenney/ui/Medals/PNG/flatshadow_medal3.png',
+  4: 'assets/kenney/ui/Medals/PNG/flatshadow_medal4.png',
+  5: 'assets/kenney/ui/Medals/PNG/flatshadow_medal5.png',
+  6: 'assets/kenney/ui/Medals/PNG/flatshadow_medal6.png',
+  7: 'assets/kenney/ui/Medals/PNG/flatshadow_medal7.png',
+  8: 'assets/kenney/ui/Medals/PNG/flatshadow_medal8.png',
+  9: 'assets/kenney/ui/Medals/PNG/flatshadow_medal9.png'
+};
+
+const POKEMON_ICONS = {
+  1: {before:'assets/kenney/sprites/Generic Items/PNG/Colored/genericItem_color_057.png', after:'assets/kenney/sprites/Generic Items/PNG/Colored/genericItem_color_058.png'},
+  2: {before:'assets/kenney/sprites/Generic Items/PNG/Colored/genericItem_color_059.png', after:'assets/kenney/sprites/Generic Items/PNG/Colored/genericItem_color_060.png'},
+  3: {before:'assets/kenney/sprites/Generic Items/PNG/Colored/genericItem_color_061.png', after:'assets/kenney/sprites/Generic Items/PNG/Colored/genericItem_color_062.png'},
+  4: {before:'assets/kenney/sprites/Generic Items/PNG/Colored/genericItem_color_063.png', after:'assets/kenney/sprites/Generic Items/PNG/Colored/genericItem_color_064.png'},
+  5: {before:'assets/kenney/sprites/Generic Items/PNG/Colored/genericItem_color_065.png', after:'assets/kenney/sprites/Generic Items/PNG/Colored/genericItem_color_066.png'},
+  6: {before:'assets/kenney/sprites/Generic Items/PNG/Colored/genericItem_color_067.png', after:'assets/kenney/sprites/Generic Items/PNG/Colored/genericItem_color_068.png'},
+  7: {before:'assets/kenney/sprites/Generic Items/PNG/Colored/genericItem_color_069.png', after:'assets/kenney/sprites/Generic Items/PNG/Colored/genericItem_color_070.png'},
+  8: {before:'assets/kenney/sprites/Generic Items/PNG/Colored/genericItem_color_071.png', after:'assets/kenney/sprites/Generic Items/PNG/Colored/genericItem_color_072.png'},
+  9: {before:'assets/kenney/sprites/Generic Items/PNG/Colored/genericItem_color_073.png', after:'assets/kenney/sprites/Generic Items/PNG/Colored/genericItem_color_074.png'}
+};
 
 const ZONE_DATA = [
   {id:1, name:'ADDITION FACTS\nTO 12',      emoji:'➕', bg:'bg-grass',     poke:'🌱', type:'mc',       unlocked:true},
@@ -648,6 +702,15 @@ const Z1_POOL = [
   {q:'What is 4 + 5?',  choices:['7','8','9','10'],    ans:2},
   {q:'What is 7 + 6?',  choices:['11','12','13','14'], ans:2},
   {q:'What is 8 + 5?',  choices:['11','12','13','14'], ans:2},
+  {q:'What is 3 + 6?',  choices:['9','8','10','11'],  ans:0},
+  {q:'What is 2 + 7?',  choices:['8','9','10','11'],  ans:1},
+  {q:'What is 4 + 6?',  choices:['8','9','10','11'],  ans:2},
+  {q:'What is 5 + 8?',  choices:['12','13','14','15'], ans:1},
+  {q:'___ + 5 = 13',    choices:['7','8','6','9'],  ans:1},
+  {q:'___ + 3 = 11',    choices:['8','7','6','9'],  ans:0},
+  {q:'Mia has 5 Roblox hats and gets 3 more. How many hats does she have?', choices:['7','8','9','10'], ans:1},
+  {q:'You have 4 stickers and your friend gives you 2 more. How many stickers now?', choices:['5','6','7','8'], ans:1},
+  {q:'There are 6 pets and 4 more join the party. How many pets are there?', choices:['9','10','11','12'], ans:1},
 ];
 
 // ZONE 2: Subtraction facts to 12
@@ -680,6 +743,10 @@ const Z2_POOL = [
   {q:'What is 11 − 7?', choices:['2','3','4','5'],    ans:2},
   {q:'What is 12 − 8?', choices:['2','3','4','5'],    ans:2},
   {q:'What is 10 − 9?', choices:['0','1','2','3'],    ans:1},
+  {q:'What is 8 − 3?',  choices:['3','4','5','6'],    ans:2},
+  {q:'What is 7 − 2?',  choices:['3','4','5','6'],    ans:2},
+  {q:'___ − 4 = 7',    choices:['9','10','11','12'],   ans:0},
+  {q:'What is 9 − 7?',  choices:['1','2','3','4'],    ans:1},
 ];
 
 // ZONE 3: Add & Subtract Tens
@@ -710,6 +777,14 @@ const Z3_POOL = [
   {q:'What is 39 + 10?', choices:['40','48','49','50'],  ans:2},
   {q:'What is 51 − 10?', choices:['40','41','42','50'],  ans:1},
   {q:'What is 68 + 10?', choices:['69','77','78','79'],  ans:2},
+  {q:'There are 30 players in a game and 10 more join. How many players now?', choices:['40','50','30','20'], ans:0},
+  {q:'You have 20 Robux and spend 10. How much is left?', choices:['10','15','20','30'], ans:0},
+  {q:'A friend has 50 coins and finds 10 more. How many coins total?', choices:['50','60','70','80'], ans:1},
+  {q:'What is 20 + 10?', choices:['20','30','40','50'],  ans:1},
+  {q:'What is 90 − 10?', choices:['70','80','90','100'], ans:1},
+  {q:'What is 40 − 10?', choices:['20','30','40','50'],  ans:1},
+  {q:'What is 33 + 10?', choices:['43','34','44','53'],  ans:0},
+  {q:'What is 66 − 10?', choices:['54','55','56','57'],  ans:2},
 ];
 
 // ZONE 4: Add & Subtract Hundreds
@@ -717,7 +792,9 @@ const Z4_POOL = [
   {q:'What is 300 + 100?', choices:['300','400','500','600'], ans:1},
   {q:'What is 700 − 100?', choices:['500','600','700','800'], ans:1},
   {q:'What is 245 + 100?', choices:['245','345','355','445'], ans:1},
+  {q:'A Roblox prize costs 300 and you add 100 more items. How many items do you have?', choices:['300','400','500','600'], ans:1},
   {q:'What is 862 − 100?', choices:['762','772','861','863'], ans:0},
+  {q:'A toy stack has 700 blocks and 100 are added. How many blocks now?', choices:['700','800','900','1000'], ans:1},
   {q:'What is 530 + 100?', choices:['540','620','630','640'], ans:2},
   {q:'What is 419 − 100?', choices:['309','319','320','418'], ans:1},
   {q:'What is 174 + 100?', choices:['175','264','274','284'], ans:2},
@@ -740,6 +817,10 @@ const Z4_POOL = [
   {q:'763 − 100 = ___',    choices:['663','673','762','764'], ans:0},
   {q:'What is 120 + 100?', choices:['121','200','220','221'], ans:2},
   {q:'What is 380 − 100?', choices:['270','280','290','381'], ans:1},
+  {q:'What is 250 + 100?', choices:['250','350','360','450'], ans:1},
+  {q:'What is 620 + 100?', choices:['620','720','820','920'], ans:1},
+  {q:'What is 810 − 100?', choices:['700','710','720','810'], ans:2},
+  {q:'What is 990 − 100?', choices:['890','900','910','990'], ans:0},
 ];
 
 // ZONE 5: Place Value to 999
@@ -770,6 +851,10 @@ const Z5_POOL = [
   {q:'What number is 2 hundreds, 8 tens, 6 ones?', choices:['286','268','628','682'], ans:0, num:286},
   {q:'In 951, how many TENS?', choices:['9','5','1','95'], ans:1, type:'tens', num:951},
   {q:'Which has a 3 in the hundreds place?', choices:['33','133','300','330'], ans:2},
+  {q:'What number is 4 hundreds, 5 tens, 2 ones?', choices:['452','425','542','524'], ans:0, num:452},
+  {q:'In 734, how many TENS?', choices:['7','3','4','73'], ans:1, type:'tens', num:734},
+  {q:'What is the value of the 3 in 639?', choices:['3','30','300','3000'], ans:1, num:639},
+  {q:'Which number has 2 ones?', choices:['512','520','250','215'], ans:0},
 ];
 
 // ZONE 6: Skip Counting
@@ -800,6 +885,9 @@ const Z6_POOL = [
   {q:'Count by 10s: 80, 90, ___, 110',choices:['95','98','100','105'],ans:2,rule:10,seq:[80,90,null,110]},
   {q:'Count by 2s: 30, 32, 34, ___', choices:['35','36','37','38'],ans:1, rule:2, seq:[30,32,34,null]},
   {q:'Count by 5s: 75, 80, 85, ___', choices:['86','88','90','95'],ans:2, rule:5, seq:[75,80,85,null]},
+  {q:'Count by 2s: 40, 42, 44, ___', choices:['45','46','47','48'],ans:1, rule:2, seq:[40,42,44,null]},
+  {q:'Count by 5s: 85, 90, 95, ___', choices:['96','97','98','100'],ans:3, rule:5, seq:[85,90,95,null]},
+  {q:'Count by 10s: 90, 100, 110, ___', choices:['110','120','130','140'], ans:1, rule:10, seq:[90,100,110,null]},
 ];
 
 // ZONE 7: Addition with Regrouping
@@ -832,6 +920,10 @@ const Z7_POOL = [
   {top:149, bot:382, op:'+', ans:531},
   {top:265, bot:447, op:'+', ans:712},
   {top:378, bot:143, op:'+', ans:521},
+  {top:84, bot:29, op:'+', ans:113},
+  {top:176, bot:239, op:'+', ans:415},
+  {top:467, bot:184, op:'+', ans:651},
+  {top:329, bot:276, op:'+', ans:605},
 ];
 
 // ZONE 8: Subtraction with Borrowing
@@ -864,6 +956,10 @@ const Z8_POOL = [
   {top:400, bot:278, op:'−', ans:122},
   {top:900, bot:364, op:'−', ans:536},
   {top:750, bot:483, op:'−', ans:267},
+  {top:94, bot:56, op:'−', ans:38},
+  {top:83, bot:47, op:'−', ans:36},
+  {top:715, bot:389, op:'−', ans:326},
+  {top:832, bot:475, op:'−', ans:357},
 ];
 
 // ZONE 9: 2D Shapes
@@ -894,6 +990,9 @@ const Z9_POOL = [
   {q:'Which has MORE sides — hexagon or pentagon?', choices:['Pentagon','Same','Hexagon','Neither'], ans:2},
   {q:'A quarter coin is shaped like a ___?',   choices:['Square','Triangle','Circle','Rectangle'], ans:2, shape:'circle'},
   {q:'How many corners does a rectangle have?',choices:['2','3','4','5'], ans:2, shape:'rectangle'},
+  {q:'Which shape has exactly 4 sides?',       choices:['Triangle','Square','Circle','Pentagon'], ans:1, shape:'square'},
+  {q:'How many corners does an octagon have?', choices:['6','7','8','9'], ans:2, shape:'octagon'},
+  {q:'A shape with 4 equal sides and right angles is a ___?', choices:['Square','Rhombus','Rectangle','Triangle'], ans:0, shape:'square'},
 ];
 
 // Shape SVG renderer
@@ -1011,8 +1110,10 @@ function buildMap(){
     const unlocked=isUnlocked(z.id);
     const done=badges[z.id]===true;
     const tile=document.createElement('div');
-    tile.className='pdx-card'+(unlocked?' unlocked':'locked');
-    tile.innerHTML=`<div class="pdx-zone">${z.id}</div><div class="pdx-emo">${done?(POKEMON_CHAIN[z.id-1].after):z.emoji}</div><div class="pdx-name">${z.name}</div><div class="pdx-star">${done?'⭐':'○'}</div>`;
+    tile.className='pdx-card'+(unlocked?' unlocked':' locked')+(done?' done':'');
+    const bgImage=ZONE_IMAGES[z.id] ? `linear-gradient(180deg,rgba(0,0,0,.14),rgba(0,0,0,.55)),url("${ZONE_IMAGES[z.id]}")` : '';
+    if(bgImage) tile.style.backgroundImage=bgImage;
+    tile.innerHTML=`<div class="pdx-zone">${z.id}</div><div class="pdx-emo"><img src="${BADGE_ICONS[z.id]}" alt="Zone ${z.id}"/></div><div class="pdx-name">${z.name}</div><div class="pdx-star">${done?'<img src="assets/kenney/ui/Medals/PNG/flat_medal1.png" alt="Badge earned"/>':'<img src="assets/kenney/ui/Medals/PNG/flat_medal9.png" alt="Locked"/>'}</div>`;
     if(unlocked) tile.onclick=()=>launchZone(z.id);
     grid.appendChild(tile);
   });
@@ -1028,8 +1129,8 @@ function launchZone(id){
   const z=ZONE_DATA[id-1];
   document.getElementById('gbg').className='gbg '+z.bg;
   const pc=POKEMON_CHAIN[id-1];
-  document.getElementById('hudPoke').textContent=pc.before;
-  document.getElementById('hudName').textContent=pc.before+' LVL'+(id);
+  document.getElementById('hudPoke').innerHTML=`<img src="${POKEMON_ICONS[id].before}" alt="${pc.name}"/>`;
+  document.getElementById('hudName').textContent=pc.name+' LVL '+id;
   document.getElementById('hudZone').textContent=z.name.replace('\n',' ');
   hideOverlays();
   showScreen('game');
@@ -1059,7 +1160,7 @@ function wrongAnswer(){
 
 function showGameOver(){
   const z=ZONE_DATA[currentZone-1];
-  document.getElementById('goSub').textContent=`You ran out of HP in\n${z.emoji} ${z.name.replace('\n',' ')}!\nTry again with new questions!`;
+  document.getElementById('goSub').textContent=`You ran out of HP in ${z.name.replace('\n',' ')}! Try again with fresh questions.`;
   document.getElementById('gameOver').classList.remove('hidden');
 }
 
@@ -1099,8 +1200,8 @@ function endZone(){
 // ── EVOLVE ────────────────────────────────────────────────────
 function showEvolve(){
   const pc=POKEMON_CHAIN[currentZone-1];
-  document.getElementById('evoBefore').textContent=pc.before;
-  document.getElementById('evoAfter').textContent=pc.after;
+  document.getElementById('evoBefore').innerHTML=`<img src="${POKEMON_ICONS[currentZone].before}" alt="${pc.before}"/>`;
+  document.getElementById('evoAfter').innerHTML=`<img src="${POKEMON_ICONS[currentZone].after}" alt="${pc.after}"/>`;
   document.getElementById('evoAfter').classList.remove('show');
   document.getElementById('evoName').textContent='✨ '+pc.name+' ✨';
   document.getElementById('evoType').textContent='TYPE: '+pc.type;
@@ -1124,7 +1225,7 @@ function retryZone(){hideOverlays();launchZone(currentZone);}
 // ── FINAL ─────────────────────────────────────────────────────
 function showFinalScreen(){
   const team=document.getElementById('finalTeam');team.innerHTML='';
-  POKEMON_CHAIN.forEach(pc=>{const d=document.createElement('div');d.className='final-poke';d.textContent=pc.after;team.appendChild(d);});
+  POKEMON_CHAIN.forEach((pc,index)=>{const d=document.createElement('div');d.className='final-poke';d.innerHTML=`<img src="${POKEMON_ICONS[index+1].after}" alt="${pc.name}"/><div>${pc.name}</div>`;team.appendChild(d);});
   showScreen('finalScreen');
 }
 function resetGame(){badges={};evolvedPokes={};pcData={zonePokes:{},wildCatches:[]};saveSave();buildMap();showScreen('pokedex');}

@@ -39,7 +39,7 @@ button{font-family:var(--body);font-weight:900;color:var(--ink);cursor:pointer}
    TITLE
 ══════════════════════════════════ */
 #title{
-  background:linear-gradient(180deg,#1a0a3d 0%,#2d1565 50%,#4c1d95 100%);
+  background:linear-gradient(180deg,rgba(26,10,61,.85) 0%,rgba(45,21,101,.85) 50%,rgba(76,29,149,.85) 100%),url('assets/kenney/backgrounds/Platformer Assets Base/PNG/Background/bg_castle.png') center/cover no-repeat;
   justify-content:center;align-items:center;text-align:center;
   gap:20px;padding:28px 16px;position:relative;overflow:hidden;
 }
@@ -52,9 +52,10 @@ button{font-family:var(--body);font-weight:900;color:var(--ink);cursor:pointer}
 .title-portals span{
   display:inline-flex;align-items:center;justify-content:center;
   width:60px;height:60px;border:3px solid var(--line);border-radius:16px;
-  background:#fff;box-shadow:0 5px 0 var(--line);font-size:2rem;
+  background:#fff;box-shadow:0 5px 0 var(--line);
   animation:bob 2.8s ease-in-out infinite;
 }
+.title-portals span img{width:100%;height:100%;object-fit:contain;}
 .title-portals span:nth-child(2){animation-delay:.2s}
 .title-portals span:nth-child(3){animation-delay:.4s}
 .title-portals span:nth-child(4){animation-delay:.6s}
@@ -115,8 +116,11 @@ button{font-family:var(--body);font-weight:900;color:var(--ink);cursor:pointer}
 .prog-fill{height:100%;background:linear-gradient(90deg,var(--green),#84cc16);border-radius:999px;transition:.3s}
 .game-wrap{width:100%;max-width:960px;padding:18px 14px 80px;display:flex;flex-direction:column;gap:14px;align-items:center}
 .event-bar{width:100%;font-size:clamp(1rem,2.5vw,1.25rem);font-weight:900;text-align:center;padding:10px 14px;border-radius:18px;background:#fff;border:3px solid var(--line);color:#374151}
+.world-scene{width:100%;max-width:960px;overflow:hidden;border-radius:28px;padding:12px;background:linear-gradient(180deg,#fffdf7,#f8f1e1);box-shadow:0 10px 0 rgba(31,41,55,.15),0 18px 28px rgba(31,41,55,.12);}
+.world-scene>svg{display:block;width:100%;height:auto;animation:bob 3.5s ease-in-out infinite;}
 
 /* question */
+.hud-icon img,.portal-art img,.world-scene img{width:100%;height:100%;object-fit:cover;display:block;border-radius:16px;}
 .q-card{width:100%;padding:20px}
 .q-card.wide{max-width:100%}
 .q-text{font-size:clamp(1.3rem,3.5vw,2rem);line-height:1.3;font-weight:900;text-align:center;color:#1f2937}
@@ -169,7 +173,13 @@ svg{max-width:100%;height:auto}
 <section id="title" class="screen active">
   <div class="title-card card">
     <div class="title-portals">
-      <span>🍬</span><span>🦒</span><span>🚀</span><span>🦊</span><span>👽</span><span>🎮</span><span>🎤</span>
+      <span><img src="assets/kenney/ui/Medals/PNG/flatshadow_medal1.png" alt="Badge"/></span>
+      <span><img src="assets/kenney/ui/Medals/PNG/flatshadow_medal2.png" alt="Badge"/></span>
+      <span><img src="assets/kenney/ui/Medals/PNG/flatshadow_medal3.png" alt="Badge"/></span>
+      <span><img src="assets/kenney/ui/Medals/PNG/flatshadow_medal4.png" alt="Badge"/></span>
+      <span><img src="assets/kenney/ui/Medals/PNG/flatshadow_medal5.png" alt="Badge"/></span>
+      <span><img src="assets/kenney/ui/Medals/PNG/flatshadow_medal6.png" alt="Badge"/></span>
+      <span><img src="assets/kenney/ui/Medals/PNG/flatshadow_medal7.png" alt="Badge"/></span>
     </div>
     <h1 class="game-title">Portal Park</h1>
     <p class="tagline">Seven worlds. Seven doors. Coins, hearts, and a badge waiting inside each one.</p>
@@ -205,6 +215,7 @@ svg{max-width:100%;height:auto}
     <div class="prog-wrap" style="flex-basis:100%"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
   </div>
   <main class="game-wrap">
+    <div class="world-scene card" id="worldScene"></div>
     <div class="event-bar" id="eventBar">Loading...</div>
     <div id="gameArea" style="width:100%;display:flex;flex-direction:column;gap:12px;align-items:center"></div>
   </main>
@@ -353,384 +364,28 @@ function svgBarChart(labels,values,colors,w=320,h=160){
 // WORLD PORTAL ART (SVG scenes)
 // ═══════════════════════════════════════════════════════
 const PORTAL_ART={
-  candy:`<svg viewBox="0 0 300 160" preserveAspectRatio="xMidYMid slice">
-    <defs><linearGradient id="csky" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#ffd6e8"/><stop offset="100%" stop-color="#fff0f8"/></linearGradient></defs>
-    <rect width="300" height="160" fill="url(#csky)"/>
-    <!-- rolling candy hills -->
-    <ellipse cx="80" cy="145" rx="90" ry="40" fill="#ffb3d1"/>
-    <ellipse cx="220" cy="148" rx="100" ry="38" fill="#ff80b0"/>
-    <!-- candy cane path -->
-    <path d="M30 160 Q50 100 70 120 Q90 140 110 100 Q130 60 150 90 Q170 120 190 80 Q210 40 230 70 Q250 100 270 60" stroke="#ff3399" stroke-width="8" fill="none" stroke-linecap="round"/>
-    <path d="M30 160 Q50 100 70 120 Q90 140 110 100 Q130 60 150 90 Q170 120 190 80 Q210 40 230 70 Q250 100 270 60" stroke="white" stroke-width="4" fill="none" stroke-linecap="round" stroke-dasharray="12 12"/>
-    <!-- gumdrops -->
-    <circle cx="60" cy="105" r="14" fill="#ff6eb4" stroke="#cc0066" stroke-width="2"/>
-    <circle cx="60" cy="105" r="7" fill="#ffaacc" opacity=".6"/>
-    <circle cx="140" cy="82" r="14" fill="#ff9f1c" stroke="#cc6600" stroke-width="2"/>
-    <circle cx="140" cy="82" r="7" fill="#ffd17c" opacity=".6"/>
-    <circle cx="220" cy="62" r="14" fill="#9b5de5" stroke="#6600cc" stroke-width="2"/>
-    <circle cx="220" cy="62" r="7" fill="#c77dff" opacity=".6"/>
-    <!-- candy cane poles -->
-    <rect x="88" y="70" width="8" height="50" rx="4" fill="white" stroke="#ff3399" stroke-width="1.5"/>
-    <rect x="88" y="70" width="8" height="10" rx="4" fill="#ff3399"/>
-    <rect x="88" y="90" width="8" height="10" rx="4" fill="#ff3399"/>
-    <rect x="88" y="110" width="8" height="10" rx="4" fill="#ff3399"/>
-    <!-- lollipop -->
-    <line x1="255" y1="155" x2="255" y2="85" stroke="#cc44aa" stroke-width="3"/>
-    <circle cx="255" cy="80" r="18" fill="#ff6eb4" stroke="#cc0066" stroke-width="2"/>
-    <path d="M255 62 A18 18 0 0 1 273 80" stroke="white" stroke-width="5" fill="none" stroke-linecap="round"/>
-    <!-- stars/sparkles -->
-    <text x="170" y="45" font-size="18" fill="#ff3399" opacity=".8">✦</text>
-    <text x="40" y="55" font-size="14" fill="#ff9f1c" opacity=".8">✧</text>
-  </svg>`,
-
-  animals:`<svg viewBox="0 0 300 160" preserveAspectRatio="xMidYMid slice">
-    <defs>
-      <linearGradient id="asky" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#ff9f1c"/><stop offset="40%" stop-color="#ffbf69"/><stop offset="100%" stop-color="#e07b39"/></linearGradient>
-    </defs>
-    <rect width="300" height="160" fill="url(#asky)"/>
-    <!-- sun -->
-    <circle cx="240" cy="30" r="22" fill="#ffd166" opacity=".9"/>
-    <circle cx="240" cy="30" r="16" fill="#ffec8b"/>
-    <!-- savanna ground -->
-    <ellipse cx="150" cy="175" rx="180" ry="55" fill="#c8843a"/>
-    <ellipse cx="150" cy="168" rx="180" ry="42" fill="#d4924a"/>
-    <!-- grass tufts -->
-    <g fill="#7cb518">
-      <path d="M20 135 Q22 115 24 135"/><path d="M23 135 Q26 110 29 135"/>
-      <path d="M80 130 Q82 112 84 130"/><path d="M83 130 Q86 108 89 130"/>
-      <path d="M200 128 Q202 110 204 128"/><path d="M203 128 Q206 106 209 128"/>
-    </g>
-    <!-- acacia tree -->
-    <rect x="118" y="80" width="10" height="60" fill="#8b4513"/>
-    <ellipse cx="123" cy="68" rx="32" ry="18" fill="#5a8a1a"/>
-    <ellipse cx="105" cy="72" rx="20" ry="12" fill="#4a7a14"/>
-    <ellipse cx="142" cy="72" rx="20" ry="12" fill="#4a7a14"/>
-    <!-- giraffe simplified -->
-    <rect x="38" y="72" width="8" height="52" rx="3" fill="#f4a030"/>
-    <rect x="38" y="62" width="8" height="16" rx="3" fill="#f4a030"/>
-    <!-- giraffe spots -->
-    <rect x="39" y="75" width="5" height="5" rx="1" fill="#c87820" opacity=".7"/>
-    <rect x="40" y="88" width="4" height="4" rx="1" fill="#c87820" opacity=".7"/>
-    <rect x="38" y="100" width="5" height="5" rx="1" fill="#c87820" opacity=".7"/>
-    <!-- head -->
-    <rect x="36" y="54" width="12" height="10" rx="4" fill="#f4a030"/>
-    <line x1="40" y1="54" x2="40" y2="48" stroke="#f4a030" stroke-width="3"/>
-    <line x1="46" y1="54" x2="46" y2="48" stroke="#f4a030" stroke-width="3"/>
-    <!-- elephant -->
-    <ellipse cx="218" cy="122" rx="26" ry="22" fill="#9e9e9e"/>
-    <circle cx="210" cy="106" r="16" fill="#ababab"/>
-    <!-- trunk -->
-    <path d="M205 115 Q195 120 192 132 Q196 136 200 132 Q200 124 208 118" fill="#9e9e9e" stroke="#888" stroke-width="1"/>
-    <circle cx="197" cy="108" r="4" fill="#888"/><!-- eye -->
-    <!-- zebra -->
-    <ellipse cx="265" cy="128" rx="18" ry="14" fill="white" stroke="#333" stroke-width="1.5"/>
-    <circle cx="258" cy="116" r="10" fill="white" stroke="#333" stroke-width="1.5"/>
-    <path d="M260 110 L258 104" stroke="#333" stroke-width="2.5"/>
-    <path d="M263 109 L262 103" stroke="#333" stroke-width="2.5"/>
-    <!-- zebra stripes -->
-    <path d="M250 120 Q255 115 260 120" stroke="#333" stroke-width="2" fill="none"/>
-    <path d="M255 128 Q260 122 267 127" stroke="#333" stroke-width="2" fill="none"/>
-    <circle cx="257" cy="115" r="2" fill="#333"/>
-  </svg>`,
-
-  space:`<svg viewBox="0 0 300 160" preserveAspectRatio="xMidYMid slice">
-    <defs>
-      <radialGradient id="spaceBg" cx="50%" cy="50%" r="70%"><stop offset="0%" stop-color="#1a1a4e"/><stop offset="100%" stop-color="#050520"/></radialGradient>
-      <radialGradient id="planetGlow" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#ff6b35"/><stop offset="100%" stop-color="#cc3300"/></radialGradient>
-    </defs>
-    <rect width="300" height="160" fill="url(#spaceBg)"/>
-    <!-- stars -->
-    <g fill="white">
-      <circle cx="15" cy="12" r="1.5"/><circle cx="40" cy="28" r="1"/><circle cx="75" cy="8" r="2"/>
-      <circle cx="110" cy="18" r="1.5"/><circle cx="155" cy="5" r="1"/><circle cx="190" cy="22" r="2"/>
-      <circle cx="225" cy="10" r="1.5"/><circle cx="265" cy="18" r="1"/><circle cx="285" cy="8" r="2"/>
-      <circle cx="30" cy="50" r="1"/><circle cx="95" cy="40" r="1.5"/><circle cx="175" cy="38" r="1"/>
-      <circle cx="248" cy="45" r="1.5"/><circle cx="280" cy="55" r="1"/>
-      <circle cx="8" cy="80" r="1"/><circle cx="52" cy="72" r="1.5"/><circle cx="130" cy="65" r="1"/>
-    </g>
-    <!-- milky way streak -->
-    <path d="M0 70 Q75 55 150 70 Q225 85 300 68" stroke="rgba(200,200,255,.18)" stroke-width="18" fill="none"/>
-    <!-- big planet -->
-    <circle cx="72" cy="88" r="38" fill="#e8621a"/>
-    <ellipse cx="72" cy="88" rx="38" ry="38" fill="url(#planetGlow)"/>
-    <!-- planet bands -->
-    <path d="M34 80 Q72 74 110 80" stroke="#c84a08" stroke-width="7" fill="none" opacity=".6"/>
-    <path d="M36 92 Q72 98 108 92" stroke="#ff8844" stroke-width="5" fill="none" opacity=".5"/>
-    <!-- planet rings -->
-    <ellipse cx="72" cy="88" rx="56" ry="12" fill="none" stroke="#f0a060" stroke-width="5" opacity=".7"/>
-    <ellipse cx="72" cy="88" rx="56" ry="12" fill="none" stroke="#ffcf9e" stroke-width="2" opacity=".4"/>
-    <!-- rocket -->
-    <path d="M218 130 L225 70 L232 130 Z" fill="#e8e8f0" stroke="#555" stroke-width="1.5"/>
-    <rect x="219" y="108" width="12" height="24" rx="2" fill="#c8c8d8" stroke="#555" stroke-width="1.5"/>
-    <!-- rocket window -->
-    <circle cx="225" cy="98" r="5" fill="#66aaff" stroke="#3366cc" stroke-width="1.5"/>
-    <!-- rocket flame -->
-    <path d="M220 132 Q225 148 230 132" fill="#ff6600" opacity=".85"/>
-    <path d="M221 132 Q225 143 229 132" fill="#ffcc00"/>
-    <!-- rocket fins -->
-    <path d="M219 128 L213 136 L219 128" fill="#aaaacc" stroke="#555" stroke-width="1"/>
-    <path d="M231 128 L237 136 L231 128" fill="#aaaacc" stroke="#555" stroke-width="1"/>
-    <!-- moon -->
-    <circle cx="260" cy="45" r="20" fill="#f0e8c8" stroke="#d4c090" stroke-width="1.5"/>
-    <circle cx="253" cy="38" r="5" fill="#e0d4aa" opacity=".6"/>
-    <circle cx="266" cy="50" r="4" fill="#e0d4aa" opacity=".5"/>
-    <circle cx="258" cy="54" r="3" fill="#e0d4aa" opacity=".5"/>
-    <!-- small planet -->
-    <circle cx="155" cy="110" r="15" fill="#9b5de5"/>
-    <path d="M140 108 Q155 104 170 108" stroke="#6a0dad" stroke-width="4" fill="none" opacity=".6"/>
-  </svg>`,
-
-  zootopia:`<svg viewBox="0 0 300 160" preserveAspectRatio="xMidYMid slice">
-    <defs>
-      <linearGradient id="zsky" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#87ceeb"/><stop offset="100%" stop-color="#b0e0ff"/></linearGradient>
-    </defs>
-    <rect width="300" height="160" fill="url(#zsky)"/>
-    <!-- city buildings back -->
-    <rect x="0" y="55" width="40" height="105" fill="#5b8fd4"/>
-    <rect x="5" y="45" width="30" height="20" fill="#4a7ec3"/>
-    <!-- windows -->
-    <g fill="#ffd166" opacity=".8">
-      <rect x="8" y="58" width="7" height="7" rx="1"/>
-      <rect x="20" y="58" width="7" height="7" rx="1"/>
-      <rect x="8" y="72" width="7" height="7" rx="1"/>
-      <rect x="20" y="72" width="7" height="7" rx="1"/>
-      <rect x="8" y="86" width="7" height="7" rx="1"/>
-      <rect x="20" y="86" width="7" height="7" rx="1"/>
-    </g>
-    <rect x="44" y="35" width="50" height="125" fill="#7d9ec0"/>
-    <rect x="48" y="25" width="42" height="16" fill="#6888aa"/>
-    <g fill="#fef3c7" opacity=".85">
-      <rect x="50" y="40" width="10" height="10" rx="1"/>
-      <rect x="66" y="40" width="10" height="10" rx="1"/>
-      <rect x="80" y="40" width="8" height="10" rx="1"/>
-      <rect x="50" y="57" width="10" height="10" rx="1"/>
-      <rect x="66" y="57" width="10" height="10" rx="1"/>
-      <rect x="50" y="74" width="10" height="10" rx="1"/>
-      <rect x="66" y="74" width="10" height="10" rx="1"/>
-      <rect x="80" y="74" width="8" height="10" rx="1"/>
-    </g>
-    <!-- big center tower -->
-    <rect x="105" y="20" width="65" height="140" fill="#9ab8d4"/>
-    <polygon points="105,20 137,0 170,20" fill="#7da0bc"/>
-    <rect x="128" y="25" width="18" height="18" rx="2" fill="#ffd166" opacity=".9"/>
-    <g fill="#fef3c7" opacity=".85">
-      <rect x="110" y="48" width="12" height="12" rx="1"/>
-      <rect x="130" y="48" width="12" height="12" rx="1"/>
-      <rect x="150" y="48" width="12" height="12" rx="1"/>
-      <rect x="110" y="68" width="12" height="12" rx="1"/>
-      <rect x="130" y="68" width="12" height="12" rx="1"/>
-      <rect x="150" y="68" width="12" height="12" rx="1"/>
-      <rect x="110" y="88" width="12" height="12" rx="1"/>
-      <rect x="130" y="88" width="12" height="12" rx="1"/>
-      <rect x="150" y="88" width="12" height="12" rx="1"/>
-    </g>
-    <!-- right buildings -->
-    <rect x="178" y="45" width="45" height="115" fill="#6888b8"/>
-    <g fill="#fef3c7" opacity=".8">
-      <rect x="183" y="52" width="10" height="10" rx="1"/>
-      <rect x="198" y="52" width="10" height="10" rx="1"/>
-      <rect x="210" y="52" width="8" height="10" rx="1"/>
-      <rect x="183" y="70" width="10" height="10" rx="1"/>
-      <rect x="198" y="70" width="10" height="10" rx="1"/>
-    </g>
-    <rect x="228" y="60" width="38" height="100" fill="#8aaac8"/>
-    <g fill="#fef3c7" opacity=".8">
-      <rect x="232" y="68" width="9" height="9" rx="1"/>
-      <rect x="247" y="68" width="9" height="9" rx="1"/>
-      <rect x="232" y="84" width="9" height="9" rx="1"/>
-      <rect x="247" y="84" width="9" height="9" rx="1"/>
-    </g>
-    <rect x="268" y="50" width="32" height="110" fill="#5878a8"/>
-    <!-- street -->
-    <rect x="0" y="138" width="300" height="22" fill="#555"/>
-    <rect x="0" y="147" width="300" height="4" fill="#666"/>
-    <!-- dashes -->
-    <g fill="#ffd166"><rect x="30" y="149" width="20" height="2" rx="1"/><rect x="80" y="149" width="20" height="2" rx="1"/><rect x="130" y="149" width="20" height="2" rx="1"/><rect x="180" y="149" width="20" height="2" rx="1"/><rect x="230" y="149" width="20" height="2" rx="1"/></g>
-    <!-- ZPD sign -->
-    <rect x="192" y="108" width="60" height="26" rx="6" fill="#2563eb" stroke="#1e40af" stroke-width="2"/>
-    <text x="222" y="126" text-anchor="middle" font-family="sans-serif" font-size="13" font-weight="900" fill="white">ZPD</text>
-  </svg>`,
-
-  stitch:`<svg viewBox="0 0 300 160" preserveAspectRatio="xMidYMid slice">
-    <defs>
-      <linearGradient id="ssky" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#0096c7"/><stop offset="60%" stop-color="#48cae4"/><stop offset="100%" stop-color="#90e0ef"/></linearGradient>
-    </defs>
-    <rect width="300" height="160" fill="url(#ssky)"/>
-    <!-- sun rays -->
-    <g stroke="#ffd166" stroke-width="3" opacity=".35">
-      <line x1="255" y1="28" x2="245" y2="8"/><line x1="255" y1="28" x2="272" y2="12"/>
-      <line x1="255" y1="28" x2="278" y2="28"/><line x1="255" y1="28" x2="270" y2="44"/>
-    </g>
-    <circle cx="255" cy="28" r="18" fill="#ffd166"/>
-    <!-- ocean -->
-    <path d="M0 118 Q50 108 100 118 Q150 128 200 118 Q250 108 300 118 L300 160 L0 160 Z" fill="#0077b6"/>
-    <path d="M0 122 Q40 115 80 122 Q120 129 160 122 Q200 115 240 122 Q270 129 300 124 L300 160 L0 160 Z" fill="#0096c7" opacity=".6"/>
-    <!-- palm trees -->
-    <rect x="30" y="75" width="8" height="60" rx="3" fill="#8b6343"/>
-    <ellipse cx="34" cy="68" rx="28" ry="14" fill="#52b788" transform="rotate(-15 34 68)"/>
-    <ellipse cx="34" cy="68" rx="25" ry="12" fill="#74c69d" transform="rotate(10 34 68)"/>
-    <ellipse cx="34" cy="68" rx="22" ry="10" fill="#52b788" transform="rotate(-30 34 68)"/>
-    <rect x="245" y="85" width="7" height="50" rx="3" fill="#8b6343"/>
-    <ellipse cx="248" cy="78" rx="24" ry="12" fill="#52b788" transform="rotate(-10 248 78)"/>
-    <ellipse cx="248" cy="78" rx="22" ry="11" fill="#74c69d" transform="rotate(15 248 78)"/>
-    <!-- Stitch simplified face -->
-    <ellipse cx="148" cy="105" rx="36" ry="32" fill="#0077b6"/>
-    <!-- body blue -->
-    <ellipse cx="148" cy="118" rx="30" ry="22" fill="#0096c7"/>
-    <!-- big blue head -->
-    <circle cx="148" cy="88" r="30" fill="#0077b6"/>
-    <!-- ears -->
-    <ellipse cx="122" cy="65" rx="10" ry="18" fill="#0077b6" transform="rotate(-20 122 65)"/>
-    <ellipse cx="122" cy="65" rx="6" ry="12" fill="#48cae4" transform="rotate(-20 122 65)"/>
-    <ellipse cx="174" cy="65" rx="10" ry="18" fill="#0077b6" transform="rotate(20 174 65)"/>
-    <ellipse cx="174" cy="65" rx="6" ry="12" fill="#48cae4" transform="rotate(20 174 65)"/>
-    <!-- face -->
-    <ellipse cx="148" cy="92" rx="22" ry="18" fill="#48cae4" opacity=".5"/>
-    <!-- eyes -->
-    <circle cx="138" cy="82" r="7" fill="white"/>
-    <circle cx="158" cy="82" r="7" fill="white"/>
-    <circle cx="139" cy="83" r="4" fill="#1a1a2e"/>
-    <circle cx="159" cy="83" r="4" fill="#1a1a2e"/>
-    <circle cx="140" cy="81" r="1.5" fill="white"/>
-    <circle cx="160" cy="81" r="1.5" fill="white"/>
-    <!-- nose -->
-    <ellipse cx="148" cy="90" rx="5" ry="3.5" fill="#1a3a5c"/>
-    <!-- smile -->
-    <path d="M136 97 Q148 106 160 97" stroke="#1a3a5c" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-    <!-- claws/feet suggestion -->
-    <path d="M125 125 Q118 135 122 140" stroke="#0066aa" stroke-width="4" fill="none" stroke-linecap="round"/>
-    <path d="M135 128 Q130 138 132 144" stroke="#0066aa" stroke-width="4" fill="none" stroke-linecap="round"/>
-    <path d="M165 128 Q168 138 166 144" stroke="#0066aa" stroke-width="4" fill="none" stroke-linecap="round"/>
-    <!-- Hawaii flower -->
-    <circle cx="52" cy="108" r="8" fill="#ff6eb4"/>
-    <circle cx="52" cy="108" r="4" fill="#ffd166"/>
-    <circle cx="44" cy="108" r="6" fill="#ff9f1c" opacity=".8"/>
-    <circle cx="60" cy="108" r="6" fill="#ff9f1c" opacity=".8"/>
-    <circle cx="52" cy="100" r="6" fill="#ff9f1c" opacity=".8"/>
-    <circle cx="52" cy="116" r="6" fill="#ff9f1c" opacity=".8"/>
-    <!-- 626 tag -->
-    <rect x="168" y="58" width="34" height="18" rx="5" fill="#e63946" stroke="#9b1c1c" stroke-width="1.5"/>
-    <text x="185" y="71" text-anchor="middle" font-family="sans-serif" font-size="10" font-weight="900" fill="white">626</text>
-  </svg>`,
-
-  roblox:`<svg viewBox="0 0 300 160" preserveAspectRatio="xMidYMid slice">
-    <defs>
-      <linearGradient id="rbg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1a1a1a"/><stop offset="100%" stop-color="#2d2d2d"/></linearGradient>
-    </defs>
-    <rect width="300" height="160" fill="url(#rbg)"/>
-    <!-- game tile grid background -->
-    <g opacity=".15" stroke="#fff" stroke-width=".5">
-      <line x1="0" y1="40" x2="300" y2="40"/><line x1="0" y1="80" x2="300" y2="80"/>
-      <line x1="0" y1="120" x2="300" y2="120"/>
-      <line x1="75" y1="0" x2="75" y2="160"/><line x1="150" y1="0" x2="150" y2="160"/>
-      <line x1="225" y1="0" x2="225" y2="160"/>
-    </g>
-    <!-- ROBLOX logo area -->
-    <rect x="90" y="12" width="120" height="36" rx="6" fill="#ff0000"/>
-    <text x="150" y="38" text-anchor="middle" font-family="sans-serif" font-size="22" font-weight="900" fill="white" letter-spacing="1">ROBLOX</text>
-    <!-- game tiles -->
-    <!-- adopt me tile -->
-    <rect x="8" y="56" width="68" height="58" rx="8" fill="#ff94c2" stroke="#ff5f9e" stroke-width="2"/>
-    <text x="42" y="78" text-anchor="middle" font-size="22" fill="white">🐣</text>
-    <text x="42" y="96" text-anchor="middle" font-family="sans-serif" font-size="8" font-weight="900" fill="white">Adopt Me!</text>
-    <rect x="10" y="106" width="64" height="5" rx="2" fill="rgba(255,255,255,.3)"/>
-    <!-- blox fruits tile -->
-    <rect x="84" y="56" width="68" height="58" rx="8" fill="#2563eb" stroke="#1d4ed8" stroke-width="2"/>
-    <text x="118" y="78" text-anchor="middle" font-size="22" fill="white">⚔️</text>
-    <text x="118" y="96" text-anchor="middle" font-family="sans-serif" font-size="8" font-weight="900" fill="white">Blox Fruits</text>
-    <rect x="86" y="106" width="64" height="5" rx="2" fill="rgba(255,255,255,.3)"/>
-    <!-- obby tile -->
-    <rect x="160" y="56" width="68" height="58" rx="8" fill="#16a34a" stroke="#15803d" stroke-width="2"/>
-    <text x="194" y="78" text-anchor="middle" font-size="22" fill="white">🏃</text>
-    <text x="194" y="96" text-anchor="middle" font-family="sans-serif" font-size="8" font-weight="900" fill="white">Tower Obby</text>
-    <rect x="162" y="106" width="64" height="5" rx="2" fill="rgba(255,255,255,.3)"/>
-    <!-- avatar tile -->
-    <rect x="236" y="56" width="58" height="58" rx="8" fill="#7c3aed" stroke="#6d28d9" stroke-width="2"/>
-    <text x="265" y="78" text-anchor="middle" font-size="22" fill="white">👾</text>
-    <text x="265" y="96" text-anchor="middle" font-family="sans-serif" font-size="8" font-weight="900" fill="white">My Avatar</text>
-    <rect x="238" y="106" width="54" height="5" rx="2" fill="rgba(255,255,255,.3)"/>
-    <!-- Robux counter -->
-    <rect x="8" y="122" width="284" height="30" rx="8" fill="#1a1a1a" stroke="#444" stroke-width="1.5"/>
-    <text x="150" y="143" text-anchor="middle" font-family="sans-serif" font-size="13" font-weight="900" fill="#00b06f">💎 Robux: 0</text>
-  </svg>`,
-
-  katseye:`<svg viewBox="0 0 300 160" preserveAspectRatio="xMidYMid slice">
-    <defs>
-      <linearGradient id="kbg" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#1a0535"/><stop offset="50%" stop-color="#4a0a80"/><stop offset="100%" stop-color="#2d0070"/></linearGradient>
-      <radialGradient id="spotG" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="rgba(255,255,255,.18)"/><stop offset="100%" stop-color="rgba(255,255,255,0)"/></radialGradient>
-    </defs>
-    <rect width="300" height="160" fill="url(#kbg)"/>
-    <!-- spotlights -->
-    <path d="M60 0 L20 160 L100 160 Z" fill="url(#spotG)"/>
-    <path d="M150 0 L110 160 L190 160 Z" fill="url(#spotG)"/>
-    <path d="M240 0 L200 160 L280 160 Z" fill="url(#spotG)"/>
-    <!-- stage floor -->
-    <rect x="0" y="130" width="300" height="30" fill="#0d001a" opacity=".8"/>
-    <!-- stage floor reflection lines -->
-    <g stroke="rgba(180,100,255,.2)" stroke-width="1">
-      <line x1="0" y1="135" x2="300" y2="135"/>
-      <line x1="0" y1="140" x2="300" y2="140"/>
-      <line x1="0" y1="145" x2="300" y2="145"/>
-    </g>
-    <!-- KATSEYE logo arc -->
-    <path d="M50 40 Q150 10 250 40" stroke="#d4a0ff" stroke-width="3" fill="none" opacity=".8"/>
-    <text x="150" y="38" text-anchor="middle" font-family="sans-serif" font-size="18" font-weight="900" fill="#e879f9" letter-spacing="4">KATSEYE</text>
-    <!-- lightsticks row -->
-    <g>
-      <!-- lightstick 1 -->
-      <rect x="22" y="88" width="10" height="36" rx="4" fill="#d4a0ff"/>
-      <ellipse cx="27" cy="88" rx="6" ry="10" fill="#e879f9"/>
-      <circle cx="27" cy="88" r="5" fill="#f0abfc" opacity=".8"/>
-      <!-- lightstick 2 -->
-      <rect x="52" y="82" width="10" height="42" rx="4" fill="#c084fc"/>
-      <ellipse cx="57" cy="82" rx="6" ry="10" fill="#a855f7"/>
-      <circle cx="57" cy="82" r="5" fill="#d8b4fe" opacity=".8"/>
-      <!-- lightstick 3 -->
-      <rect x="82" y="90" width="10" height="34" rx="4" fill="#e879f9"/>
-      <ellipse cx="87" cy="90" rx="6" ry="10" fill="#d946ef"/>
-      <circle cx="87" cy="90" r="5" fill="#f0abfc" opacity=".8"/>
-      <!-- right side -->
-      <rect x="200" y="86" width="10" height="38" rx="4" fill="#d4a0ff"/>
-      <ellipse cx="205" cy="86" rx="6" ry="10" fill="#e879f9"/>
-      <circle cx="205" cy="86" r="5" fill="#f0abfc" opacity=".8"/>
-      <rect x="228" y="80" width="10" height="44" rx="4" fill="#c084fc"/>
-      <ellipse cx="233" cy="80" rx="6" ry="10" fill="#a855f7"/>
-      <circle cx="233" cy="80" r="5" fill="#d8b4fe" opacity=".8"/>
-      <rect x="258" y="88" width="10" height="36" rx="4" fill="#e879f9"/>
-      <ellipse cx="263" cy="88" rx="6" ry="10" fill="#d946ef"/>
-      <circle cx="263" cy="88" r="5" fill="#f0abfc" opacity=".8"/>
-    </g>
-    <!-- 6 member silhouettes on stage -->
-    <g fill="#2d0060" opacity=".85">
-      <ellipse cx="112" cy="120" rx="7" ry="18"/><rect x="107" y="104" width="10" height="5" rx="5"/>
-      <ellipse cx="130" cy="118" rx="7" ry="18"/><rect x="125" y="102" width="10" height="5" rx="5"/>
-      <ellipse cx="148" cy="122" rx="7" ry="18"/><rect x="143" y="106" width="10" height="5" rx="5"/>
-      <ellipse cx="166" cy="119" rx="7" ry="18"/><rect x="161" y="103" width="10" height="5" rx="5"/>
-      <ellipse cx="184" cy="121" rx="7" ry="18"/><rect x="179" y="105" width="10" height="5" rx="5"/>
-    </g>
-    <!-- stars sparkles -->
-    <g fill="#f0abfc">
-      <text x="130" y="70" font-size="14">✦</text>
-      <text x="158" y="62" font-size="10">✧</text>
-      <text x="170" y="74" font-size="14">✦</text>
-    </g>
-    <!-- STAR fandom text -->
-    <text x="150" y="158" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="700" fill="#d4a0ff" letter-spacing="4">★ STAR FANDOM ★</text>
-  </svg>`
+  candy:`<img src="assets/kenney/backgrounds/Background Elements/PNG/Flat/castle.png" alt="Candy Land portal"/>`,
+  animals:`<img src="assets/kenney/backgrounds/Background Elements/PNG/Flat/tree07.png" alt="Wild Safari portal"/>`,
+  space:`<img src="assets/kenney/backgrounds/Background Elements/PNG/moon_full.png" alt="Space Mission portal"/>`,
+  zootopia:`<img src="assets/kenney/backgrounds/Background Elements/PNG/Flat/house_front_tall.png" alt="Zootopia portal"/>`,
+  stitch:`<img src="assets/kenney/backgrounds/Background Elements/PNG/Flat/temple.png" alt="Stitch portal"/>`,
+  roblox:`<img src="assets/kenney/backgrounds/Platformer Assets Base/PNG/Background/bg_castle.png" alt="Roblox portal"/>`,
+  katseye:`<img src="assets/kenney/backgrounds/Platformer Assets Base/PNG/Background/bg.png" alt="Katseye portal"/>`
 };
 
 // ═══════════════════════════════════════════════════════
 // HUD ICON SVGs (tiny versions)
 // ═══════════════════════════════════════════════════════
 const HUD_ICONS={
-  candy:`<svg viewBox="0 0 60 60"><rect width="60" height="60" fill="#ffe0f0"/><circle cx="30" cy="30" r="14" fill="#ff6eb4" stroke="#cc0066" stroke-width="2"/><circle cx="30" cy="30" r="7" fill="#ffaacc" opacity=".7"/></svg>`,
-  animals:`<svg viewBox="0 0 60 60"><rect width="60" height="60" fill="#fff3d6"/><ellipse cx="30" cy="35" rx="14" ry="12" fill="#f4a030"/><circle cx="30" cy="20" r="10" fill="#f4a030"/><rect x="26" y="10" width="4" height="8" rx="2" fill="#f4a030"/><rect x="32" y="10" width="4" height="8" rx="2" fill="#f4a030"/></svg>`,
-  space:`<svg viewBox="0 0 60 60"><rect width="60" height="60" fill="#1a1a4e"/><circle cx="30" cy="30" r="16" fill="#e8621a"/><ellipse cx="30" cy="30" rx="24" ry="5" fill="none" stroke="#f0a060" stroke-width="3" opacity=".7"/><g fill="white"><circle cx="10" cy="10" r="1.5"/><circle cx="50" cy="8" r="1"/><circle cx="8" cy="50" r="1"/><circle cx="52" cy="48" r="1.5"/></g></svg>`,
-  zootopia:`<svg viewBox="0 0 60 60"><rect width="60" height="60" fill="#b0d4f0"/><rect x="8" y="20" width="18" height="40" fill="#5b8fd4"/><rect x="28" y="10" width="24" height="50" fill="#9ab8d4"/><polygon points="28,10 40,0 52,10" fill="#7da0bc"/><rect x="0" y="50" width="60" height="10" fill="#555"/><rect x="32" y="42" width="10" height="18" rx="2" fill="#2563eb"/></svg>`,
-  stitch:`<svg viewBox="0 0 60 60"><rect width="60" height="60" fill="#90e0ef"/><circle cx="30" cy="28" r="20" fill="#0077b6"/><ellipse cx="18" cy="15" rx="6" ry="11" fill="#0077b6" transform="rotate(-20 18 15)"/><ellipse cx="42" cy="15" rx="6" ry="11" fill="#0077b6" transform="rotate(20 42 15)"/><circle cx="22" cy="24" r="5" fill="white"/><circle cx="38" cy="24" r="5" fill="white"/><circle cx="23" cy="25" r="3" fill="#111"/><circle cx="39" cy="25" r="3" fill="#111"/></svg>`,
-  roblox:`<svg viewBox="0 0 60 60"><rect width="60" height="60" fill="#1a1a1a" rx="8"/><rect x="10" y="12" width="40" height="18" rx="4" fill="#ff0000"/><text x="30" y="26" text-anchor="middle" font-size="10" font-weight="900" fill="white">ROBLOX</text><rect x="8" y="35" width="20" height="18" rx="4" fill="#ff94c2"/><rect x="32" y="35" width="20" height="18" rx="4" fill="#2563eb"/></svg>`,
-  katseye:`<svg viewBox="0 0 60 60"><rect width="60" height="60" fill="#2d0060"/><text x="30" y="22" text-anchor="middle" font-size="8" font-weight="900" fill="#e879f9" letter-spacing="2">KATSEYE</text><rect x="20" y="28" width="8" height="22" rx="3" fill="#c084fc"/><ellipse cx="24" cy="28" rx="4" ry="7" fill="#e879f9"/><rect x="32" y="30" width="8" height="20" rx="3" fill="#c084fc"/><ellipse cx="36" cy="30" rx="4" ry="7" fill="#e879f9"/></svg>`
+  candy:`<img src="assets/kenney/ui/Medals/PNG/flatshadow_medal1.png" alt="Candy icon"/>`,
+  animals:`<img src="assets/kenney/ui/Medals/PNG/flatshadow_medal2.png" alt="Animals icon"/>`,
+  space:`<img src="assets/kenney/ui/Medals/PNG/flatshadow_medal3.png" alt="Space icon"/>`,
+  zootopia:`<img src="assets/kenney/ui/Medals/PNG/flatshadow_medal4.png" alt="Zootopia icon"/>`,
+  stitch:`<img src="assets/kenney/ui/Medals/PNG/flatshadow_medal5.png" alt="Stitch icon"/>`,
+  roblox:`<img src="assets/kenney/ui/Medals/PNG/flatshadow_medal6.png" alt="Roblox icon"/>`,
+  katseye:`<img src="assets/kenney/ui/Medals/PNG/flatshadow_medal7.png" alt="Katseye icon"/>`
 };
+
 
 // ═══════════════════════════════════════════════════════
 // PORTALS CONFIG
@@ -773,9 +428,9 @@ function goHub(){buildHub();show("hub")}
 
 function buildHub(){
   state.rank=1+Math.floor(Object.keys(state.badges).length/2);
-  document.getElementById("rankStat").textContent="🌟 Rank "+state.rank;
-  document.getElementById("coinStat").textContent="Coins: "+state.coins;
-  document.getElementById("badgeStat").textContent="🏅 "+Object.keys(state.badges).length+" / "+PORTALS.length;
+  document.getElementById("rankStat").innerHTML=`<img src="assets/kenney/ui/Medals/PNG/flatshadow_medal1.png" alt="Rank"/> Rank ${state.rank}`;
+  document.getElementById("coinStat").innerHTML=`<img src="assets/kenney/sprites/Generic Items/PNG/Colored/genericItem_color_057.png" alt="Coins"/> Coins: ${state.coins}`;
+  document.getElementById("badgeStat").innerHTML=`<img src="assets/kenney/ui/Medals/PNG/flatshadow_medal5.png" alt="Badges"/> ${Object.keys(state.badges).length} / ${PORTALS.length}`;
   const grid=document.getElementById("portalGrid");grid.innerHTML="";
   PORTALS.forEach(p=>{
     const done=state.badges[p.id];
@@ -798,6 +453,7 @@ function launch(id){
   deck=sh(current.types.flatMap(t=>makeBank(t))).slice(0,8);
   document.getElementById("hudIcon").innerHTML=HUD_ICONS[id];
   document.getElementById("hudName").textContent=current.name;
+  document.getElementById("worldScene").innerHTML = PORTAL_ART[id] || "";
   document.getElementById("game").style.background="";
   show("game");updateHud();renderQ();
 }
@@ -805,7 +461,7 @@ function launch(id){
 function updateHud(){
   document.getElementById("hudQ").textContent=`Challenge ${qIdx+1} of ${deck.length}`;
   document.getElementById("hearts").textContent="❤️".repeat(hearts)+"🤍".repeat(Math.max(0,3-hearts));
-  document.getElementById("hudCoins").textContent="Coins: "+state.coins;
+  document.getElementById("hudCoins").innerHTML=`<img src="assets/kenney/sprites/Generic Items/PNG/Colored/genericItem_color_057.png" alt="Coins"/> ${state.coins}`;
   document.getElementById("progFill").style.width=(qIdx/deck.length*100)+"%";
   document.getElementById("eventBar").textContent=rand(EVENTS[current.id]);
 }
@@ -1038,11 +694,15 @@ function moneyBank(){
     {coins:[{f:svgQuarter,v:25},{f:svgQuarter,v:25}],total:50},
     {coins:[{f:svgPenny,v:1},{f:svgNickel,v:5},{f:svgDime,v:10}],total:16},
     {coins:[{f:svgQuarter,v:25},{f:svgDime,v:10},{f:svgNickel,v:5}],total:40},
+    {coins:[{f:svgQuarter,v:25},{f:svgQuarter,v:25},{f:svgDime,v:10}],total:60},
+    {coins:[{f:svgQuarter,v:25},{f:svgDime,v:10},{f:svgNickel,v:5},{f:svgPenny,v:1}],total:41},
+    {coins:[{f:svgQuarter,v:25},{f:svgQuarter,v:25},{f:svgNickel,v:5}],total:55},
+    {coins:[{f:svgDime,v:10},{f:svgDime,v:10},{f:svgNickel,v:5},{f:svgPenny,v:1},{f:svgPenny,v:1}],total:27},
   ];
   combos.forEach(combo=>{
     const t=combo.total;
     const visual=combo.coins.map(c=>c.f(60)).join('');
-    const w1=[t+5,t-5,t+10].filter(x=>x>0&&x!==t);
+    const w1=[t+5,t-5,t+10,t-10].filter(x=>x>0&&x!==t).slice(0,3);
     qs.push({q:"How much money is shown?",
       choices:sh([t+"¢",...w1.map(x=>x+"¢")]),
       ans:0,visual,
@@ -1050,11 +710,12 @@ function moneyBank(){
     });
   });
   // change problems
-  [[25,30],[35,40],[40,50],[60,75],[50,55]].forEach(([cost,pay])=>{
+  [[25,30],[35,40],[40,50],[60,75],[50,55],[18,25],[47,50],[65,100]].forEach(([cost,pay])=>{
     const change=pay-cost;
     qs.push(mc(`A snack costs ${cost}¢. You pay ${pay}¢. How much change do you get?`,
       [change+"¢",(change+5)+"¢",(change-5)+"¢",(change+10)+"¢"],0,svgPenny(70)+svgNickel(70)));
   });
+  qs.push(mc("You buy a Roblox hat for 40¢ and pay 50¢. How much change do you get?",["5¢","10¢","15¢","20¢"],1,svgPenny(70)+svgNickel(70)));
   return sh(qs);
 }
 
@@ -1088,13 +749,26 @@ function timeBank(){
       get ans(){return this.choices.indexOf(`${h}:15`)}
     });
   });
+  // quarter to
+  [1,3,5,7,9,11].forEach(h=>{
+    qs.push({
+      q:"What time does this clock show?",
+      visual:svgClock(h,45),
+      choices:sh([`${h}:45`,`${h}:15`,`${h}:30`,`${h===12?1:h+1}:00`]),
+      get ans(){return this.choices.indexOf(`${h}:45`)}
+    });
+  });
   // elapsed time
-  [[8,0,1,`9:00`],[3,30,1,`4:30`],[11,15,0.5,`11:45`]].forEach(([h,m,addH,ans])=>{
+  [[8,0,1,`9:00`],[3,30,1,`4:30`],[11,15,0.5,`11:45`],[2,30,1,`3:30`],[6,45,0.5,`7:15`]].forEach(([h,m,addH,ans])=>{
     qs.push(mc(`A movie starts at ${h}:${m===0?"00":m}. It lasts ${addH===0.5?"30 minutes":"1 hour"}. When does it end?`,
       [ans,`${h}:00`,`${h+2}:00`,`${h-1}:00`],0,svgClock(h,m)));
   });
+  qs.push(mc("A Roblox game starts at 2:00 and lasts 1 hour. What time does it end?",["2:30","3:00","4:00","1:00"],1,svgClock(2,0)));
+  qs.push(mc("A game starts at 4:30 and ends at 5:00. How long did it last?",["15 minutes","20 minutes","30 minutes","45 minutes"],2,svgClock(4,30)));
+
   qs.push(mc("How many minutes are in one hour?",["60","30","100","24"],0,svgClock(1,0)));
-  qs.push(mc("How many hours are in one day?",["24","12","60","48"],0,svgClock(12,0)));
+  qs.push(mc("How many minutes are in half an hour?",["60","30","15","45"],0,svgClock(1,30)));
+  qs.push(mc("How many hours are in two days?",["24","12","48","36"],2,svgClock(12,0)));
   return sh(qs);
 }
 
@@ -1113,6 +787,10 @@ function fracBank(){
     mc("You share a cake equally with 1 friend. Each gets…",["1/2","1/4","1/3","1 whole"],0,"🎂"),
     mc("What does the bottom number in a fraction tell you?",["Total equal parts","Parts eaten","The whole number","The color"],0,"🔢"),
     mc("A pie is cut into 4 equal pieces. 2 are eaten. What fraction is left?",["2/4","1/4","3/4","4/4"],0,"🥧"),
+    mc("Which fraction shows one third?",["1/3","1/2","1/4","3/4"],0,"🍰"),
+    mc("What fraction is equal to 2/4?",["1/2","2/4","3/4","1/4"],0,"🍕"),
+    mc("Which is smaller — 1/3 or 1/2?",["1/3","1/2","same","can't tell"],0,"📏"),
+    mc("You shade 3 of 6 equal parts. What fraction is shaded?",["3/6","1/6","2/6","4/6"],0,"🎨"),
   ]);
 }
 
@@ -1124,8 +802,9 @@ function measureBank(){
     mc("Which unit measures a football field?",["yards","inches","centimeters","millimeters"],0,"🏈"),
     mc("How many inches are in 1 foot?",["12","6","10","24"],0,"📏"),
     mc("How many feet are in 1 yard?",["3","2","4","12"],0,"📐"),
-    mc("Which is longest?",["1 yard","1 foot","1 inch","1 centimeter"],0,"📏"),
-    mc("Which tool measures length?",["ruler","thermometer","scale","clock"],0,"📏"),
+    mc("How many inches are in 2 feet?",["24","12","18","20"],0,"📏"),
+    mc("How many feet are in 2 yards?",["3","6","9","12"],1,"📐"),
+    mc("A crate is 36 inches long. How many feet is that?",["3","4","6","9"],0,"📦"),
     mc("Which tool measures weight?",["scale","ruler","thermometer","clock"],0,"⚖️"),
     mc("Which tool measures temperature?",["thermometer","ruler","scale","clock"],0,"🌡️"),
     mc("A door is about ___ tall.",["7 feet","7 inches","7 miles","7 yards"],0,"🚪"),
@@ -1151,6 +830,9 @@ function graphBank(){
     {labels:["Boys","Girls"],values:[12,9],q:"students",q2:"students"},
     {labels:["Red","Blue"],values:[5,8],q:"color votes",q2:"votes"},
     {labels:["Bikes","Cars"],values:[4,9],q:"vehicles",q2:"vehicles"},
+    {labels:["Books","Games"],values:[5,8],q:"items",q2:"items"},
+    {labels:["Cookies","Cakes"],values:[7,9],q:"treats",q2:"treats"},
+    {labels:["Trucks","Bikes"],values:[3,7],q:"vehicles",q2:"vehicles"},
   ];
   const colors=["#3b82f6","#f59e0b","#10b981","#ef4444","#8b5cf6","#ec4899","#f97316","#06b6d4"];
   datasets.forEach((d,di)=>{
@@ -1588,7 +1270,9 @@ function fracCircleBank(){
 // ── BASE-10 BLOCK QUESTIONS ───────────────────────────
 function base10Bank(){
   const nums=[
-    [2,3,5],[1,4,7],[3,0,2],[2,5,0],[1,8,3],[4,2,6],[3,6,1],[2,0,8],[1,1,4],[3,3,9]
+    [2,3,5],[1,4,7],[3,0,2],[2,5,0],[1,8,3],[4,2,6],[3,6,1],[2,0,8],[1,1,4],[3,3,9],
+    [2,4,9],[3,5,7],[4,6,8],[5,7,9],[6,8,1],[7,9,2],[8,1,3],[9,2,4],[1,2,7],[2,4,6],
+    [3,5,9],[4,7,8],[5,8,4],[6,9,5],[7,3,1],[8,4,2],[9,5,6],[1,3,2],[2,6,4],[3,7,8]
   ];
   const qs=[];
   nums.forEach(([h,t,o])=>{
@@ -1624,6 +1308,9 @@ function pictographBank(){
     {labels:["🌞 Sunny","🌧️ Rainy"],values:[6,2],icon:"⭐",key:2},
     {labels:["🍕 Pizza","🌮 Tacos"],values:[4,6],icon:"🍽️",key:2},
     {labels:["Boys","Girls"],values:[8,10],icon:"👤",key:2},
+    {labels:["🥛 Milk","🧃 Juice"],values:[5,7],icon:"🥤",key:1},
+    {labels:["🚚 Trucks","🚌 Buses"],values:[4,6],icon:"🚍",key:1},
+    {labels:["📚 Books","🧸 Toys"],values:[3,8],icon:"📦",key:1},
   ];
   sets.forEach(s=>{
     const [la,lb]=[s.labels[0],s.labels[1]];
